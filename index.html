@@ -107,22 +107,23 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
 
-        .role-pill-switch {
+        .role-pill-switch-3 {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             background: #f1f5f9;
             border-radius: 12px;
             padding: 4px;
             margin-bottom: 20px;
+            gap: 2px;
         }
 
         .role-pill-btn {
             border: none;
             background: transparent;
-            padding: 10px;
+            padding: 9px 4px;
             border-radius: 10px;
             font-weight: 700;
-            font-size: 0.88rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             cursor: pointer;
         }
@@ -319,9 +320,10 @@
 
         <!-- 1. ലോഗിൻ വ്യൂ -->
         <div id="viewLogin">
-            <div class="role-pill-switch">
+            <div class="role-pill-switch-3">
                 <button class="role-pill-btn active" id="btnRoleStudent" onclick="setRole('student')">👨‍🎓 വിദ്യാർത്ഥി</button>
-                <button class="role-pill-btn" id="btnRoleAdmin" onclick="setRole('admin')">👨‍🍳 അഡ്മിൻ</button>
+                <button class="role-pill-btn" id="btnRoleStaff" onclick="setRole('staff')">👨‍🍳 സ്റ്റാഫ്</button>
+                <button class="role-pill-btn" id="btnRoleAdmin" onclick="setRole('admin')">👑 അഡ്മിൻ</button>
             </div>
 
             <form id="formLogin" class="card">
@@ -337,8 +339,10 @@
                 <button type="submit" class="btn-main">പ്രവേശിക്കുക</button>
             </form>
 
-            <div style="background: #eef2ff; border-radius: 12px; padding: 14px; font-size: 0.82rem; color: #4338ca; line-height: 1.5;">
-                💡 <b>അഡ്മിൻ ലോഗിൻ:</b> User: <code>admin</code> | Pass: <code>admin123</code>
+            <div style="background: #eef2ff; border-radius: 12px; padding: 14px; font-size: 0.8rem; color: #4338ca; line-height: 1.5;">
+                💡 <b>ഡീഫോൾട്ട് ലോഗിനുകൾ:</b><br>
+                • അഡ്മിൻ: <code>admin</code> / <code>admin123</code><br>
+                • സ്റ്റാഫ്: <code>staff</code> / <code>staff123</code>
             </div>
         </div>
 
@@ -377,6 +381,16 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- വിദ്യാർത്ഥിയുടെ പാസ്‌വേഡ് മാറ്റൽ ഫോം -->
+                <form id="formStudentChangePass" class="card">
+                    <h3 style="margin-top:0; font-size:0.95rem;">🔐 പാസ്‌വേഡ് മാറ്റുക (Change Password)</h3>
+                    <div class="form-group">
+                        <label>പുതിയ പാസ്‌വേഡ്:</label>
+                        <input type="password" id="inStuNewPass" placeholder="പുതിയ പാസ്‌വേഡ് നൽകുക" required>
+                    </div>
+                    <button type="submit" class="btn-main" style="background:#475569;">പാസ്‌വേഡ് അപ്‌ഡേറ്റ് ചെയ്യുക</button>
+                </form>
             </div>
 
             <div id="stuTabRent" class="hidden">
@@ -399,15 +413,15 @@
             </div>
         </div>
 
-        <!-- 3. അഡ്മിൻ ഡാഷ്‌ബോർഡ് -->
+        <!-- 3. അഡ്മിൻ & സ്റ്റാഫ് ഷെയർ ചെയ്യുന്ന ഡാഷ്‌ബോർഡ് വ്യൂ -->
         <div id="viewAdmin" class="hidden">
             <div id="admTabOverview">
-                <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                <div id="secOrderSwitch" class="card" style="display:flex; justify-content:space-between; align-items:center;">
                     <div>
                         <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">ഓർഡർ വിൻഡോ</div>
                         <span id="badgeAdminOrderActive" class="badge open" style="margin-top:4px;">🟢 OPEN</span>
                     </div>
-                    <div style="display:flex; gap:6px;">
+                    <div id="grpOrderSwitchBtns" style="display:flex; gap:6px;">
                         <button class="btn-action-sm" style="background:#dcfce7; color:#15803d;" onclick="setOrderActive(true)">Start</button>
                         <button class="btn-action-sm" style="background:#fee2e2; color:#b91c1c;" onclick="setOrderActive(false)">Close</button>
                     </div>
@@ -431,13 +445,14 @@
                     </div>
                 </div>
 
-                <div style="margin-bottom: 16px;">
+                <div id="secResetOrders" style="margin-bottom: 16px;">
                     <button class="btn-main warning" onclick="adminResetOrders()">
                         🔄 ഇന്നത്തെ ഭക്ഷണ ഓർഡറുകൾ റീസെറ്റ് ചെയ്യുക (Reset)
                     </button>
                 </div>
 
-                <div class="card">
+                <!-- അഡ്മിന് മാത്രം കാണേണ്ട ഫിനാൻസ് കാർഡ് -->
+                <div id="secAdminFinance" class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                         <label style="margin:0;">📅 മാസം തിരഞ്ഞെടുക്കുക:</label>
                         <select id="selectFinanceMonth" style="width:auto; padding:6px 10px; font-size:0.85rem;" onchange="renderAdmin()"></select>
@@ -457,7 +472,36 @@
                         </div>
                     </div>
 
-                    <button class="btn-main" style="background:#f1f5f9; color:var(--text-dark); font-size:0.85rem;" onclick="exportCSV()">📥 എക്സൽ (CSV) റിപ്പോർട്ട് ഡൗൺലോഡ്</button>
+                    <button class="btn-main" style="background:#f1f5f9; color:var(--text-dark); font-size:0.85rem; margin-bottom:10px;" onclick="exportCSV()">📥 എക്സൽ (CSV) റിപ്പോർട്ട് ഡൗൺലോഡ്</button>
+                </div>
+
+                <!-- പാസ്‌വേഡ് മാനേജ്‌മെന്റ് (അഡ്മിന് മാത്രം) -->
+                <div id="secAdminSecurity">
+                    <form id="formAdminChangeCreds" class="card">
+                        <h3 style="margin-top:0; font-size:0.95rem;">👑 അഡ്മിൻ പാസ്‌വേഡ് മാറ്റുക</h3>
+                        <div class="form-group">
+                            <label>അഡ്മിൻ യൂസർനെയിം:</label>
+                            <input type="text" id="inAdmNewUser" required>
+                        </div>
+                        <div class="form-group">
+                            <label>പുതിയ പാസ്‌വേഡ്:</label>
+                            <input type="password" id="inAdmNewPass" placeholder="പുതിയ പാസ്‌വേഡ്" required>
+                        </div>
+                        <button type="submit" class="btn-main success" style="font-size:0.85rem;">💾 അഡ്മിൻ വിവരങ്ങൾ സേവ് ചെയ്യുക</button>
+                    </form>
+
+                    <form id="formStaffChangeCreds" class="card">
+                        <h3 style="margin-top:0; font-size:0.95rem;">👨‍🍳 സ്റ്റാഫ് ലോഗിൻ വിവരങ്ങൾ മാറ്റുക</h3>
+                        <div class="form-group">
+                            <label>സ്റ്റാഫ് യൂസർനെയിം:</label>
+                            <input type="text" id="inStaffNewUser" required>
+                        </div>
+                        <div class="form-group">
+                            <label>സ്റ്റാഫ് പാസ്‌വേഡ്:</label>
+                            <input type="password" id="inStaffNewPass" placeholder="പുതിയ പാസ്‌വേഡ്" required>
+                        </div>
+                        <button type="submit" class="btn-main" style="background:#0284c7; font-size:0.85rem;">💾 സ്റ്റാഫ് വിവരങ്ങൾ സേവ് ചെയ്യുക</button>
+                    </form>
                 </div>
             </div>
 
@@ -553,7 +597,7 @@
         </div>
     </div>
 
-    <!-- വിവരങ്ങൾ എഡിറ്റ് ചെയ്യാനുള്ള ബോക്സ് (Edit Modal) -->
+    <!-- വിവരങ്ങൾ എഡിറ്റ് ചെയ്യാനുള്ള ബോക്സ് -->
     <div id="modalEditStudent" class="modal-overlay hidden" onclick="handleEditBackdropClick(event)">
         <div class="modal-card">
             <div class="modal-header">
@@ -613,7 +657,8 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const ADMIN_CRED = { id: "admin", pass: "admin123" };
+    let adminCredentials = { user: "admin", pass: "admin123" };
+    let staffCredentials = { user: "staff", pass: "staff123" };
 
     function getCurMonthKey() {
         const d = new Date();
@@ -648,7 +693,7 @@
                 loadStudentData();
             }
         }
-        if (currentRole === 'admin') {
+        if (currentRole === 'admin' || currentRole === 'staff') {
             renderAdmin();
         }
     });
@@ -658,9 +703,29 @@
             const data = doc.data();
             dailyMenuText = data.menu || "";
             isOrderActive = data.isOrderActive ?? true;
+            if (data.adminUser && data.adminPass) {
+                adminCredentials = { user: data.adminUser, pass: data.adminPass };
+            }
+            if (data.staffUser && data.staffPass) {
+                staffCredentials = { user: data.staffUser, pass: data.staffPass };
+            }
+
+            document.getElementById('inAdmNewUser').value = adminCredentials.user;
+            document.getElementById('inAdmNewPass').value = adminCredentials.pass;
+            document.getElementById('inStaffNewUser').value = staffCredentials.user;
+            document.getElementById('inStaffNewPass').value = staffCredentials.pass;
             
             if (currentUser && currentRole === 'student') loadStudentData();
-            if (currentRole === 'admin') renderAdmin();
+            if (currentRole === 'admin' || currentRole === 'staff') renderAdmin();
+        } else {
+            db.collection("settings").doc("mess_state").set({
+                adminUser: "admin",
+                adminPass: "admin123",
+                staffUser: "staff",
+                staffPass: "staff123",
+                isOrderActive: true,
+                menu: dailyMenuText
+            });
         }
     });
 
@@ -689,9 +754,22 @@
         currentRole = role;
         document.getElementById('inputRole').value = role;
         document.getElementById('btnRoleStudent').classList.toggle('active', role === 'student');
+        document.getElementById('btnRoleStaff').classList.toggle('active', role === 'staff');
         document.getElementById('btnRoleAdmin').classList.toggle('active', role === 'admin');
-        document.getElementById('labelLoginId').innerText = role === 'student' ? 'Student ID (റൂം നമ്പർ):' : 'അഡ്മിൻ യൂസർനെയിം:';
-        document.getElementById('inputLoginId').placeholder = role === 'student' ? 'ഉദാ: H101' : 'അഡ്മിൻ ഐഡി';
+
+        const lbl = document.getElementById('labelLoginId');
+        const inp = document.getElementById('inputLoginId');
+
+        if(role === 'student') {
+            lbl.innerText = 'Student ID (റൂം നമ്പർ):';
+            inp.placeholder = 'ഉദാ: H101';
+        } else if(role === 'staff') {
+            lbl.innerText = 'സ്റ്റാഫ് യൂസർനെയിം:';
+            inp.placeholder = 'സ്റ്റാഫ് ഐഡി';
+        } else {
+            lbl.innerText = 'അഡ്മിൻ യൂസർനെയിം:';
+            inp.placeholder = 'അഡ്മിൻ ഐഡി';
+        }
     }
 
     document.getElementById('formLogin').addEventListener('submit', function(e) {
@@ -700,11 +778,18 @@
         const inputPass = document.getElementById('inputLoginPass').value.trim();
 
         if (currentRole === 'admin') {
-            if (inputId.toLowerCase() === ADMIN_CRED.id.toLowerCase() && inputPass === ADMIN_CRED.pass) {
+            if (inputId.toLowerCase() === adminCredentials.user.toLowerCase() && inputPass === adminCredentials.pass) {
                 currentUser = { role: 'admin' };
                 showView('admin');
             } else {
                 alert('അഡ്മിൻ യൂസർനെയിം അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
+            }
+        } else if (currentRole === 'staff') {
+            if (inputId.toLowerCase() === staffCredentials.user.toLowerCase() && inputPass === staffCredentials.pass) {
+                currentUser = { role: 'staff' };
+                showView('staff');
+            } else {
+                alert('സ്റ്റാഫ് യൂസർനെയിം അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
             }
         } else {
             const stu = students.find(s => 
@@ -741,9 +826,31 @@
                 <button class="nav-item" onclick="switchStuTab('rent', this)"><span class="icon">💳</span>വാടക</button>
             `;
             loadStudentData();
+        } else if (role === 'staff') {
+            document.getElementById('viewAdmin').classList.remove('hidden');
+            document.getElementById('appSubHeader').innerText = "👨‍🍳 സ്റ്റാഫ് പാനൽ (Food Service)";
+
+            // സ്റ്റാഫിന് വേണ്ടാത്തവ മറയ്ക്കുന്നു
+            document.getElementById('secResetOrders').classList.add('hidden');
+            document.getElementById('secAdminFinance').classList.add('hidden');
+            document.getElementById('secAdminSecurity').classList.add('hidden');
+            document.getElementById('grpOrderSwitchBtns').classList.add('hidden');
+
+            bottomBar.innerHTML = `
+                <button class="nav-item active" id="btnNavAdmDash" onclick="switchAdmTab('overview', this)"><span class="icon">📊</span>ഡാഷ്‌ബോർഡ്</button>
+                <button class="nav-item" id="btnNavAdmScan" onclick="switchAdmTab('scanner', this)"><span class="icon">📷</span>സ്കാനർ</button>
+                <button class="nav-item" id="btnNavAdmRent" onclick="switchAdmTab('rent', this)"><span class="icon">🍲</span>ലിസ്റ്റ്</button>
+            `;
+            renderAdmin();
         } else {
             document.getElementById('viewAdmin').classList.remove('hidden');
-            document.getElementById('appSubHeader').innerText = "അഡ്മിൻ ക്ലൗഡ് പാനൽ";
+            document.getElementById('appSubHeader').innerText = "👑 അഡ്മിൻ ക്ലൗഡ് പാനൽ";
+
+            // അഡ്മിന് എല്ലാം കാണിക്കുന്നു
+            document.getElementById('secResetOrders').classList.remove('hidden');
+            document.getElementById('secAdminFinance').classList.remove('hidden');
+            document.getElementById('secAdminSecurity').classList.remove('hidden');
+            document.getElementById('grpOrderSwitchBtns').classList.remove('hidden');
 
             bottomBar.innerHTML = `
                 <button class="nav-item active" id="btnNavAdmDash" onclick="switchAdmTab('overview', this)"><span class="icon">📊</span>ഡാഷ്‌ബോർഡ്</button>
@@ -818,6 +925,61 @@
         });
     });
 
+    // വിദ്യാർത്ഥി പാസ്‌വേഡ് മാറ്റൽ
+    document.getElementById('formStudentChangePass').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const newP = document.getElementById('inStuNewPass').value.trim();
+        if(newP.length < 3) {
+            alert('പാസ്‌വേഡ് കുറഞ്ഞത് 3 അക്ഷരങ്ങൾ വേണം.');
+            return;
+        }
+
+        db.collection("students").doc(currentUser.docId).update({
+            pass: newP
+        }).then(() => {
+            alert('നിങ്ങളുടെ പാസ്‌വേഡ് വിജയകരമായി മാറ്റി!');
+            document.getElementById('inStuNewPass').value = '';
+        });
+    });
+
+    // അഡ്മിൻ പാസ്‌വേഡ് മാറ്റൽ
+    document.getElementById('formAdminChangeCreds').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const newU = document.getElementById('inAdmNewUser').value.trim();
+        const newP = document.getElementById('inAdmNewPass').value.trim();
+
+        if(!newU || !newP) {
+            alert('യൂസർനെയിമും പാസ്‌വേഡും നൽകുക.');
+            return;
+        }
+
+        db.collection("settings").doc("mess_state").set({
+            adminUser: newU,
+            adminPass: newP
+        }, { merge: true }).then(() => {
+            alert('അഡ്മിൻ യൂസർനെയിമും പാസ്‌വേഡും വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്തു!');
+        });
+    });
+
+    // സ്റ്റാഫ് പാസ്‌വേഡ് മാറ്റൽ
+    document.getElementById('formStaffChangeCreds').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const newU = document.getElementById('inStaffNewUser').value.trim();
+        const newP = document.getElementById('inStaffNewPass').value.trim();
+
+        if(!newU || !newP) {
+            alert('സ്റ്റാഫ് വിവരങ്ങൾ നൽകുക.');
+            return;
+        }
+
+        db.collection("settings").doc("mess_state").set({
+            staffUser: newU,
+            staffPass: newP
+        }, { merge: true }).then(() => {
+            alert('സ്റ്റാഫ് ലോഗിൻ വിവരങ്ങൾ അപ്‌ഡേറ്റ് ചെയ്തു!');
+        });
+    });
+
     function renderStudentQR() {
         const qrBox = document.getElementById('boxStudentQR');
         const qrContainer = document.getElementById('qrcodeContainer');
@@ -872,6 +1034,7 @@
     }
 
     function filterByPaymentCard(mode) {
+        if(currentRole === 'staff') return;
         filterMode = mode;
         const rentNavBtn = document.getElementById('btnNavAdmRent');
         switchAdmTab('rent', rentNavBtn);
@@ -1024,34 +1187,52 @@
                 foodStatusBadge = '<span class="badge" style="background:#f1f5f9; color:#94a3b8;">ഓർഡറില്ല</span>';
             }
 
-            card.innerHTML = `
-                <div class="item-row-top">
-                    <div>
-                        <b style="font-size:0.95rem;">${s.name}</b> <small style="color:var(--text-muted); font-weight:700;">(${s.id})</small>
-                        <div style="font-size:0.75rem; color:var(--text-muted);">Due: ${calculateDueDate(s.joinDate)} | വാടക: ₹${amt}</div>
+            if(currentRole === 'staff') {
+                // സ്റ്റാഫിനുള്ള ലളിതമായ വ്യൂ (ഭക്ഷണം സെർവ് ചെയ്യാൻ മാത്രം)
+                card.innerHTML = `
+                    <div class="item-row-top">
+                        <div>
+                            <b style="font-size:0.95rem;">${s.name}</b> <small style="color:var(--text-muted); font-weight:700;">(റൂം: ${s.id})</small>
+                        </div>
+                        <div>${foodStatusBadge}</div>
                     </div>
-                    <span class="badge ${isPaid ? 'paid' : 'unpaid'}">${isPaid ? 'PAID ✓' : 'PENDING'}</span>
-                </div>
-                
-                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin:2px 0;">
-                    <div>ഭക്ഷണ നില: ${foodStatusBadge}</div>
-                    ${s.hasFoodOrder && !s.isServed ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}')">✓ Serve</button>` : ''}
-                </div>
-
-                <div class="item-actions">
-                    <label style="display:flex; align-items:center; gap:4px; font-size:0.78rem; font-weight:700; cursor:pointer;">
-                        <input type="checkbox" class="pay-checkbox" ${isPaid ? 'checked' : ''} onchange="togglePay('${s.docId}', '${selMonth}', this.checked)"> വാടക അടച്ചു
-                    </label>
-
-                    <div style="margin-left:auto; display:flex; gap:6px;">
-                        <button class="btn-action-sm edit" onclick="openEditModal(${idx})">✏️ എഡിറ്റ്</button>
-                        <button class="btn-action-sm info" onclick="openDetailsModal(${idx})">📋</button>
-                        ${!isPaid && s.phone ? `<a href="https://wa.me/91${s.phone}?text=${waMsg}" target="_blank" style="text-decoration:none;"><button class="btn-action-sm whatsapp">📲 WA</button></a>` : ''}
-                        <button class="btn-action-sm ${s.isBlocked ? 'unlock' : 'block'}" onclick="toggleBlock('${s.docId}', ${!s.isBlocked})">${s.isBlocked ? '🔓' : '🚫'}</button>
-                        <button class="btn-action-sm" style="background:#f1f5f9; color:#94a3b8;" onclick="deleteStudent('${s.docId}')">🗑️</button>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                        <span style="font-size:0.8rem; color:var(--text-muted);">${s.isBlocked ? '🚫 അക്കൗണ്ട് ബ്ലോക്കാണ്' : 'ഭക്ഷണ ഓർഡർ: ' + (s.hasFoodOrder ? 'ഉണ്ട്' : 'ഇല്ല')}</span>
+                        ${s.hasFoodOrder && !s.isServed && !s.isBlocked ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}')">✓ ഭക്ഷണം നൽകി (Serve)</button>` : ''}
                     </div>
-                </div>
-            `;
+                `;
+            } else {
+                // അഡ്മിനുള്ള പൂർണ്ണ വ്യൂ
+                card.innerHTML = `
+                    <div class="item-row-top">
+                        <div>
+                            <b style="font-size:0.95rem;">${s.name}</b> <small style="color:var(--text-muted); font-weight:700;">(${s.id})</small>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">Due: ${calculateDueDate(s.joinDate)} | വാടക: ₹${amt}</div>
+                        </div>
+                        <span class="badge ${isPaid ? 'paid' : 'unpaid'}">${isPaid ? 'PAID ✓' : 'PENDING'}</span>
+                    </div>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin:2px 0;">
+                        <div>ഭക്ഷണ നില: ${foodStatusBadge}</div>
+                        ${s.hasFoodOrder && !s.isServed ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}')">✓ Serve</button>` : ''}
+                    </div>
+
+                    <div class="item-actions">
+                        <label style="display:flex; align-items:center; gap:4px; font-size:0.78rem; font-weight:700; cursor:pointer;">
+                            <input type="checkbox" class="pay-checkbox" ${isPaid ? 'checked' : ''} onchange="togglePay('${s.docId}', '${selMonth}', this.checked)"> വാടക അടച്ചു
+                        </label>
+
+                        <div style="margin-left:auto; display:flex; gap:6px;">
+                            <button class="btn-action-sm edit" onclick="openEditModal(${idx})">✏️ എഡിറ്റ്</button>
+                            <button class="btn-action-sm info" onclick="openDetailsModal(${idx})">📋</button>
+                            ${!isPaid && s.phone ? `<a href="https://wa.me/91${s.phone}?text=${waMsg}" target="_blank" style="text-decoration:none;"><button class="btn-action-sm whatsapp">📲 WA</button></a>` : ''}
+                            <button class="btn-action-sm ${s.isBlocked ? 'unlock' : 'block'}" onclick="toggleBlock('${s.docId}', ${!s.isBlocked})">${s.isBlocked ? '🔓' : '🚫'}</button>
+                            <button class="btn-action-sm" style="background:#f1f5f9; color:#94a3b8;" onclick="deleteStudent('${s.docId}')">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }
+
             container.appendChild(card);
         });
 
