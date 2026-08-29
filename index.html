@@ -354,7 +354,7 @@
             </form>
         </div>
 
-        <!-- 2. വിദ്യാർത്ഥി ഡാഷ്‌ബോർഡ് -->
+        <!-- 2. വിദ്യാർത്ഥി ഡാഷ്‌ബോർഡ് (സിംഗിൾ ഓർഡർ മാത്രം) -->
         <div id="viewStudent" class="hidden">
             <div id="stuTabOrder">
                 <div class="card" style="background:#fffbeb; border-color:#fde68a;">
@@ -367,17 +367,10 @@
                     <h3 style="margin-top:0; font-size:1rem;">ഭക്ഷണ ഓർഡർ (Food Order)</h3>
                     
                     <form id="formStudentOrder">
-                        <div style="background:#f8fafc; padding:14px; border-radius:12px; border:1.5px solid var(--border); margin-bottom:12px;">
+                        <div style="background:#f8fafc; padding:14px; border-radius:12px; border:1.5px solid var(--border); margin-bottom:14px;">
                             <label style="display:flex; align-items:center; gap:10px; font-weight:700; cursor:pointer; margin:0; font-size:0.95rem;">
                                 <input type="checkbox" id="chkStuFood" style="width:22px; height:22px; accent-color:var(--primary);">
-                                🍽️ ഇന്ന് റെഗുലർ ഭക്ഷണം വേണം (Normal Meal)
-                            </label>
-                        </div>
-
-                        <div style="background:#fff7ed; padding:14px; border-radius:12px; border:1.5px solid #fed7aa; margin-bottom:14px;">
-                            <label style="display:flex; align-items:center; gap:10px; font-weight:700; cursor:pointer; margin:0; font-size:0.95rem; color:#9a3412;">
-                                <input type="checkbox" id="chkStuExtraFood" style="width:22px; height:22px; accent-color:#ea580c;">
-                                ➕ ഇന്ന് അധിക ഭക്ഷണം വേണം (Extra Meal)
+                                🍽️ ഇന്ന് ഭക്ഷണം വേണം (Order Food)
                             </label>
                         </div>
 
@@ -393,7 +386,6 @@
                         <div id="qrcodeContainer"></div>
                         <div style="margin-top:8px;">
                             <b id="dispQrStudentId" style="font-size:1.1rem; color:var(--primary);"></b>
-                            <div id="dispQrExtraBadge" style="margin-top:4px;"></div>
                             <div id="dispQrServingStatus" style="margin-top:4px;"></div>
                         </div>
                     </div>
@@ -926,31 +918,26 @@
         }
 
         const chkFood = document.getElementById('chkStuFood');
-        const chkExtra = document.getElementById('chkStuExtraFood');
         const alertBox = document.getElementById('dispOrderWindowAlert');
         const btnOrder = document.getElementById('btnSubmitOrder');
 
         // ഇന്ന് ഇതിനകം ഓർഡർ ചെയ്തിട്ടുണ്ടോ എന്ന് പരിശോധിക്കുന്നു
-        const isAlreadyOrderedToday = (currentUser.lastOrderDate === todayStr && (currentUser.hasFoodOrder || currentUser.hasExtraFood));
+        const isAlreadyOrderedToday = (currentUser.lastOrderDate === todayStr && currentUser.hasFoodOrder);
 
         chkFood.checked = currentUser.hasFoodOrder || false;
-        chkExtra.checked = currentUser.hasExtraFood || false;
 
         if (isAlreadyOrderedToday) {
-            // ഇന്നത്തെ ഓർഡർ ഇതിനകം രേഖപ്പെടുത്തി കഴിഞ്ഞാൽ ലോക്ക് ചെയ്യുന്നു
             alertBox.style.background = '#dcfce7';
             alertBox.style.color = '#15803d';
-            alertBox.innerText = '✅ ഇന്നത്തെ ഭക്ഷണ ഓർഡർ രേഖപ്പെടുത്തിയിട്ടുണ്ട് (1 Time Limit)';
+            alertBox.innerText = '✅ ഇന്നത്തെ ഭക്ഷണ ഓർഡർ രേഖപ്പെടുത്തിയിട്ടുണ്ട്';
             chkFood.disabled = true;
-            chkExtra.disabled = true;
             btnOrder.disabled = true;
             btnOrder.innerText = '🔒 ഇന്ന് ഓർഡർ രേഖപ്പെടുത്തിക്കഴിഞ്ഞു';
         } else if (isOrderActive) {
             alertBox.style.background = '#e0f2fe';
             alertBox.style.color = '#0369a1';
-            alertBox.innerText = '🟢 ഓർഡർ സ്വീകരിക്കുന്നു (ഒരു തവണ മാത്രം)';
+            alertBox.innerText = '🟢 ഓർഡർ സ്വീകരിക്കുന്നു';
             chkFood.disabled = false;
-            chkExtra.disabled = false;
             btnOrder.disabled = false;
             btnOrder.innerText = 'ഓർഡർ സേവ് ചെയ്യുക';
         } else {
@@ -958,7 +945,6 @@
             alertBox.style.color = '#b91c1c';
             alertBox.innerText = '🔴 ഓർഡർ സമയം അവസാനിച്ചു (Closed)';
             chkFood.disabled = true;
-            chkExtra.disabled = true;
             btnOrder.disabled = true;
             btnOrder.innerText = 'ഓർഡർ സമയം അവസാനിച്ചു';
         }
@@ -971,26 +957,23 @@
         e.preventDefault();
         const todayStr = getTodayDateKey();
 
-        // വീണ്ടും ഓർഡർ ചെയ്യാൻ ശ്രമിച്ചാൽ തടയുന്നു
-        if (currentUser.lastOrderDate === todayStr && (currentUser.hasFoodOrder || currentUser.hasExtraFood)) {
-            alert('നിങ്ങൾ ഇന്ന് ഇതിനകം ഒരു തവണ ഓർഡർ നൽകിയിട്ടുണ്ട്!');
+        if (currentUser.lastOrderDate === todayStr && currentUser.hasFoodOrder) {
+            alert('നിങ്ങൾ ഇന്ന് ഇതിനകം ഓർഡർ നൽകിയിട്ടുണ്ട്!');
             return;
         }
 
         const hasOrder = document.getElementById('chkStuFood').checked;
-        const hasExtra = document.getElementById('chkStuExtraFood').checked;
 
-        if (!hasOrder && !hasExtra) {
+        if (!hasOrder) {
             alert('ദയവായി ഓർഡർ ടിക്ക് ചെയ്യുക!');
             return;
         }
         
         db.collection("students").doc(currentUser.docId).update({
-            hasFoodOrder: hasOrder,
-            hasExtraFood: hasExtra,
+            hasFoodOrder: true,
             lastOrderDate: todayStr
         }).then(() => {
-            alert('ഇന്നത്തെ ഭക്ഷണ ഓർഡർ വിജയകരമായി രേഖപ്പെടുത്തി! ഇനി ഇന്ന് മാറ്റാൻ സാധിക്കില്ല.');
+            alert('ഇന്നത്തെ ഭക്ഷണ ഓർഡർ രേഖപ്പെടുത്തി!');
         });
     });
 
@@ -1065,16 +1048,9 @@
         const qrContainer = document.getElementById('qrcodeContainer');
         qrContainer.innerHTML = '';
 
-        if (currentUser.hasFoodOrder || currentUser.hasExtraFood) {
+        if (currentUser.hasFoodOrder) {
             qrBox.classList.remove('hidden');
             document.getElementById('dispQrStudentId').innerText = `ID: ${currentUser.id} - ${currentUser.name}`;
-            
-            const extraBadge = document.getElementById('dispQrExtraBadge');
-            if (currentUser.hasExtraFood) {
-                extraBadge.innerHTML = `<span class="badge" style="background:#ffedd5; color:#c2410c; font-size:0.82rem;">➕ അധിക ഓർഡർ ഉണ്ട് (1 Normal + 1 Extra)</span>`;
-            } else {
-                extraBadge.innerHTML = `<span class="badge" style="background:#eef2ff; color:var(--primary); font-size:0.8rem;">🍽️ സാധാരണ ഭക്ഷണം (1 Meal)</span>`;
-            }
 
             const qrPayload = JSON.stringify({
                 id: currentUser.id,
@@ -1153,15 +1129,14 @@
     }
 
     function adminResetOrders() {
-        if(confirm("എല്ലാ വിദ്യാർത്ഥികളുടെയും ഇന്നത്തെ ഭക്ഷണ ഓർഡറുകൾ പൂജ്യമാക്കണോ? (ഇതോടെ കുട്ടികൾക്ക് പുതിയ ഓർഡർ നൽകാം)")) {
+        if(confirm("എല്ലാ വിദ്യാർത്ഥികളുടെയും ഇന്നത്തെ ഭക്ഷണ ഓർഡറുകൾ പൂജ്യമാക്കണോ?")) {
             const batch = db.batch();
             students.forEach(s => {
                 const ref = db.collection("students").doc(s.docId);
                 batch.update(ref, { 
                     hasFoodOrder: false, 
-                    hasExtraFood: false, 
                     isServed: false,
-                    lastOrderDate: "" // റീസെറ്റ് ചെയ്യുമ്പോൾ അന്നത്തെ ഡേറ്റ് മാറ്റുന്നു
+                    lastOrderDate: ""
                 });
             });
             batch.commit().then(() => {
@@ -1200,7 +1175,6 @@
             isBlocked: false,
             paidMonths: [],
             hasFoodOrder: false,
-            hasExtraFood: false,
             isServed: false,
             lastOrderDate: ""
         };
@@ -1253,11 +1227,10 @@
         }
 
         students.forEach((s, idx) => {
-            const hasAnyFood = s.hasFoodOrder || s.hasExtraFood;
-            if(hasAnyFood) {
-                totalFood += (s.hasExtraFood ? 2 : 1);
-                if(s.isServed) servedCount += (s.hasExtraFood ? 2 : 1);
-                else remainingCount += (s.hasExtraFood ? 2 : 1);
+            if(s.hasFoodOrder) {
+                totalFood++;
+                if(s.isServed) servedCount++;
+                else remainingCount++;
             }
 
             const isPaid = (s.paidMonths || []).includes(selMonth);
@@ -1266,9 +1239,9 @@
 
             if(filterMode === 'paid' && !isPaid) return;
             if(filterMode === 'pending' && isPaid) return;
-            if(filterMode === 'all-ordered' && !hasAnyFood) return;
-            if(filterMode === 'served' && (!hasAnyFood || !s.isServed)) return;
-            if(filterMode === 'remaining' && (!hasAnyFood || s.isServed)) return;
+            if(filterMode === 'all-ordered' && !s.hasFoodOrder) return;
+            if(filterMode === 'served' && (!s.hasFoodOrder || !s.isServed)) return;
+            if(filterMode === 'remaining' && (!s.hasFoodOrder || s.isServed)) return;
 
             const card = document.createElement('div');
             card.className = `student-item-card ${s.isBlocked ? 'blocked' : ''} ${s.isServed ? 'served' : ''}`;
@@ -1277,11 +1250,10 @@
             const waMsg = encodeURIComponent(`പ്രിയപ്പെട്ട ${s.name}, ശ്രീ മുത്തപ്പൻ മെസ്സിലെ വാടക ₹${amt} നൽകാൻ ബാക്കിയുണ്ട്. ദയവായി അടയ്ക്കുക.`);
 
             let foodStatusBadge = '';
-            if(hasAnyFood) {
-                const countText = s.hasExtraFood ? ' [2 Meals (Extra)]' : ' [1 Meal]';
+            if(s.hasFoodOrder) {
                 foodStatusBadge = s.isServed 
-                    ? `<span class="badge served">കഴിച്ചു (Served)${countText}</span>` 
-                    : `<span class="badge pending-food">കഴിക്കാൻ ബാക്കി${countText}</span>`;
+                    ? `<span class="badge served">കഴിച്ചു (Served)</span>` 
+                    : `<span class="badge pending-food">കഴിക്കാൻ ബാക്കി</span>`;
             } else {
                 foodStatusBadge = '<span class="badge" style="background:#f1f5f9; color:#94a3b8;">ഓർഡറില്ല</span>';
             }
@@ -1295,8 +1267,8 @@
                         <div>${foodStatusBadge}</div>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-                        <span style="font-size:0.8rem; color:var(--text-muted);">${s.isBlocked ? '🚫 അക്കൗണ്ട് ബ്ലോക്കാണ്' : (s.hasExtraFood ? '🔥 അധിക ഭക്ഷണം (2 Meals)' : 'ഭക്ഷണം: 1 Meal')}</span>
-                        ${hasAnyFood && !s.isServed && !s.isBlocked ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}', ${s.hasExtraFood})">✓ Serve</button>` : ''}
+                        <span style="font-size:0.8rem; color:var(--text-muted);">${s.isBlocked ? '🚫 അക്കൗണ്ട് ബ്ലോക്കാണ്' : (s.hasFoodOrder ? 'ഭക്ഷണ ഓർഡർ ഉണ്ട്' : 'ഓർഡറില്ല')}</span>
+                        ${s.hasFoodOrder && !s.isServed && !s.isBlocked ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}')">✓ Serve</button>` : ''}
                     </div>
                 `;
             } else {
@@ -1311,7 +1283,7 @@
                     
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin:2px 0;">
                         <div>ഭക്ഷണ നില: ${foodStatusBadge}</div>
-                        ${hasAnyFood && !s.isServed ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}', ${s.hasExtraFood})">✓ Serve</button>` : ''}
+                        ${s.hasFoodOrder && !s.isServed ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}')">✓ Serve</button>` : ''}
                     </div>
 
                     <div class="item-actions">
@@ -1349,9 +1321,8 @@
         badgeOrder.innerText = isOrderActive ? '🟢 OPEN' : '🔴 CLOSED';
     }
 
-    function manualServeFood(docId, name, hasExtra) {
-        const countMsg = hasExtra ? "2 ഭക്ഷണങ്ങൾ (Extra സഹിതം)" : "1 ഭക്ഷണം";
-        if(confirm(`${name} ന് ${countMsg} നൽകിയതായി രേഖപ്പെടുത്തണോ?`)) {
+    function manualServeFood(docId, name) {
+        if(confirm(`${name} ന് ഭക്ഷണം നൽകിയതായി രേഖപ്പെടുത്തണോ?`)) {
             db.collection("students").doc(docId).update({
                 isServed: true
             });
@@ -1411,10 +1382,7 @@
                 return;
             }
 
-            const hasOrder = stu.hasFoodOrder;
-            const hasExtra = stu.hasExtraFood;
-
-            if (!hasOrder && !hasExtra) {
+            if (!stu.hasFoodOrder) {
                 resBox.className = "scan-result-card warning";
                 resBox.innerHTML = `
                     <h3>⚠️ ഇന്ന് ഓർഡർ ചെയ്തിട്ടില്ല! (No Food Order)</h3>
@@ -1434,20 +1402,6 @@
                 return;
             }
 
-            let orderDescription = "";
-            let mealCountBadge = "";
-
-            if (hasOrder && hasExtra) {
-                orderDescription = "🔥 <b>അധിക ഓർഡർ ഉണ്ട്: 2 ഭക്ഷണങ്ങൾ നൽകുക</b> (1 Normal + 1 Extra Meal)";
-                mealCountBadge = "🍗 2 MEALS (EXTRA ORDER)";
-            } else if (hasExtra) {
-                orderDescription = "➕ <b>അധിക ഭക്ഷണം മാത്രം: 1 Extra Meal നൽകുക</b>";
-                mealCountBadge = "🍱 1 EXTRA MEAL";
-            } else {
-                orderDescription = "🍽️ <b>സാധാരണ ഭക്ഷണം: 1 Meal നൽകുക</b>";
-                mealCountBadge = "🍛 1 REGULAR MEAL";
-            }
-
             db.collection("students").doc(stu.docId).update({
                 isServed: true
             }).then(() => {
@@ -1456,10 +1410,7 @@
                 resBox.innerHTML = `
                     <div style="font-size:1.15rem; font-weight:800; margin-bottom:4px;">✅ ടോക്കൺ സ്വീകരിച്ചു! (SERVED)</div>
                     <div style="font-size:0.95rem; margin-bottom:8px;"><b>${stu.name}</b> (റൂം: ${stu.id})</div>
-                    <div style="background:#ffffff; padding:8px 12px; border-radius:8px; border:1px solid #a7f3d0; margin-bottom:6px;">
-                        ${orderDescription}
-                    </div>
-                    <span class="badge paid" style="font-size:0.8rem;">${mealCountBadge}</span>
+                    <span class="badge paid" style="font-size:0.8rem;">🍽️ ഭക്ഷണം നൽകുക (1 Meal)</span>
                 `;
             });
 
@@ -1532,6 +1483,7 @@
             <div class="detail-row"><span>പേര്</span><b>${s.name}</b></div>
             <div class="detail-row"><span>ഫോൺ നമ്പർ</span><b><a href="tel:${s.phone}" style="color:var(--primary);">📞 ${s.phone || 'N/A'}</a></b></div>
             <div class="detail-row"><span>മേൽവിലാസം</span><b>${s.address || 'N/A'}</b></div>
+            <div class="detail-row"><span>പാസ്‌വേഡ്</span><b><code>${s.pass}</code></b></div>
             <div class="detail-row"><span>പ്രതിമാസ വാടക</span><b>₹${s.rent || 4500}</b></div>
             <div class="detail-row"><span>ജോയിനിംഗ് ഡേറ്റ്</span><b>${s.joinDate || 'N/A'}</b></div>
             <div class="detail-row"><span>അക്കൗണ്ട് നില</span><b>${s.isBlocked ? '<span style="color:var(--danger)">🚫 BLOCKED</span>' : '<span style="color:var(--success)">✅ ACTIVE</span>'}</b></div>
@@ -1586,11 +1538,11 @@
 
     function exportCSV() {
         const mKey = document.getElementById('selectFinanceMonth').value || getCurMonthKey();
-        let csv = "data:text/csv;charset=utf-8,\uFEFFID,Name,Phone,Address,Rent,Joining Date,Status,Food Order,Extra Food,Food Served\n";
+        let csv = "data:text/csv;charset=utf-8,\uFEFFID,Name,Phone,Address,Rent,Joining Date,Status,Food Order,Food Served\n";
         students.forEach(s => {
             const isPaid = (s.paidMonths || []).includes(mKey);
             const cleanAddr = (s.address || '').replace(/"/g, '""');
-            csv += `"${s.id}","${s.name}","${s.phone || ''}","${cleanAddr}","${s.rent || 4500}","${s.joinDate || ''}","${isPaid ? 'Paid' : 'Pending'}","${s.hasFoodOrder ? 'Yes' : 'No'}","${s.hasExtraFood ? 'Yes' : 'No'}","${s.isServed ? 'Yes' : 'No'}"\n`;
+            csv += `"${s.id}","${s.name}","${s.phone || ''}","${cleanAddr}","${s.rent || 4500}","${s.joinDate || ''}","${isPaid ? 'Paid' : 'Pending'}","${s.hasFoodOrder ? 'Yes' : 'No'}","${s.isServed ? 'Yes' : 'No'}"\n`;
         });
         const link = document.createElement("a");
         link.setAttribute("href", encodeURI(csv));
