@@ -91,11 +91,11 @@
             background: none;
             border: none;
             cursor: pointer;
-            width: 16.6%;
+            width: 20%;
             padding: 4px 0;
         }
 
-        .nav-item .icon { font-size: 1.25rem; }
+        .nav-item .icon { font-size: 1.3rem; }
         .nav-item.active { color: var(--primary); font-weight: 800; }
 
         .card {
@@ -160,7 +160,6 @@
             gap: 8px;
         }
 
-        button.btn-main:hover { opacity: 0.95; }
         button.btn-main.success { background: var(--success); }
         button.btn-main.danger { background: var(--danger); }
         button.btn-main.warning { background: #fef3c7; color: #92400e; border: 1.5px solid #fde68a; }
@@ -224,6 +223,7 @@
         .btn-action-sm.block { background: #fee2e2; color: #b91c1c; }
         .btn-action-sm.unlock { background: #e0e7ff; color: var(--primary); }
         .btn-action-sm.info { background: #e0f2fe; color: #0369a1; }
+        .btn-action-sm.edit { background: #fef3c7; color: #92400e; }
         .btn-action-sm.serve { background: #10b981; color: #ffffff; }
 
         .qr-display-box {
@@ -308,7 +308,7 @@
             <span class="brand-icon">🚩</span>
             <div class="brand-text">
                 <h1>ശ്രീ മുത്തപ്പൻ മെസ്സ്</h1>
-                <p id="appSubHeader">ക്ലൗഡ് പോർട്ടൽ</p>
+                <p id="appSubHeader">ക്ലൗഡ് ലൈവ് പോർട്ടൽ 🟢</p>
             </div>
         </div>
         <button id="btnLogoutTop" class="btn-action-sm" style="background:#f1f5f9; display:none;" onclick="logout()">Logout</button>
@@ -317,7 +317,7 @@
     <!-- MAIN BODY -->
     <div class="app-content">
 
-        <!-- 1. ലോഗിൻ വ്യൂ (ഡെമോ ബോക്സ് ഒഴിവാക്കിയത്) -->
+        <!-- 1. ലോഗിൻ വ്യൂ -->
         <div id="viewLogin">
             <div class="role-pill-switch">
                 <button class="role-pill-btn active" id="btnRoleStudent" onclick="setRole('student')">👨‍🎓 വിദ്യാർത്ഥി</button>
@@ -336,6 +336,10 @@
                 </div>
                 <button type="submit" class="btn-main">പ്രവേശിക്കുക</button>
             </form>
+
+            <div style="background: #eef2ff; border-radius: 12px; padding: 14px; font-size: 0.82rem; color: #4338ca; line-height: 1.5;">
+                💡 <b>അഡ്മിൻ ലോഗിൻ:</b> User: <code>admin</code> | Pass: <code>admin123</code>
+            </div>
         </div>
 
         <!-- 2. വിദ്യാർത്ഥി ഡാഷ്‌ബോർഡ് -->
@@ -397,8 +401,6 @@
 
         <!-- 3. അഡ്മിൻ ഡാഷ്‌ബോർഡ് -->
         <div id="viewAdmin" class="hidden">
-            
-            <!-- Admin Tab 1: കിച്ചൺ & സാമ്പത്തിക കണക്കുകൾ -->
             <div id="admTabOverview">
                 <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
                     <div>
@@ -459,7 +461,6 @@
                 </div>
             </div>
 
-            <!-- Admin Tab 2: QR സ്കാനർ -->
             <div id="admTabScanner" class="hidden">
                 <div class="card" style="text-align:center;">
                     <h3 style="margin-top:0; font-size:1.05rem;">📷 QR കോഡ് സ്കാനർ (Food Serving)</h3>
@@ -475,7 +476,6 @@
                 </div>
             </div>
 
-            <!-- Admin Tab 3: മെനു മാറ്റുക -->
             <div id="admTabMenu" class="hidden">
                 <form id="formAdminMenu" class="card">
                     <h3 style="margin-top:0; font-size:1rem;">🍲 ഇന്നത്തെ മെനു മാറ്റുക</h3>
@@ -487,7 +487,6 @@
                 </form>
             </div>
 
-            <!-- Admin Tab 4: പുതിയ രജിസ്ട്രേഷൻ -->
             <div id="admTabReg" class="hidden">
                 <form id="formAdminAddStudent" class="card">
                     <h3 style="margin-top:0; font-size:1rem;">➕ പുതിയ വിദ്യാർത്ഥിയെ ചേർക്കുക</h3>
@@ -523,7 +522,6 @@
                 </form>
             </div>
 
-            <!-- Admin Tab 5: വാടക & കുട്ടികളുടെ ലിസ്റ്റ് -->
             <div id="admTabRent" class="hidden">
                 <div id="bannerFilterState" class="filter-status-banner hidden">
                     <span id="textFilterStateTitle">ഫിൽട്ടർ ചെയ്ത ലിസ്റ്റ്</span>
@@ -535,28 +533,6 @@
                 </div>
                 
                 <div id="containerStudentCards"></div>
-            </div>
-
-            <!-- Admin Tab 6: അഡ്മിൻ പാസ്‌വേഡ് മാറ്റാനുള്ള സെറ്റിങ്സ് (New Feature) -->
-            <div id="admTabSettings" class="hidden">
-                <form id="formAdminChangePass" class="card">
-                    <h3 style="margin-top:0; font-size:1.05rem; color:var(--primary);">⚙️ അഡ്മിൻ പാസ്‌വേഡ് മാറ്റുക (Settings)</h3>
-                    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">അഡ്മിൻ ലോഗിൻ യൂസർനെയിമും പാസ്‌വേഡും മാറ്റാൻ ഇത് ഉപയോഗിക്കുക:</p>
-                    
-                    <div class="form-group">
-                        <label>നിലവിലെ പാസ്‌വേഡ് (Current Password):</label>
-                        <input type="password" id="inCurAdminPass" placeholder="••••••••" required>
-                    </div>
-                    <div class="form-group">
-                        <label>പുതിയ അഡ്മിൻ യൂസർനെയിം (New Username):</label>
-                        <input type="text" id="inNewAdminUser" placeholder="ഉദാ: admin" required>
-                    </div>
-                    <div class="form-group">
-                        <label>പുതിയ പാസ്‌വേഡ് (New Password):</label>
-                        <input type="password" id="inNewAdminPass" placeholder="പുതിയ പാസ്‌വേഡ്" required>
-                    </div>
-                    <button type="submit" class="btn-main success">പാസ്‌വേഡ് മാറ്റുക (Update Credentials)</button>
-                </form>
             </div>
         </div>
 
@@ -577,6 +553,48 @@
         </div>
     </div>
 
+    <!-- വിവരങ്ങൾ എഡിറ്റ് ചെയ്യാനുള്ള ബോക്സ് (Edit Modal) -->
+    <div id="modalEditStudent" class="modal-overlay hidden" onclick="handleEditBackdropClick(event)">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>✏️ വിവരങ്ങൾ എഡിറ്റ് ചെയ്യുക</h3>
+                <button class="close-btn" onclick="closeEditModal()">✕</button>
+            </div>
+            <form id="formEditStudent">
+                <input type="hidden" id="editDocId">
+                <div class="form-group">
+                    <label>വിദ്യാർത്ഥിയുടെ പേര്:</label>
+                    <input type="text" id="editName" required>
+                </div>
+                <div class="form-group">
+                    <label>Student ID (റൂം നമ്പർ):</label>
+                    <input type="text" id="editId" required>
+                </div>
+                <div class="form-group">
+                    <label>വാട്സാപ്പ് നമ്പർ:</label>
+                    <input type="tel" id="editPhone" required>
+                </div>
+                <div class="form-group">
+                    <label>പൂർണ്ണ മേൽവിലാസം:</label>
+                    <textarea id="editAddress" rows="2" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>പാസ്‌വേഡ്:</label>
+                    <input type="text" id="editPass" required>
+                </div>
+                <div class="form-group">
+                    <label>മാസ വാടക (₹):</label>
+                    <input type="number" id="editRent" required>
+                </div>
+                <div class="form-group">
+                    <label>ജോയിനിംഗ് ഡേറ്റ്:</label>
+                    <input type="date" id="editDate" required>
+                </div>
+                <button type="submit" class="btn-main success" style="margin-top:10px;">💾 മാറ്റങ്ങൾ സേവ് ചെയ്യുക</button>
+            </form>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -591,11 +609,11 @@
         measurementId: "G-D9CTVJ2TCZ"
     };
 
+    // Firebase Initialize
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // അഡ്മിൻ ക്രെഡൻഷ്യൽസ് വേരിയബിൾ (ക്ലൗഡിൽ നിന്ന് ഓട്ടോമാറ്റിക് ആയി മാറും)
-    let adminAuth = { id: "admin", pass: "admin123" };
+    const ADMIN_CRED = { id: "admin", pass: "admin123" };
 
     function getCurMonthKey() {
         const d = new Date();
@@ -640,10 +658,6 @@
             const data = doc.data();
             dailyMenuText = data.menu || "";
             isOrderActive = data.isOrderActive ?? true;
-            if (data.adminId && data.adminPass) {
-                adminAuth.id = data.adminId;
-                adminAuth.pass = data.adminPass;
-            }
             
             if (currentUser && currentRole === 'student') loadStudentData();
             if (currentRole === 'admin') renderAdmin();
@@ -686,7 +700,7 @@
         const inputPass = document.getElementById('inputLoginPass').value.trim();
 
         if (currentRole === 'admin') {
-            if (inputId.toLowerCase() === adminAuth.id.toLowerCase() && inputPass === adminAuth.pass) {
+            if (inputId.toLowerCase() === ADMIN_CRED.id.toLowerCase() && inputPass === ADMIN_CRED.pass) {
                 currentUser = { role: 'admin' };
                 showView('admin');
             } else {
@@ -732,12 +746,11 @@
             document.getElementById('appSubHeader').innerText = "അഡ്മിൻ ക്ലൗഡ് പാനൽ";
 
             bottomBar.innerHTML = `
-                <button class="nav-item active" id="btnNavAdmDash" onclick="switchAdmTab('overview', this)"><span class="icon">📊</span>ഡാഷ്‌</button>
-                <button class="nav-item" id="btnNavAdmScan" onclick="switchAdmTab('scanner', this)"><span class="icon">📷</span>സ്കാൻ</button>
+                <button class="nav-item active" id="btnNavAdmDash" onclick="switchAdmTab('overview', this)"><span class="icon">📊</span>ഡാഷ്‌ബോർഡ്</button>
+                <button class="nav-item" id="btnNavAdmScan" onclick="switchAdmTab('scanner', this)"><span class="icon">📷</span>സ്കാനർ</button>
                 <button class="nav-item" id="btnNavAdmRent" onclick="switchAdmTab('rent', this)"><span class="icon">👥</span>ലിസ്റ്റ്</button>
                 <button class="nav-item" id="btnNavAdmMenu" onclick="switchAdmTab('menu', this)"><span class="icon">🍲</span>മെനു</button>
                 <button class="nav-item" id="btnNavAdmReg" onclick="switchAdmTab('reg', this)"><span class="icon">➕</span>ആഡ്</button>
-                <button class="nav-item" id="btnNavAdmSettings" onclick="switchAdmTab('settings', this)"><span class="icon">⚙️</span>സെറ്റിങ്സ്</button>
             `;
             renderAdmin();
         }
@@ -848,16 +861,9 @@
         document.getElementById('admTabRent').classList.toggle('hidden', tab !== 'rent');
         document.getElementById('admTabMenu').classList.toggle('hidden', tab !== 'menu');
         document.getElementById('admTabReg').classList.toggle('hidden', tab !== 'reg');
-        document.getElementById('admTabSettings').classList.toggle('hidden', tab !== 'settings');
 
         if(tab === 'menu') {
             document.getElementById('inMenuFull').value = dailyMenuText;
-        }
-
-        if(tab === 'settings') {
-            document.getElementById('inNewAdminUser').value = adminAuth.id;
-            document.getElementById('inCurAdminPass').value = '';
-            document.getElementById('inNewAdminPass').value = '';
         }
 
         if(tab !== 'scanner') {
@@ -914,29 +920,6 @@
             isOrderActive: isOrderActive
         }, { merge: true }).then(() => {
             alert('മെനു ക്ലൗഡിൽ അപ്‌ഡേറ്റ് ചെയ്തു!');
-        });
-    });
-
-    // അഡ്മിൻ പാസ്‌വേഡ് മാറ്റുന്ന ഫോം (Update Password Logic)
-    document.getElementById('formAdminChangePass').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const curPass = document.getElementById('inCurAdminPass').value.trim();
-        const newUser = document.getElementById('inNewAdminUser').value.trim();
-        const newPass = document.getElementById('inNewAdminPass').value.trim();
-
-        if (curPass !== adminAuth.pass) {
-            alert('നിങ്ങൾ നൽകിയ നിലവിലെ പാസ്‌വേഡ് തെറ്റാണ്!');
-            return;
-        }
-
-        db.collection("settings").doc("mess_state").set({
-            adminId: newUser,
-            adminPass: newPass
-        }, { merge: true }).then(() => {
-            adminAuth.id = newUser;
-            adminAuth.pass = newPass;
-            alert('അഡ്മിൻ യൂസർനെയിമും പാസ്‌വേഡും വിജയകരമായി മാറ്റി!');
-            document.getElementById('formAdminChangePass').reset();
         });
     });
 
@@ -1061,7 +1044,8 @@
                     </label>
 
                     <div style="margin-left:auto; display:flex; gap:6px;">
-                        <button class="btn-action-sm info" onclick="openDetailsModal(${idx})">📋 വിവരങ്ങൾ</button>
+                        <button class="btn-action-sm edit" onclick="openEditModal(${idx})">✏️ എഡിറ്റ്</button>
+                        <button class="btn-action-sm info" onclick="openDetailsModal(${idx})">📋</button>
                         ${!isPaid && s.phone ? `<a href="https://wa.me/91${s.phone}?text=${waMsg}" target="_blank" style="text-decoration:none;"><button class="btn-action-sm whatsapp">📲 WA</button></a>` : ''}
                         <button class="btn-action-sm ${s.isBlocked ? 'unlock' : 'block'}" onclick="toggleBlock('${s.docId}', ${!s.isBlocked})">${s.isBlocked ? '🔓' : '🚫'}</button>
                         <button class="btn-action-sm" style="background:#f1f5f9; color:#94a3b8;" onclick="deleteStudent('${s.docId}')">🗑️</button>
@@ -1173,6 +1157,59 @@
         }
     }
 
+    // ================= EDIT MODAL FUNCTIONS =================
+    function openEditModal(idx) {
+        const s = students[idx];
+        document.getElementById('editDocId').value = s.docId;
+        document.getElementById('editName').value = s.name || '';
+        document.getElementById('editId').value = s.id || '';
+        document.getElementById('editPhone').value = s.phone || '';
+        document.getElementById('editAddress').value = s.address || '';
+        document.getElementById('editPass').value = s.pass || '';
+        document.getElementById('editRent').value = s.rent || 4500;
+        document.getElementById('editDate').value = s.joinDate || '';
+
+        document.getElementById('modalEditStudent').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+        document.getElementById('modalEditStudent').classList.add('hidden');
+    }
+
+    function handleEditBackdropClick(event) {
+        if (event.target.id === 'modalEditStudent') closeEditModal();
+    }
+
+    document.getElementById('formEditStudent').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const docId = document.getElementById('editDocId').value;
+        const updatedId = document.getElementById('editId').value.trim().toUpperCase();
+
+        const exists = students.find(s => s.docId !== docId && String(s.id).trim().toUpperCase() === updatedId);
+        if(exists) {
+            alert('ഈ Student ID മറ്റൊരാൾക്ക് നൽകിയിട്ടുണ്ട്! ദയവായി മറ്റൊരു ID നൽകുക.');
+            return;
+        }
+
+        const updateData = {
+            name: document.getElementById('editName').value.trim(),
+            id: updatedId,
+            phone: document.getElementById('editPhone').value.trim(),
+            address: document.getElementById('editAddress').value.trim(),
+            pass: document.getElementById('editPass').value.trim(),
+            rent: parseInt(document.getElementById('editRent').value) || 4500,
+            joinDate: document.getElementById('editDate').value
+        };
+
+        db.collection("students").doc(docId).update(updateData).then(() => {
+            alert('വിവരങ്ങൾ വിജയകരമായി അപ്ഡേറ്റ് ചെയ്തു!');
+            closeEditModal();
+        }).catch(err => {
+            alert('അപ്ഡേറ്റ് ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു: ' + err.message);
+        });
+    });
+
+    // ================= DETAILS MODAL =================
     function openDetailsModal(idx) {
         const s = students[idx];
         const modalBody = document.getElementById('modalDetailsBody');
