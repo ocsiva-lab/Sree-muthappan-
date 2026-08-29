@@ -86,16 +86,16 @@
             align-items: center;
             gap: 4px;
             color: var(--text-muted);
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 600;
             background: none;
             border: none;
             cursor: pointer;
-            width: 20%;
-            padding: 4px 0;
+            padding: 4px 6px;
+            flex: 1;
         }
 
-        .nav-item .icon { font-size: 1.3rem; }
+        .nav-item .icon { font-size: 1.25rem; }
         .nav-item.active { color: var(--primary); font-weight: 800; }
 
         .card {
@@ -164,6 +164,7 @@
         button.btn-main.success { background: var(--success); }
         button.btn-main.danger { background: var(--danger); }
         button.btn-main.warning { background: #fef3c7; color: #92400e; border: 1.5px solid #fde68a; }
+        button.btn-main:disabled { background: #94a3b8; cursor: not-allowed; }
 
         .stats-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
         .stats-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
@@ -246,6 +247,19 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             margin: 10px 0;
         }
+
+        .scan-result-card {
+            border-radius: 14px;
+            padding: 14px;
+            margin-top: 14px;
+            text-align: left;
+            border: 1.5px solid transparent;
+            line-height: 1.5;
+        }
+
+        .scan-result-card.success { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+        .scan-result-card.warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+        .scan-result-card.danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
 
         .modal-overlay {
             position: fixed;
@@ -338,12 +352,6 @@
                 </div>
                 <button type="submit" class="btn-main">പ്രവേശിക്കുക</button>
             </form>
-
-            <div style="background: #eef2ff; border-radius: 12px; padding: 14px; font-size: 0.8rem; color: #4338ca; line-height: 1.5;">
-                💡 <b>ഡീഫോൾട്ട് ലോഗിനുകൾ:</b><br>
-                • അഡ്മിൻ: <code>admin</code> / <code>admin123</code><br>
-                • സ്റ്റാഫ്: <code>staff</code> / <code>staff123</code>
-            </div>
         </div>
 
         <!-- 2. വിദ്യാർത്ഥി ഡാഷ്‌ബോർഡ് -->
@@ -359,12 +367,20 @@
                     <h3 style="margin-top:0; font-size:1rem;">ഭക്ഷണ ഓർഡർ (Food Order)</h3>
                     
                     <form id="formStudentOrder">
-                        <div style="background:#f8fafc; padding:14px; border-radius:12px; border:1.5px solid var(--border); margin-bottom:14px;">
+                        <div style="background:#f8fafc; padding:14px; border-radius:12px; border:1.5px solid var(--border); margin-bottom:12px;">
                             <label style="display:flex; align-items:center; gap:10px; font-weight:700; cursor:pointer; margin:0; font-size:0.95rem;">
                                 <input type="checkbox" id="chkStuFood" style="width:22px; height:22px; accent-color:var(--primary);">
-                                🍽️ ഇന്ന് ഭക്ഷണം വേണം (Order Food)
+                                🍽️ ഇന്ന് റെഗുലർ ഭക്ഷണം വേണം (Normal Meal)
                             </label>
                         </div>
+
+                        <div style="background:#fff7ed; padding:14px; border-radius:12px; border:1.5px solid #fed7aa; margin-bottom:14px;">
+                            <label style="display:flex; align-items:center; gap:10px; font-weight:700; cursor:pointer; margin:0; font-size:0.95rem; color:#9a3412;">
+                                <input type="checkbox" id="chkStuExtraFood" style="width:22px; height:22px; accent-color:#ea580c;">
+                                ➕ ഇന്ന് അധിക ഭക്ഷണം വേണം (Extra Meal)
+                            </label>
+                        </div>
+
                         <button type="submit" id="btnSubmitOrder" class="btn-main">ഓർഡർ സേവ് ചെയ്യുക</button>
                     </form>
                 </div>
@@ -377,20 +393,17 @@
                         <div id="qrcodeContainer"></div>
                         <div style="margin-top:8px;">
                             <b id="dispQrStudentId" style="font-size:1.1rem; color:var(--primary);"></b>
+                            <div id="dispQrExtraBadge" style="margin-top:4px;"></div>
                             <div id="dispQrServingStatus" style="margin-top:4px;"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- വിദ്യാർത്ഥിയുടെ പാസ്‌വേഡ് മാറ്റൽ ഫോം -->
-                <form id="formStudentChangePass" class="card">
-                    <h3 style="margin-top:0; font-size:0.95rem;">🔐 പാസ്‌വേഡ് മാറ്റുക (Change Password)</h3>
-                    <div class="form-group">
-                        <label>പുതിയ പാസ്‌വേഡ്:</label>
-                        <input type="password" id="inStuNewPass" placeholder="പുതിയ പാസ്‌വേഡ് നൽകുക" required>
-                    </div>
-                    <button type="submit" class="btn-main" style="background:#475569;">പാസ്‌വേഡ് അപ്‌ഡേറ്റ് ചെയ്യുക</button>
-                </form>
+                <div style="margin-top: 10px;">
+                    <button class="btn-main" style="background:#f1f5f9; color:var(--text-dark); border:1.5px solid var(--border);" onclick="openStudentPassModal()">
+                        🔐 പാസ്‌വേഡ് മാറ്റുക (Change Password)
+                    </button>
+                </div>
             </div>
 
             <div id="stuTabRent" class="hidden">
@@ -472,51 +485,53 @@
                         </div>
                     </div>
 
-                    <button class="btn-main" style="background:#f1f5f9; color:var(--text-dark); font-size:0.85rem; margin-bottom:10px;" onclick="exportCSV()">📥 എക്സൽ (CSV) റിപ്പോർട്ട് ഡൗൺലോഡ്</button>
-                </div>
-
-                <!-- പാസ്‌വേഡ് മാനേജ്‌മെന്റ് (അഡ്മിന് മാത്രം) -->
-                <div id="secAdminSecurity">
-                    <form id="formAdminChangeCreds" class="card">
-                        <h3 style="margin-top:0; font-size:0.95rem;">👑 അഡ്മിൻ പാസ്‌വേഡ് മാറ്റുക</h3>
-                        <div class="form-group">
-                            <label>അഡ്മിൻ യൂസർനെയിം:</label>
-                            <input type="text" id="inAdmNewUser" required>
-                        </div>
-                        <div class="form-group">
-                            <label>പുതിയ പാസ്‌വേഡ്:</label>
-                            <input type="password" id="inAdmNewPass" placeholder="പുതിയ പാസ്‌വേഡ്" required>
-                        </div>
-                        <button type="submit" class="btn-main success" style="font-size:0.85rem;">💾 അഡ്മിൻ വിവരങ്ങൾ സേവ് ചെയ്യുക</button>
-                    </form>
-
-                    <form id="formStaffChangeCreds" class="card">
-                        <h3 style="margin-top:0; font-size:0.95rem;">👨‍🍳 സ്റ്റാഫ് ലോഗിൻ വിവരങ്ങൾ മാറ്റുക</h3>
-                        <div class="form-group">
-                            <label>സ്റ്റാഫ് യൂസർനെയിം:</label>
-                            <input type="text" id="inStaffNewUser" required>
-                        </div>
-                        <div class="form-group">
-                            <label>സ്റ്റാഫ് പാസ്‌വേഡ്:</label>
-                            <input type="password" id="inStaffNewPass" placeholder="പുതിയ പാസ്‌വേഡ്" required>
-                        </div>
-                        <button type="submit" class="btn-main" style="background:#0284c7; font-size:0.85rem;">💾 സ്റ്റാഫ് വിവരങ്ങൾ സേവ് ചെയ്യുക</button>
-                    </form>
+                    <button class="btn-main" style="background:#f1f5f9; color:var(--text-dark); font-size:0.85rem;" onclick="exportCSV()">📥 എക്സൽ (CSV) റിപ്പോർട്ട് ഡൗൺലോഡ്</button>
                 </div>
             </div>
 
+            <!-- പ്രത്യേക സെറ്റിംഗ്സ് & പാസ്‌വേഡ് മാനേജ്‌മെന്റ് ടാബ് -->
+            <div id="admTabSettings" class="hidden">
+                <form id="formAdminChangeCreds" class="card">
+                    <h3 style="margin-top:0; font-size:1rem; color:var(--primary);">👑 അഡ്മിൻ പാസ്‌വേഡ് മാറ്റുക</h3>
+                    <div class="form-group">
+                        <label>അഡ്മിൻ യൂസർനെയിം:</label>
+                        <input type="text" id="inAdmNewUser" required>
+                    </div>
+                    <div class="form-group">
+                        <label>പുതിയ പാസ്‌വേഡ്:</label>
+                        <input type="password" id="inAdmNewPass" placeholder="പുതിയ പാസ്‌വേഡ്" required>
+                    </div>
+                    <button type="submit" class="btn-main success" style="font-size:0.85rem;">💾 അഡ്മിൻ വിവരങ്ങൾ സേവ് ചെയ്യുക</button>
+                </form>
+
+                <form id="formStaffChangeCreds" class="card">
+                    <h3 style="margin-top:0; font-size:1rem; color:#0284c7;">👨‍🍳 സ്റ്റാഫ് ലോഗിൻ വിവരങ്ങൾ മാറ്റുക</h3>
+                    <div class="form-group">
+                        <label>സ്റ്റാഫ് യൂസർനെയിം:</label>
+                        <input type="text" id="inStaffNewUser" required>
+                    </div>
+                    <div class="form-group">
+                        <label>സ്റ്റാഫ് പാസ്‌വേഡ്:</label>
+                        <input type="password" id="inStaffNewPass" placeholder="പുതിയ പാസ്‌വേഡ്" required>
+                    </div>
+                    <button type="submit" class="btn-main" style="background:#0284c7; font-size:0.85rem;">💾 സ്റ്റാഫ് വിവരങ്ങൾ സേവ് ചെയ്യുക</button>
+                </form>
+            </div>
+
+            <!-- സ്കാനർ ടാബ് -->
             <div id="admTabScanner" class="hidden">
                 <div class="card" style="text-align:center;">
                     <h3 style="margin-top:0; font-size:1.05rem;">📷 QR കോഡ് സ്കാനർ (Food Serving)</h3>
-                    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">വിദ്യാർത്ഥിയുടെ QR കോഡ് കാണിക്കുക:</p>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">വിദ്യാർത്ഥിയുടെ QR കോഡ് ക്യാമറയിലേക്ക് കാണിക്കുക:</p>
                     
                     <div class="scanner-box-wrapper">
                         <div id="qrReader" style="width:100%;"></div>
                     </div>
 
-                    <div id="scanResultMsg" style="margin-top:10px; font-weight:700; font-size:0.9rem;"></div>
                     <button id="btnStartScan" class="btn-main success" onclick="startQRScanner()">📷 ക്യാമറ ഓൺ ചെയ്യുക</button>
                     <button id="btnStopScan" class="btn-main danger hidden" style="margin-top:8px;" onclick="stopQRScanner()">⏹️ ക്യാമറ ഓഫ് ചെയ്യുക</button>
+
+                    <div id="scanResultContainer" class="hidden"></div>
                 </div>
             </div>
 
@@ -635,6 +650,23 @@
                     <input type="date" id="editDate" required>
                 </div>
                 <button type="submit" class="btn-main success" style="margin-top:10px;">💾 മാറ്റങ്ങൾ സേവ് ചെയ്യുക</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- വിദ്യാർത്ഥിക്ക് പാസ്‌വേഡ് മാറ്റാനുള്ള പ്രത്യേക പോപ്പ്-അപ്പ് -->
+    <div id="modalStudentPass" class="modal-overlay hidden" onclick="handleStudentPassBackdrop(event)">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>🔐 പാസ്‌വേഡ് മാറ്റുക</h3>
+                <button class="close-btn" onclick="closeStudentPassModal()">✕</button>
+            </div>
+            <form id="formStudentChangePass">
+                <div class="form-group">
+                    <label>പുതിയ പാസ്‌വേഡ്:</label>
+                    <input type="password" id="inStuNewPass" placeholder="പുതിയ പാസ്‌വേഡ് നൽകുക" required>
+                </div>
+                <button type="submit" class="btn-main success" style="margin-top:10px;">💾 പാസ്‌വേഡ് അപ്‌ഡേറ്റ് ചെയ്യുക</button>
             </form>
         </div>
     </div>
@@ -830,10 +862,8 @@
             document.getElementById('viewAdmin').classList.remove('hidden');
             document.getElementById('appSubHeader').innerText = "👨‍🍳 സ്റ്റാഫ് പാനൽ (Food Service)";
 
-            // സ്റ്റാഫിന് വേണ്ടാത്തവ മറയ്ക്കുന്നു
             document.getElementById('secResetOrders').classList.add('hidden');
             document.getElementById('secAdminFinance').classList.add('hidden');
-            document.getElementById('secAdminSecurity').classList.add('hidden');
             document.getElementById('grpOrderSwitchBtns').classList.add('hidden');
 
             bottomBar.innerHTML = `
@@ -846,10 +876,8 @@
             document.getElementById('viewAdmin').classList.remove('hidden');
             document.getElementById('appSubHeader').innerText = "👑 അഡ്മിൻ ക്ലൗഡ് പാനൽ";
 
-            // അഡ്മിന് എല്ലാം കാണിക്കുന്നു
             document.getElementById('secResetOrders').classList.remove('hidden');
             document.getElementById('secAdminFinance').classList.remove('hidden');
-            document.getElementById('secAdminSecurity').classList.remove('hidden');
             document.getElementById('grpOrderSwitchBtns').classList.remove('hidden');
 
             bottomBar.innerHTML = `
@@ -858,6 +886,7 @@
                 <button class="nav-item" id="btnNavAdmRent" onclick="switchAdmTab('rent', this)"><span class="icon">👥</span>ലിസ്റ്റ്</button>
                 <button class="nav-item" id="btnNavAdmMenu" onclick="switchAdmTab('menu', this)"><span class="icon">🍲</span>മെനു</button>
                 <button class="nav-item" id="btnNavAdmReg" onclick="switchAdmTab('reg', this)"><span class="icon">➕</span>ആഡ്</button>
+                <button class="nav-item" id="btnNavAdmSettings" onclick="switchAdmTab('settings', this)"><span class="icon">⚙️</span>സെറ്റിംഗ്സ്</button>
             `;
             renderAdmin();
         }
@@ -872,6 +901,7 @@
     }
 
     function loadStudentData() {
+        const todayStr = getTodayDateKey();
         const curM = getCurMonthKey();
         const isPaid = (currentUser.paidMonths || []).includes(curM);
 
@@ -895,37 +925,86 @@
             payBox.innerHTML = `<b>⚠️ വാടക കുടിശ്ശികയുണ്ട്:</b> മെസ്സ് മാനേജർക്ക് വാടക നൽകുക.`;
         }
 
-        document.getElementById('chkStuFood').checked = currentUser.hasFoodOrder || false;
-
+        const chkFood = document.getElementById('chkStuFood');
+        const chkExtra = document.getElementById('chkStuExtraFood');
         const alertBox = document.getElementById('dispOrderWindowAlert');
         const btnOrder = document.getElementById('btnSubmitOrder');
-        if(isOrderActive) {
+
+        // ഇന്ന് ഇതിനകം ഓർഡർ ചെയ്തിട്ടുണ്ടോ എന്ന് പരിശോധിക്കുന്നു
+        const isAlreadyOrderedToday = (currentUser.lastOrderDate === todayStr && (currentUser.hasFoodOrder || currentUser.hasExtraFood));
+
+        chkFood.checked = currentUser.hasFoodOrder || false;
+        chkExtra.checked = currentUser.hasExtraFood || false;
+
+        if (isAlreadyOrderedToday) {
+            // ഇന്നത്തെ ഓർഡർ ഇതിനകം രേഖപ്പെടുത്തി കഴിഞ്ഞാൽ ലോക്ക് ചെയ്യുന്നു
             alertBox.style.background = '#dcfce7';
             alertBox.style.color = '#15803d';
-            alertBox.innerText = '🟢 ഓർഡറുകൾ സ്വീകരിക്കുന്നു';
+            alertBox.innerText = '✅ ഇന്നത്തെ ഭക്ഷണ ഓർഡർ രേഖപ്പെടുത്തിയിട്ടുണ്ട് (1 Time Limit)';
+            chkFood.disabled = true;
+            chkExtra.disabled = true;
+            btnOrder.disabled = true;
+            btnOrder.innerText = '🔒 ഇന്ന് ഓർഡർ രേഖപ്പെടുത്തിക്കഴിഞ്ഞു';
+        } else if (isOrderActive) {
+            alertBox.style.background = '#e0f2fe';
+            alertBox.style.color = '#0369a1';
+            alertBox.innerText = '🟢 ഓർഡർ സ്വീകരിക്കുന്നു (ഒരു തവണ മാത്രം)';
+            chkFood.disabled = false;
+            chkExtra.disabled = false;
             btnOrder.disabled = false;
+            btnOrder.innerText = 'ഓർഡർ സേവ് ചെയ്യുക';
         } else {
             alertBox.style.background = '#fee2e2';
             alertBox.style.color = '#b91c1c';
             alertBox.innerText = '🔴 ഓർഡർ സമയം അവസാനിച്ചു (Closed)';
+            chkFood.disabled = true;
+            chkExtra.disabled = true;
             btnOrder.disabled = true;
+            btnOrder.innerText = 'ഓർഡർ സമയം അവസാനിച്ചു';
         }
 
         renderStudentQR();
     }
 
+    // വിദ്യാർത്ഥി ഓർഡർ സേവ് ചെയ്യുമ്പോൾ
     document.getElementById('formStudentOrder').addEventListener('submit', function(e) {
         e.preventDefault();
+        const todayStr = getTodayDateKey();
+
+        // വീണ്ടും ഓർഡർ ചെയ്യാൻ ശ്രമിച്ചാൽ തടയുന്നു
+        if (currentUser.lastOrderDate === todayStr && (currentUser.hasFoodOrder || currentUser.hasExtraFood)) {
+            alert('നിങ്ങൾ ഇന്ന് ഇതിനകം ഒരു തവണ ഓർഡർ നൽകിയിട്ടുണ്ട്!');
+            return;
+        }
+
         const hasOrder = document.getElementById('chkStuFood').checked;
+        const hasExtra = document.getElementById('chkStuExtraFood').checked;
+
+        if (!hasOrder && !hasExtra) {
+            alert('ദയവായി ഓർഡർ ടിക്ക് ചെയ്യുക!');
+            return;
+        }
         
         db.collection("students").doc(currentUser.docId).update({
-            hasFoodOrder: hasOrder
+            hasFoodOrder: hasOrder,
+            hasExtraFood: hasExtra,
+            lastOrderDate: todayStr
         }).then(() => {
-            alert(hasOrder ? 'ഭക്ഷണ ഓർഡർ രേഖപ്പെടുത്തി!' : 'ഭക്ഷണം ആവശ്യമില്ലെന്ന് രേഖപ്പെടുത്തി.');
+            alert('ഇന്നത്തെ ഭക്ഷണ ഓർഡർ വിജയകരമായി രേഖപ്പെടുത്തി! ഇനി ഇന്ന് മാറ്റാൻ സാധിക്കില്ല.');
         });
     });
 
-    // വിദ്യാർത്ഥി പാസ്‌വേഡ് മാറ്റൽ
+    // വിദ്യാർത്ഥി പാസ്‌വേഡ് മോഡൽ
+    function openStudentPassModal() {
+        document.getElementById('modalStudentPass').classList.remove('hidden');
+    }
+    function closeStudentPassModal() {
+        document.getElementById('modalStudentPass').classList.add('hidden');
+    }
+    function handleStudentPassBackdrop(event) {
+        if(event.target.id === 'modalStudentPass') closeStudentPassModal();
+    }
+
     document.getElementById('formStudentChangePass').addEventListener('submit', function(e) {
         e.preventDefault();
         const newP = document.getElementById('inStuNewPass').value.trim();
@@ -939,6 +1018,7 @@
         }).then(() => {
             alert('നിങ്ങളുടെ പാസ്‌വേഡ് വിജയകരമായി മാറ്റി!');
             document.getElementById('inStuNewPass').value = '';
+            closeStudentPassModal();
         });
     });
 
@@ -985,10 +1065,17 @@
         const qrContainer = document.getElementById('qrcodeContainer');
         qrContainer.innerHTML = '';
 
-        if (currentUser.hasFoodOrder) {
+        if (currentUser.hasFoodOrder || currentUser.hasExtraFood) {
             qrBox.classList.remove('hidden');
             document.getElementById('dispQrStudentId').innerText = `ID: ${currentUser.id} - ${currentUser.name}`;
             
+            const extraBadge = document.getElementById('dispQrExtraBadge');
+            if (currentUser.hasExtraFood) {
+                extraBadge.innerHTML = `<span class="badge" style="background:#ffedd5; color:#c2410c; font-size:0.82rem;">➕ അധിക ഓർഡർ ഉണ്ട് (1 Normal + 1 Extra)</span>`;
+            } else {
+                extraBadge.innerHTML = `<span class="badge" style="background:#eef2ff; color:var(--primary); font-size:0.8rem;">🍽️ സാധാരണ ഭക്ഷണം (1 Meal)</span>`;
+            }
+
             const qrPayload = JSON.stringify({
                 id: currentUser.id,
                 date: getTodayDateKey()
@@ -1023,6 +1110,9 @@
         document.getElementById('admTabRent').classList.toggle('hidden', tab !== 'rent');
         document.getElementById('admTabMenu').classList.toggle('hidden', tab !== 'menu');
         document.getElementById('admTabReg').classList.toggle('hidden', tab !== 'reg');
+        
+        const setTab = document.getElementById('admTabSettings');
+        if(setTab) setTab.classList.toggle('hidden', tab !== 'settings');
 
         if(tab === 'menu') {
             document.getElementById('inMenuFull').value = dailyMenuText;
@@ -1063,14 +1153,19 @@
     }
 
     function adminResetOrders() {
-        if(confirm("എല്ലാ വിദ്യാർത്ഥികളുടെയും ഇന്നത്തെ ഭക്ഷണ ഓർഡറുകൾ പൂജ്യമാക്കണോ?")) {
+        if(confirm("എല്ലാ വിദ്യാർത്ഥികളുടെയും ഇന്നത്തെ ഭക്ഷണ ഓർഡറുകൾ പൂജ്യമാക്കണോ? (ഇതോടെ കുട്ടികൾക്ക് പുതിയ ഓർഡർ നൽകാം)")) {
             const batch = db.batch();
             students.forEach(s => {
                 const ref = db.collection("students").doc(s.docId);
-                batch.update(ref, { hasFoodOrder: false, isServed: false });
+                batch.update(ref, { 
+                    hasFoodOrder: false, 
+                    hasExtraFood: false, 
+                    isServed: false,
+                    lastOrderDate: "" // റീസെറ്റ് ചെയ്യുമ്പോൾ അന്നത്തെ ഡേറ്റ് മാറ്റുന്നു
+                });
             });
             batch.commit().then(() => {
-                alert("എല്ലാ ഓർഡറുകളും റീസെറ്റ് ചെയ്തു!");
+                alert("എല്ലാ ഓർഡറുകളും വിജയകരമായി റീസെറ്റ് ചെയ്തു!");
             });
         }
     }
@@ -1105,7 +1200,9 @@
             isBlocked: false,
             paidMonths: [],
             hasFoodOrder: false,
-            isServed: false
+            hasExtraFood: false,
+            isServed: false,
+            lastOrderDate: ""
         };
 
         db.collection("students").add(newStudent).then(() => {
@@ -1156,10 +1253,11 @@
         }
 
         students.forEach((s, idx) => {
-            if(s.hasFoodOrder) {
-                totalFood++;
-                if(s.isServed) servedCount++;
-                else remainingCount++;
+            const hasAnyFood = s.hasFoodOrder || s.hasExtraFood;
+            if(hasAnyFood) {
+                totalFood += (s.hasExtraFood ? 2 : 1);
+                if(s.isServed) servedCount += (s.hasExtraFood ? 2 : 1);
+                else remainingCount += (s.hasExtraFood ? 2 : 1);
             }
 
             const isPaid = (s.paidMonths || []).includes(selMonth);
@@ -1168,9 +1266,9 @@
 
             if(filterMode === 'paid' && !isPaid) return;
             if(filterMode === 'pending' && isPaid) return;
-            if(filterMode === 'all-ordered' && !s.hasFoodOrder) return;
-            if(filterMode === 'served' && (!s.hasFoodOrder || !s.isServed)) return;
-            if(filterMode === 'remaining' && (!s.hasFoodOrder || s.isServed)) return;
+            if(filterMode === 'all-ordered' && !hasAnyFood) return;
+            if(filterMode === 'served' && (!hasAnyFood || !s.isServed)) return;
+            if(filterMode === 'remaining' && (!hasAnyFood || s.isServed)) return;
 
             const card = document.createElement('div');
             card.className = `student-item-card ${s.isBlocked ? 'blocked' : ''} ${s.isServed ? 'served' : ''}`;
@@ -1179,16 +1277,16 @@
             const waMsg = encodeURIComponent(`പ്രിയപ്പെട്ട ${s.name}, ശ്രീ മുത്തപ്പൻ മെസ്സിലെ വാടക ₹${amt} നൽകാൻ ബാക്കിയുണ്ട്. ദയവായി അടയ്ക്കുക.`);
 
             let foodStatusBadge = '';
-            if(s.hasFoodOrder) {
+            if(hasAnyFood) {
+                const countText = s.hasExtraFood ? ' [2 Meals (Extra)]' : ' [1 Meal]';
                 foodStatusBadge = s.isServed 
-                    ? '<span class="badge served">കഴിച്ചു (Served)</span>' 
-                    : '<span class="badge pending-food">കഴിക്കാൻ ബാക്കി</span>';
+                    ? `<span class="badge served">കഴിച്ചു (Served)${countText}</span>` 
+                    : `<span class="badge pending-food">കഴിക്കാൻ ബാക്കി${countText}</span>`;
             } else {
                 foodStatusBadge = '<span class="badge" style="background:#f1f5f9; color:#94a3b8;">ഓർഡറില്ല</span>';
             }
 
             if(currentRole === 'staff') {
-                // സ്റ്റാഫിനുള്ള ലളിതമായ വ്യൂ (ഭക്ഷണം സെർവ് ചെയ്യാൻ മാത്രം)
                 card.innerHTML = `
                     <div class="item-row-top">
                         <div>
@@ -1197,12 +1295,11 @@
                         <div>${foodStatusBadge}</div>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-                        <span style="font-size:0.8rem; color:var(--text-muted);">${s.isBlocked ? '🚫 അക്കൗണ്ട് ബ്ലോക്കാണ്' : 'ഭക്ഷണ ഓർഡർ: ' + (s.hasFoodOrder ? 'ഉണ്ട്' : 'ഇല്ല')}</span>
-                        ${s.hasFoodOrder && !s.isServed && !s.isBlocked ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}')">✓ ഭക്ഷണം നൽകി (Serve)</button>` : ''}
+                        <span style="font-size:0.8rem; color:var(--text-muted);">${s.isBlocked ? '🚫 അക്കൗണ്ട് ബ്ലോക്കാണ്' : (s.hasExtraFood ? '🔥 അധിക ഭക്ഷണം (2 Meals)' : 'ഭക്ഷണം: 1 Meal')}</span>
+                        ${hasAnyFood && !s.isServed && !s.isBlocked ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}', ${s.hasExtraFood})">✓ Serve</button>` : ''}
                     </div>
                 `;
             } else {
-                // അഡ്മിനുള്ള പൂർണ്ണ വ്യൂ
                 card.innerHTML = `
                     <div class="item-row-top">
                         <div>
@@ -1214,7 +1311,7 @@
                     
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin:2px 0;">
                         <div>ഭക്ഷണ നില: ${foodStatusBadge}</div>
-                        ${s.hasFoodOrder && !s.isServed ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}')">✓ Serve</button>` : ''}
+                        ${hasAnyFood && !s.isServed ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}', ${s.hasExtraFood})">✓ Serve</button>` : ''}
                     </div>
 
                     <div class="item-actions">
@@ -1252,18 +1349,19 @@
         badgeOrder.innerText = isOrderActive ? '🟢 OPEN' : '🔴 CLOSED';
     }
 
-    function manualServeFood(docId, name) {
-        db.collection("students").doc(docId).update({
-            isServed: true
-        }).then(() => {
-            alert(`${name} ന് ഭക്ഷണം നൽകിയതായി രേഖപ്പെടുത്തി!`);
-        });
+    function manualServeFood(docId, name, hasExtra) {
+        const countMsg = hasExtra ? "2 ഭക്ഷണങ്ങൾ (Extra സഹിതം)" : "1 ഭക്ഷണം";
+        if(confirm(`${name} ന് ${countMsg} നൽകിയതായി രേഖപ്പെടുത്തണോ?`)) {
+            db.collection("students").doc(docId).update({
+                isServed: true
+            });
+        }
     }
 
     // ================= QR SCANNER =================
     function startQRScanner() {
-        const qrMsg = document.getElementById('scanResultMsg');
-        qrMsg.innerText = "ക്യാമറ റെഡിയാകുന്നു...";
+        const resBox = document.getElementById('scanResultContainer');
+        resBox.classList.add('hidden');
         
         document.getElementById('btnStartScan').classList.add('hidden');
         document.getElementById('btnStopScan').classList.remove('hidden');
@@ -1277,8 +1375,7 @@
             },
             (errorMessage) => {}
         ).catch(err => {
-            qrMsg.style.color = "var(--danger)";
-            qrMsg.innerText = "ക്യാമറ ആക്സസ് ലഭിച്ചില്ല!";
+            alert("ക്യാമറ ആക്സസ് ലഭിച്ചില്ല!");
             stopQRScanner();
         });
     }
@@ -1295,46 +1392,80 @@
     }
 
     function handleScannedQR(qrDataStr) {
-        const qrMsg = document.getElementById('scanResultMsg');
+        const resBox = document.getElementById('scanResultContainer');
+        resBox.classList.remove('hidden');
+
         try {
             const data = JSON.parse(qrDataStr);
             const stu = students.find(s => String(s.id).trim().toUpperCase() === String(data.id).trim().toUpperCase());
 
             if (!stu) {
-                qrMsg.style.color = "var(--danger)";
-                qrMsg.innerText = `❌ തെറ്റായ QR കോഡ്!`;
+                resBox.className = "scan-result-card danger";
+                resBox.innerHTML = `<h3>❌ അസാധുവായ ടോക്കൺ!</h3><p>ഈ വിദ്യാർത്ഥിയുടെ വിവരങ്ങൾ സിസ്റ്റത്തിൽ ലഭ്യമല്ല.</p>`;
                 return;
             }
 
             if (stu.isBlocked) {
-                qrMsg.style.color = "var(--danger)";
-                qrMsg.innerText = `🚫 ശ്രദ്ധിക്കുക! ${stu.name} ന്റെ അക്കൗണ്ട് ബ്ലോക്ക് ചെയ്തിരിക്കുന്നു!`;
+                resBox.className = "scan-result-card danger";
+                resBox.innerHTML = `<h3>🚫 അക്കൗണ്ട് ബ്ലോക്ക് ചെയ്തിരിക്കുന്നു!</h3><p><b>${stu.name} (${stu.id})</b> വാടക കുടിശ്ശികയുള്ളതിനാൽ ഭക്ഷണം നൽകരുത്.</p>`;
                 return;
             }
 
-            if (!stu.hasFoodOrder) {
-                qrMsg.style.color = "var(--warning)";
-                qrMsg.innerText = `⚠️ ${stu.name} ഇന്ന് ഭക്ഷണം ഓർഡർ ചെയ്തിട്ടില്ല!`;
+            const hasOrder = stu.hasFoodOrder;
+            const hasExtra = stu.hasExtraFood;
+
+            if (!hasOrder && !hasExtra) {
+                resBox.className = "scan-result-card warning";
+                resBox.innerHTML = `
+                    <h3>⚠️ ഇന്ന് ഓർഡർ ചെയ്തിട്ടില്ല! (No Food Order)</h3>
+                    <p><b>പേര്:</b> ${stu.name} (റൂം: ${stu.id})<br>
+                    ഇന്ന് ഈ കുട്ടി ഭക്ഷണം ഓർഡർ ചെയ്തിട്ടില്ല.</p>
+                `;
                 return;
             }
 
             if (stu.isServed) {
-                qrMsg.style.color = "var(--danger)";
-                qrMsg.innerText = `❌ ${stu.name} മുൻപ് ഭക്ഷണം വാങ്ങിയതാണ്! (Already Served)`;
+                resBox.className = "scan-result-card danger";
+                resBox.innerHTML = `
+                    <h3>❌ മുൻപ് ഭക്ഷണം വാങ്ങിയതാണ്! (Already Served)</h3>
+                    <p><b>പേര്:</b> ${stu.name} (റൂം: ${stu.id})<br>
+                    ഇന്നത്തെ ടോക്കൺ ഉപയോഗിച്ച് ഇതിനകം ഭക്ഷണം വാങ്ങിയിട്ടുണ്ട്.</p>
+                `;
                 return;
+            }
+
+            let orderDescription = "";
+            let mealCountBadge = "";
+
+            if (hasOrder && hasExtra) {
+                orderDescription = "🔥 <b>അധിക ഓർഡർ ഉണ്ട്: 2 ഭക്ഷണങ്ങൾ നൽകുക</b> (1 Normal + 1 Extra Meal)";
+                mealCountBadge = "🍗 2 MEALS (EXTRA ORDER)";
+            } else if (hasExtra) {
+                orderDescription = "➕ <b>അധിക ഭക്ഷണം മാത്രം: 1 Extra Meal നൽകുക</b>";
+                mealCountBadge = "🍱 1 EXTRA MEAL";
+            } else {
+                orderDescription = "🍽️ <b>സാധാരണ ഭക്ഷണം: 1 Meal നൽകുക</b>";
+                mealCountBadge = "🍛 1 REGULAR MEAL";
             }
 
             db.collection("students").doc(stu.docId).update({
                 isServed: true
             }).then(() => {
-                qrMsg.style.color = "var(--success)";
-                qrMsg.innerText = `✅ വിജയിച്ചു! ${stu.name} (${stu.id}) ന് ഭക്ഷണം നൽകി.`;
                 if (navigator.vibrate) navigator.vibrate(200);
+                resBox.className = "scan-result-card success";
+                resBox.innerHTML = `
+                    <div style="font-size:1.15rem; font-weight:800; margin-bottom:4px;">✅ ടോക്കൺ സ്വീകരിച്ചു! (SERVED)</div>
+                    <div style="font-size:0.95rem; margin-bottom:8px;"><b>${stu.name}</b> (റൂം: ${stu.id})</div>
+                    <div style="background:#ffffff; padding:8px 12px; border-radius:8px; border:1px solid #a7f3d0; margin-bottom:6px;">
+                        ${orderDescription}
+                    </div>
+                    <span class="badge paid" style="font-size:0.8rem;">${mealCountBadge}</span>
+                `;
             });
 
         } catch(e) {
-            qrMsg.style.color = "var(--danger)";
-            qrMsg.innerText = "❌ അസാധുവായ QR കോഡ്!";
+            resBox.className = "scan-result-card danger";
+            resBox.innerHTML = `<h3>❌ തെറ്റായ QR കോഡ്!</h3>`;
         }
     }
 
@@ -1401,7 +1532,6 @@
             <div class="detail-row"><span>പേര്</span><b>${s.name}</b></div>
             <div class="detail-row"><span>ഫോൺ നമ്പർ</span><b><a href="tel:${s.phone}" style="color:var(--primary);">📞 ${s.phone || 'N/A'}</a></b></div>
             <div class="detail-row"><span>മേൽവിലാസം</span><b>${s.address || 'N/A'}</b></div>
-            <div class="detail-row"><span>പാസ്‌വേഡ്</span><b><code>${s.pass}</code></b></div>
             <div class="detail-row"><span>പ്രതിമാസ വാടക</span><b>₹${s.rent || 4500}</b></div>
             <div class="detail-row"><span>ജോയിനിംഗ് ഡേറ്റ്</span><b>${s.joinDate || 'N/A'}</b></div>
             <div class="detail-row"><span>അക്കൗണ്ട് നില</span><b>${s.isBlocked ? '<span style="color:var(--danger)">🚫 BLOCKED</span>' : '<span style="color:var(--success)">✅ ACTIVE</span>'}</b></div>
@@ -1456,11 +1586,11 @@
 
     function exportCSV() {
         const mKey = document.getElementById('selectFinanceMonth').value || getCurMonthKey();
-        let csv = "data:text/csv;charset=utf-8,\uFEFFID,Name,Phone,Address,Rent,Joining Date,Status,Food Order,Food Served\n";
+        let csv = "data:text/csv;charset=utf-8,\uFEFFID,Name,Phone,Address,Rent,Joining Date,Status,Food Order,Extra Food,Food Served\n";
         students.forEach(s => {
             const isPaid = (s.paidMonths || []).includes(mKey);
             const cleanAddr = (s.address || '').replace(/"/g, '""');
-            csv += `"${s.id}","${s.name}","${s.phone || ''}","${cleanAddr}","${s.rent || 4500}","${s.joinDate || ''}","${isPaid ? 'Paid' : 'Pending'}","${s.hasFoodOrder ? 'Yes' : 'No'}","${s.isServed ? 'Yes' : 'No'}"\n`;
+            csv += `"${s.id}","${s.name}","${s.phone || ''}","${cleanAddr}","${s.rent || 4500}","${s.joinDate || ''}","${isPaid ? 'Paid' : 'Pending'}","${s.hasFoodOrder ? 'Yes' : 'No'}","${s.hasExtraFood ? 'Yes' : 'No'}","${s.isServed ? 'Yes' : 'No'}"\n`;
         });
         const link = document.createElement("a");
         link.setAttribute("href", encodeURI(csv));
