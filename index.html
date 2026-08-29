@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ശ്രീ മുത്തപ്പൻ ഹോസ്റ്റൽ & മെസ്സ് (Live Cloud)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- QR Code & Scanner Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #eef2ff;
+            --primary-dark: #3730a3;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --whatsapp: #25d366;
+        }
+
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0; background-color: var(--bg); color: var(--text-dark); display: flex; justify-content: center; }
+
+        .app-shell {
+            width: 100%;
+            max-width: 600px;
+            min-height: 100vh;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        .top-app-bar {
+            background: #ffffff;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand-badge { display: flex; align-items: center; gap: 10px; }
+        .brand-icon { font-size: 1.8rem; background: var(--primary-light); padding: 6px; border-radius: 12px; }
+        .brand-text h1 { font-size: 1.1rem; margin: 0; color: var(--primary); font-weight: 800; }
+        .brand-text p { font-size: 0.75rem; margin: 0; color: var(--text-muted); }
+
+        .app-content { padding: 16px; flex: 1; }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 600px;
+            background: #ffffff;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 1000;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.03);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 600;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 16.6%;
+            padding: 4px 0;
+        }
+
+        .nav-item .icon { font-size: 1.25rem; }
+        .nav-item.active { color: var(--primary); font-weight: 800; }
+
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .role-pill-switch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .role-pill-btn {
+            border: none;
+            background: transparent;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .role-pill-btn.active { background: #ffffff; color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+
+        .form-group { margin-bottom: 14px; }
+        label { display: block; margin-bottom: 6px; font-size: 0.82rem; font-weight: 700; }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            outline: none;
+            background: #f8fafc;
+        }
+
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: #ffffff; }
+
+        button.btn-main {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button.btn-main:hover { opacity: 0.95; }
+        button.btn-main.success { background: var(--success); }
+        button.btn-main.danger { background: var(--danger); }
+        button.btn-main.warning { background: #fef3c7; color: #92400e; border: 1.5px solid #fde68a; }
+
+        .stats-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+        .stats-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+
+        .stat-card-sm {
+            background: #f8fafc;
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .stat-card-sm .num { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-top: 2px; }
+        .stat-card-sm.green .num { color: var(--success); }
+        .stat-card-sm.red .num { color: var(--danger); }
+        .stat-card-sm.orange .num { color: var(--warning); }
+        .stat-card-sm .label { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
+        .stat-card-sm .hint { font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; }
+
+        .student-item-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .student-item-card.served { background: #f0fdf4; border-color: #bbf7d0; }
+        .student-item-card.blocked { background: #fef2f2; border-color: #fca5a5; }
+
+        .item-row-top { display: flex; justify-content: space-between; align-items: center; }
+        .item-actions { display: flex; gap: 6px; margin-top: 6px; align-items: center; flex-wrap: wrap; }
+
+        .badge { padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; }
+        .badge.paid { background: #dcfce7; color: #15803d; }
+        .badge.unpaid { background: #fee2e2; color: #b91c1c; }
+        .badge.blocked { background: #7f1d1d; color: #ffffff; }
+        .badge.served { background: #dcfce7; color: #15803d; }
+        .badge.pending-food { background: #fef3c7; color: #b45309; }
+
+        .btn-action-sm {
+            border: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-action-sm.whatsapp { background: #dcfce7; color: #15803d; }
+        .btn-action-sm.block { background: #fee2e2; color: #b91c1c; }
+        .btn-action-sm.unlock { background: #e0e7ff; color: var(--primary); }
+        .btn-action-sm.info { background: #e0f2fe; color: #0369a1; }
+        .btn-action-sm.serve { background: #10b981; color: #ffffff; }
+
+        .qr-display-box {
+            background: #ffffff;
+            border: 2px dashed var(--primary);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 14px;
+        }
+
+        #qrcodeContainer {
+            padding: 12px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin: 10px 0;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(4px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000; padding: 16px;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: 20px;
+            width: 100%; max-width: 480px;
+            padding: 24px; max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1.5px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;
+        }
+
+        .modal-header h3 { margin: 0; font-size: 1.15rem; color: var(--primary); }
+
+        .close-btn {
+            background: #f1f5f9; border: none; font-size: 1.2rem;
+            width: 32px; height: 32px; border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .profile-grid-box {
+            background: #f8fafc; border: 1px solid var(--border);
+            border-radius: 14px; padding: 16px; margin-bottom: 16px;
+        }
+
+        .detail-row { margin-bottom: 12px; font-size: 0.9rem; }
+        .detail-row span { color: var(--text-muted); font-weight: 600; display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 2px; }
+        .detail-row b { color: var(--text-dark); font-weight: 700; }
+
+        .pay-checkbox { width: 20px; height: 20px; accent-color: var(--success); cursor: pointer; }
+
+        .filter-status-banner {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #eef2ff; color: var(--primary); padding: 8px 12px;
+            border-radius: 10px; margin-bottom: 12px; font-size: 0.82rem; font-weight: 700;
+        }
+
+        .scanner-box-wrapper { width: 100%; border-radius: 14px; overflow: hidden; border: 2px solid var(--border); margin-bottom: 14px; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+    <!-- TOP BAR -->
+    <div class="top-app-bar">
+        <div class="brand-badge">
+            <span class="brand-icon">🚩</span>
+            <div class="brand-text">
+                <h1>ശ്രീ മുത്തപ്പൻ മെസ്സ്</h1>
+                <p id="appSubHeader">ക്ലൗഡ് പോർട്ടൽ</p>
+            </div>
+        </div>
+        <button id="btnLogoutTop" class="btn-action-sm" style="background:#f1f5f9; display:none;" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- MAIN BODY -->
+    <div class="app-content">
+
+        <!-- 1. ലോഗിൻ വ്യൂ (ഡെമോ ബോക്സ് ഒഴിവാക്കിയത്) -->
+        <div id="viewLogin">
+            <div class="role-pill-switch">
+                <button class="role-pill-btn active" id="btnRoleStudent" onclick="setRole('student')">👨‍🎓 വിദ്യാർത്ഥി</button>
+                <button class="role-pill-btn" id="btnRoleAdmin" onclick="setRole('admin')">👨‍🍳 അഡ്മിൻ</button>
+            </div>
+
+            <form id="formLogin" class="card">
+                <input type="hidden" id="inputRole" value="student">
+                <div class="form-group">
+                    <label id="labelLoginId">Student ID (റൂം നമ്പർ):</label>
+                    <input type="text" id="inputLoginId" placeholder="ഉദാ: H101" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>പാസ്‌വേഡ്:</label>
+                    <input type="password" id="inputLoginPass" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-main">പ്രവേശിക്കുക</button>
+            </form>
+        </div>
+
+        <!-- 2. വിദ്യാർത്ഥി ഡാഷ്‌ബോർഡ് -->
+        <div id="viewStudent" class="hidden">
+            <div id="stuTabOrder">
+                <div class="card" style="background:#fffbeb; border-color:#fde68a;">
+                    <div style="font-size: 0.85rem; font-weight: 700; color: #b45309; margin-bottom: 6px;">🍲 ഇന്നത്തെ സ്പെഷ്യൽ മെനു:</div>
+                    <div id="dispStuMenu" style="font-size: 0.88rem; line-height: 1.5; color: #78350f;">ലോഡാകുന്നു...</div>
+                </div>
+
+                <div class="card">
+                    <div id="dispOrderWindowAlert" style="padding:10px; border-radius:10px; font-size:0.85rem; font-weight:700; margin-bottom:12px;"></div>
+                    <h3 style="margin-top:0; font-size:1rem;">ഭക്ഷണ ഓർഡർ (Food Order)</h3>
+                    
+                    <form id="formStudentOrder">
+                        <div style="background:#f8fafc; padding:14px; border-radius:12px; border:1.5px solid var(--border); margin-bottom:14px;">
+                            <label style="display:flex; align-items:center; gap:10px; font-weight:700; cursor:pointer; margin:0; font-size:0.95rem;">
+                                <input type="checkbox" id="chkStuFood" style="width:22px; height:22px; accent-color:var(--primary);">
+                                🍽️ ഇന്ന് ഭക്ഷണം വേണം (Order Food)
+                            </label>
+                        </div>
+                        <button type="submit" id="btnSubmitOrder" class="btn-main">ഓർഡർ സേവ് ചെയ്യുക</button>
+                    </form>
+                </div>
+
+                <div id="boxStudentQR" class="card hidden" style="text-align:center;">
+                    <h3 style="margin-top:0; font-size:1rem;">🎫 ഇന്നത്തെ ഭക്ഷണ ടോക്കൺ QR കോഡ്</h3>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">ഭക്ഷണം വാങ്ങുമ്പോൾ ഇത് സ്കാൻ ചെയ്യിക്കുക:</p>
+                    
+                    <div class="qr-display-box">
+                        <div id="qrcodeContainer"></div>
+                        <div style="margin-top:8px;">
+                            <b id="dispQrStudentId" style="font-size:1.1rem; color:var(--primary);"></b>
+                            <div id="dispQrServingStatus" style="margin-top:4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="stuTabRent" class="hidden">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <div>
+                            <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">ഈ മാസത്തെ വാടക നിരക്ക്</span>
+                            <div style="font-size:1.6rem; font-weight:800; color:var(--primary);">₹<span id="dispStuRentAmt">4500</span></div>
+                        </div>
+                        <span id="badgeStuRentStatus" class="badge">PENDING</span>
+                    </div>
+
+                    <div style="font-size:0.85rem; line-height:1.6; color:#475569; margin-bottom:14px;">
+                        📅 ജോയിൻ ചെയ്ത തീയതി: <b id="dispStuJoinDate"></b><br>
+                        ⏰ അടുത്ത ഡ്യൂ ഡേറ്റ്: <b id="dispStuDueDate" style="color:var(--primary);"></b>
+                    </div>
+
+                    <div id="boxPayAction" style="padding: 12px; border-radius: 10px; font-size: 0.85rem; line-height: 1.5;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. അഡ്മിൻ ഡാഷ്‌ബോർഡ് -->
+        <div id="viewAdmin" class="hidden">
+            
+            <!-- Admin Tab 1: കിച്ചൺ & സാമ്പത്തിക കണക്കുകൾ -->
+            <div id="admTabOverview">
+                <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">ഓർഡർ വിൻഡോ</div>
+                        <span id="badgeAdminOrderActive" class="badge open" style="margin-top:4px;">🟢 OPEN</span>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn-action-sm" style="background:#dcfce7; color:#15803d;" onclick="setOrderActive(true)">Start</button>
+                        <button class="btn-action-sm" style="background:#fee2e2; color:#b91c1c;" onclick="setOrderActive(false)">Close</button>
+                    </div>
+                </div>
+
+                <div class="stats-grid-3">
+                    <div class="stat-card-sm" onclick="filterByFoodStatus('all-ordered')">
+                        <div class="label">ആകെ ഓർഡർ</div>
+                        <div class="num" id="dispAdmTotalFood">0</div>
+                        <div class="hint">ഓർഡറുകൾ</div>
+                    </div>
+                    <div class="stat-card-sm green" onclick="filterByFoodStatus('served')">
+                        <div class="label">കഴിച്ചവർ</div>
+                        <div class="num" id="dispAdmServed">0</div>
+                        <div class="hint">Served ✅</div>
+                    </div>
+                    <div class="stat-card-sm orange" onclick="filterByFoodStatus('remaining')">
+                        <div class="label">കഴിക്കാൻ ബാക്കി</div>
+                        <div class="num" id="dispAdmRemaining">0</div>
+                        <div class="hint">Pending ⏳</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <button class="btn-main warning" onclick="adminResetOrders()">
+                        🔄 ഇന്നത്തെ ഭക്ഷണ ഓർഡറുകൾ റീസെറ്റ് ചെയ്യുക (Reset)
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <label style="margin:0;">📅 മാസം തിരഞ്ഞെടുക്കുക:</label>
+                        <select id="selectFinanceMonth" style="width:auto; padding:6px 10px; font-size:0.85rem;" onchange="renderAdmin()"></select>
+                    </div>
+
+                    <div class="stats-grid-2">
+                        <div class="stat-card-sm green" onclick="filterByPaymentCard('paid')">
+                            <div class="label">ലഭിച്ച തുക</div>
+                            <div class="num" id="dispAdmCollected">₹0</div>
+                            <div class="hint">👉 തന്നവർ</div>
+                        </div>
+
+                        <div class="stat-card-sm red" onclick="filterByPaymentCard('pending')">
+                            <div class="label">കുടിശ്ശിക (ബാക്കി)</div>
+                            <div class="num" id="dispAdmPending">₹0</div>
+                            <div class="hint">👉 ബാക്കിയുള്ളവർ</div>
+                        </div>
+                    </div>
+
+                    <button class="btn-main" style="background:#f1f5f9; color:var(--text-dark); font-size:0.85rem;" onclick="exportCSV()">📥 എക്സൽ (CSV) റിപ്പോർട്ട് ഡൗൺലോഡ്</button>
+                </div>
+            </div>
+
+            <!-- Admin Tab 2: QR സ്കാനർ -->
+            <div id="admTabScanner" class="hidden">
+                <div class="card" style="text-align:center;">
+                    <h3 style="margin-top:0; font-size:1.05rem;">📷 QR കോഡ് സ്കാനർ (Food Serving)</h3>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">വിദ്യാർത്ഥിയുടെ QR കോഡ് കാണിക്കുക:</p>
+                    
+                    <div class="scanner-box-wrapper">
+                        <div id="qrReader" style="width:100%;"></div>
+                    </div>
+
+                    <div id="scanResultMsg" style="margin-top:10px; font-weight:700; font-size:0.9rem;"></div>
+                    <button id="btnStartScan" class="btn-main success" onclick="startQRScanner()">📷 ക്യാമറ ഓൺ ചെയ്യുക</button>
+                    <button id="btnStopScan" class="btn-main danger hidden" style="margin-top:8px;" onclick="stopQRScanner()">⏹️ ക്യാമറ ഓഫ് ചെയ്യുക</button>
+                </div>
+            </div>
+
+            <!-- Admin Tab 3: മെനു മാറ്റുക -->
+            <div id="admTabMenu" class="hidden">
+                <form id="formAdminMenu" class="card">
+                    <h3 style="margin-top:0; font-size:1rem;">🍲 ഇന്നത്തെ മെനു മാറ്റുക</h3>
+                    <div class="form-group">
+                        <label>ഇന്നത്തെ പ്രത്യേക വിഭവങ്ങൾ:</label>
+                        <textarea id="inMenuFull" rows="3" placeholder="ഉദാ: ചോറ്, സാമ്പാർ, മീൻ വറുത്തത്..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-main success">ക്ലൗഡിൽ സേവ് ചെയ്യുക</button>
+                </form>
+            </div>
+
+            <!-- Admin Tab 4: പുതിയ രജിസ്ട്രേഷൻ -->
+            <div id="admTabReg" class="hidden">
+                <form id="formAdminAddStudent" class="card">
+                    <h3 style="margin-top:0; font-size:1rem;">➕ പുതിയ വിദ്യാർത്ഥിയെ ചേർക്കുക</h3>
+                    <div class="form-group">
+                        <label>വിദ്യാർത്ഥിയുടെ പേര്:</label>
+                        <input type="text" id="inNewName" placeholder="ഉദാ: Rahul M" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Student ID (റൂം നമ്പർ / ലോഗിൻ ID):</label>
+                        <input type="text" id="inNewId" placeholder="ഉദാ: H-101" required>
+                    </div>
+                    <div class="form-group">
+                        <label>വാട്സാപ്പ് നമ്പർ:</label>
+                        <input type="tel" id="inNewPhone" placeholder="ഉദാ: 9876543210" required>
+                    </div>
+                    <div class="form-group">
+                        <label>പൂർണ്ണ മേൽവിലാസം (Address):</label>
+                        <textarea id="inNewAddress" rows="2" placeholder="വീട്ടുപേര്, സ്ഥലം..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>പാസ്‌വേഡ്:</label>
+                        <input type="text" id="inNewPass" placeholder="പാസ്‌വേഡ്" required>
+                    </div>
+                    <div class="form-group">
+                        <label>മാസ വാടക (₹):</label>
+                        <input type="number" id="inNewRent" value="4500" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ജോയിനിംഗ് ഡേറ്റ്:</label>
+                        <input type="date" id="inNewDate" required>
+                    </div>
+                    <button type="submit" class="btn-main success">+ രജിസ്റ്റർ ചെയ്യുക</button>
+                </form>
+            </div>
+
+            <!-- Admin Tab 5: വാടക & കുട്ടികളുടെ ലിസ്റ്റ് -->
+            <div id="admTabRent" class="hidden">
+                <div id="bannerFilterState" class="filter-status-banner hidden">
+                    <span id="textFilterStateTitle">ഫിൽട്ടർ ചെയ്ത ലിസ്റ്റ്</span>
+                    <button class="btn-action-sm" style="background:#ffffff; color:var(--primary);" onclick="resetFilterMode()">മുഴുവൻ കാണിക്കുക</button>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <input type="text" id="inSearchStudents" onkeyup="filterStudentsList()" placeholder="🔍 പേര് / ID സെർച്ച്..." style="padding:8px 12px; font-size:0.85rem;">
+                </div>
+                
+                <div id="containerStudentCards"></div>
+            </div>
+
+            <!-- Admin Tab 6: അഡ്മിൻ പാസ്‌വേഡ് മാറ്റാനുള്ള സെറ്റിങ്സ് (New Feature) -->
+            <div id="admTabSettings" class="hidden">
+                <form id="formAdminChangePass" class="card">
+                    <h3 style="margin-top:0; font-size:1.05rem; color:var(--primary);">⚙️ അഡ്മിൻ പാസ്‌വേഡ് മാറ്റുക (Settings)</h3>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">അഡ്മിൻ ലോഗിൻ യൂസർനെയിമും പാസ്‌വേഡും മാറ്റാൻ ഇത് ഉപയോഗിക്കുക:</p>
+                    
+                    <div class="form-group">
+                        <label>നിലവിലെ പാസ്‌വേഡ് (Current Password):</label>
+                        <input type="password" id="inCurAdminPass" placeholder="••••••••" required>
+                    </div>
+                    <div class="form-group">
+                        <label>പുതിയ അഡ്മിൻ യൂസർനെയിം (New Username):</label>
+                        <input type="text" id="inNewAdminUser" placeholder="ഉദാ: admin" required>
+                    </div>
+                    <div class="form-group">
+                        <label>പുതിയ പാസ്‌വേഡ് (New Password):</label>
+                        <input type="password" id="inNewAdminPass" placeholder="പുതിയ പാസ്‌വേഡ്" required>
+                    </div>
+                    <button type="submit" class="btn-main success">പാസ്‌വേഡ് മാറ്റുക (Update Credentials)</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BOTTOM APP NAVIGATION BAR -->
+    <div id="bottomNavBar" class="bottom-nav hidden"></div>
+
+    <!-- വിവരങ്ങൾ കാണാനുള്ള ബോക്സ് -->
+    <div id="modalFullDetails" class="modal-overlay hidden" onclick="handleModalBackdropClick(event)">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>📋 വിദ്യാർത്ഥിയുടെ വിവരങ്ങൾ</h3>
+                <button class="close-btn" onclick="closeDetailsModal()">✕</button>
+            </div>
+            <div class="profile-grid-box" id="modalDetailsBody"></div>
+            <div id="modalQuickActions" style="display:flex; gap:8px;"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ================= 1. FIREBASE CONFIGURATION =================
+    const firebaseConfig = {
+        apiKey: "AIzaSyBTkHIOMTxvtazNKrEgncTAe_TNkdjrMqA",
+        authDomain: "sri-muthappan.firebaseapp.com",
+        projectId: "sri-muthappan",
+        storageBucket: "sri-muthappan.firebasestorage.app",
+        messagingSenderId: "759252398348",
+        appId: "1:759252398348:web:eaa16b56266a41b29f5929",
+        measurementId: "G-D9CTVJ2TCZ"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // അഡ്മിൻ ക്രെഡൻഷ്യൽസ് വേരിയബിൾ (ക്ലൗഡിൽ നിന്ന് ഓട്ടോമാറ്റിക് ആയി മാറും)
+    let adminAuth = { id: "admin", pass: "admin123" };
+
+    function getCurMonthKey() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function getTodayDateKey() {
+        return new Date().toISOString().split('T')[0];
+    }
+
+    let students = [];
+    let dailyMenuText = "ചോറ്, സാമ്പാർ, മീൻ വറുത്തത്, തോരൻ";
+    let isOrderActive = true;
+    let currentUser = null;
+    let currentRole = 'student';
+    let filterMode = 'all'; 
+    let html5QrCodeScanner = null;
+
+    document.getElementById('inNewDate').valueAsDate = new Date();
+
+    // ================= 2. REAL-TIME CLOUD LISTENERS =================
+    db.collection("students").onSnapshot(snapshot => {
+        students = [];
+        snapshot.forEach(doc => {
+            students.push({ docId: doc.id, ...doc.data() });
+        });
+        
+        if (currentUser && currentRole === 'student') {
+            const updated = students.find(s => s.id === currentUser.id);
+            if (updated) {
+                currentUser = updated;
+                loadStudentData();
+            }
+        }
+        if (currentRole === 'admin') {
+            renderAdmin();
+        }
+    });
+
+    db.collection("settings").doc("mess_state").onSnapshot(doc => {
+        if (doc.exists) {
+            const data = doc.data();
+            dailyMenuText = data.menu || "";
+            isOrderActive = data.isOrderActive ?? true;
+            if (data.adminId && data.adminPass) {
+                adminAuth.id = data.adminId;
+                adminAuth.pass = data.adminPass;
+            }
+            
+            if (currentUser && currentRole === 'student') loadStudentData();
+            if (currentRole === 'admin') renderAdmin();
+        }
+    });
+
+    function initMonthSelector() {
+        const sel = document.getElementById('selectFinanceMonth');
+        sel.innerHTML = '';
+        const months = ["ജനുവരി", "ഫെബ്രുവരി", "മാർച്ച്", "ഏപ്രിൽ", "മേയ്", "ജൂൺ", "ജൂലൈ", "ഓഗസ്റ്റ്", "സെപ്റ്റംബർ", "ഒക്ടോബർ", "നവംബർ", "ഡിസംബർ"];
+        const now = new Date();
+        const curYear = now.getFullYear();
+        const curKey = getCurMonthKey();
+
+        for (let y = curYear + 1; y >= curYear - 1; y--) {
+            for (let m = 11; m >= 0; m--) {
+                const k = `${y}-${String(m + 1).padStart(2, '0')}`;
+                const opt = document.createElement('option');
+                opt.value = k;
+                opt.innerText = `${months[m]} ${y}`;
+                if (k === curKey) opt.selected = true;
+                sel.appendChild(opt);
+            }
+        }
+    }
+    initMonthSelector();
+
+    function setRole(role) {
+        currentRole = role;
+        document.getElementById('inputRole').value = role;
+        document.getElementById('btnRoleStudent').classList.toggle('active', role === 'student');
+        document.getElementById('btnRoleAdmin').classList.toggle('active', role === 'admin');
+        document.getElementById('labelLoginId').innerText = role === 'student' ? 'Student ID (റൂം നമ്പർ):' : 'അഡ്മിൻ യൂസർനെയിം:';
+        document.getElementById('inputLoginId').placeholder = role === 'student' ? 'ഉദാ: H101' : 'അഡ്മിൻ ഐഡി';
+    }
+
+    document.getElementById('formLogin').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const inputId = document.getElementById('inputLoginId').value.trim();
+        const inputPass = document.getElementById('inputLoginPass').value.trim();
+
+        if (currentRole === 'admin') {
+            if (inputId.toLowerCase() === adminAuth.id.toLowerCase() && inputPass === adminAuth.pass) {
+                currentUser = { role: 'admin' };
+                showView('admin');
+            } else {
+                alert('അഡ്മിൻ യൂസർനെയിം അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
+            }
+        } else {
+            const stu = students.find(s => 
+                String(s.id).trim().toLowerCase() === inputId.toLowerCase() && 
+                String(s.pass).trim() === inputPass
+            );
+
+            if (stu) {
+                if (stu.isBlocked) {
+                    alert('🚫 വാടക കുടിശ്ശികയുള്ളതിനാൽ അക്കൗണ്ട് ബ്ലോക്ക് ചെയ്തിരിക്കുന്നു!');
+                    return;
+                }
+                currentUser = stu;
+                showView('student');
+            } else {
+                alert('Student ID അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
+            }
+        }
+    });
+
+    function showView(role) {
+        document.getElementById('viewLogin').classList.add('hidden');
+        document.getElementById('btnLogoutTop').style.display = 'block';
+
+        const bottomBar = document.getElementById('bottomNavBar');
+        bottomBar.classList.remove('hidden');
+
+        if (role === 'student') {
+            document.getElementById('viewStudent').classList.remove('hidden');
+            document.getElementById('appSubHeader').innerText = `${currentUser.name} (ID: ${currentUser.id})`;
+            
+            bottomBar.innerHTML = `
+                <button class="nav-item active" onclick="switchStuTab('order', this)"><span class="icon">🍲</span>ഭക്ഷണം</button>
+                <button class="nav-item" onclick="switchStuTab('rent', this)"><span class="icon">💳</span>വാടക</button>
+            `;
+            loadStudentData();
+        } else {
+            document.getElementById('viewAdmin').classList.remove('hidden');
+            document.getElementById('appSubHeader').innerText = "അഡ്മിൻ ക്ലൗഡ് പാനൽ";
+
+            bottomBar.innerHTML = `
+                <button class="nav-item active" id="btnNavAdmDash" onclick="switchAdmTab('overview', this)"><span class="icon">📊</span>ഡാഷ്‌</button>
+                <button class="nav-item" id="btnNavAdmScan" onclick="switchAdmTab('scanner', this)"><span class="icon">📷</span>സ്കാൻ</button>
+                <button class="nav-item" id="btnNavAdmRent" onclick="switchAdmTab('rent', this)"><span class="icon">👥</span>ലിസ്റ്റ്</button>
+                <button class="nav-item" id="btnNavAdmMenu" onclick="switchAdmTab('menu', this)"><span class="icon">🍲</span>മെനു</button>
+                <button class="nav-item" id="btnNavAdmReg" onclick="switchAdmTab('reg', this)"><span class="icon">➕</span>ആഡ്</button>
+                <button class="nav-item" id="btnNavAdmSettings" onclick="switchAdmTab('settings', this)"><span class="icon">⚙️</span>സെറ്റിങ്സ്</button>
+            `;
+            renderAdmin();
+        }
+    }
+
+    function switchStuTab(tab, el) {
+        document.querySelectorAll('#bottomNavBar .nav-item').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+
+        document.getElementById('stuTabOrder').classList.toggle('hidden', tab !== 'order');
+        document.getElementById('stuTabRent').classList.toggle('hidden', tab !== 'rent');
+    }
+
+    function loadStudentData() {
+        const curM = getCurMonthKey();
+        const isPaid = (currentUser.paidMonths || []).includes(curM);
+
+        document.getElementById('dispStuMenu').innerText = dailyMenuText || "മെനു ലഭ്യമല്ല.";
+        document.getElementById('dispStuRentAmt').innerText = currentUser.rent || 4500;
+        document.getElementById('dispStuJoinDate').innerText = currentUser.joinDate;
+        document.getElementById('dispStuDueDate').innerText = calculateDueDate(currentUser.joinDate);
+
+        const badge = document.getElementById('badgeStuRentStatus');
+        const payBox = document.getElementById('boxPayAction');
+        badge.className = `badge ${isPaid ? 'paid' : 'unpaid'}`;
+        badge.innerText = isPaid ? 'PAID ✓' : 'PENDING';
+
+        if (isPaid) {
+            payBox.style.background = '#dcfce7';
+            payBox.style.color = '#15803d';
+            payBox.innerHTML = `<b>✓ ഈ മാസത്തെ വാടക ലഭിച്ചു.</b>`;
+        } else {
+            payBox.style.background = '#fee2e2';
+            payBox.style.color = '#b91c1c';
+            payBox.innerHTML = `<b>⚠️ വാടക കുടിശ്ശികയുണ്ട്:</b> മെസ്സ് മാനേജർക്ക് വാടക നൽകുക.`;
+        }
+
+        document.getElementById('chkStuFood').checked = currentUser.hasFoodOrder || false;
+
+        const alertBox = document.getElementById('dispOrderWindowAlert');
+        const btnOrder = document.getElementById('btnSubmitOrder');
+        if(isOrderActive) {
+            alertBox.style.background = '#dcfce7';
+            alertBox.style.color = '#15803d';
+            alertBox.innerText = '🟢 ഓർഡറുകൾ സ്വീകരിക്കുന്നു';
+            btnOrder.disabled = false;
+        } else {
+            alertBox.style.background = '#fee2e2';
+            alertBox.style.color = '#b91c1c';
+            alertBox.innerText = '🔴 ഓർഡർ സമയം അവസാനിച്ചു (Closed)';
+            btnOrder.disabled = true;
+        }
+
+        renderStudentQR();
+    }
+
+    document.getElementById('formStudentOrder').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const hasOrder = document.getElementById('chkStuFood').checked;
+        
+        db.collection("students").doc(currentUser.docId).update({
+            hasFoodOrder: hasOrder
+        }).then(() => {
+            alert(hasOrder ? 'ഭക്ഷണ ഓർഡർ രേഖപ്പെടുത്തി!' : 'ഭക്ഷണം ആവശ്യമില്ലെന്ന് രേഖപ്പെടുത്തി.');
+        });
+    });
+
+    function renderStudentQR() {
+        const qrBox = document.getElementById('boxStudentQR');
+        const qrContainer = document.getElementById('qrcodeContainer');
+        qrContainer.innerHTML = '';
+
+        if (currentUser.hasFoodOrder) {
+            qrBox.classList.remove('hidden');
+            document.getElementById('dispQrStudentId').innerText = `ID: ${currentUser.id} - ${currentUser.name}`;
+            
+            const qrPayload = JSON.stringify({
+                id: currentUser.id,
+                date: getTodayDateKey()
+            });
+
+            new QRCode(qrContainer, {
+                text: qrPayload,
+                width: 170,
+                height: 170,
+                colorDark: "#1e1b4b",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            const statusDisp = document.getElementById('dispQrServingStatus');
+            if (currentUser.isServed) {
+                statusDisp.innerHTML = `<span class="badge paid" style="font-size:0.85rem;">✅ ഭക്ഷണം സ്വീകരിച്ചു (SERVED)</span>`;
+            } else {
+                statusDisp.innerHTML = `<span class="badge unpaid" style="font-size:0.85rem;">⏳ ഭക്ഷണം നൽകാൻ ബാക്കിയുണ്ട്</span>`;
+            }
+        } else {
+            qrBox.classList.add('hidden');
+        }
+    }
+
+    function switchAdmTab(tab, el) {
+        document.querySelectorAll('#bottomNavBar .nav-item').forEach(b => b.classList.remove('active'));
+        if(el) el.classList.add('active');
+
+        document.getElementById('admTabOverview').classList.toggle('hidden', tab !== 'overview');
+        document.getElementById('admTabScanner').classList.toggle('hidden', tab !== 'scanner');
+        document.getElementById('admTabRent').classList.toggle('hidden', tab !== 'rent');
+        document.getElementById('admTabMenu').classList.toggle('hidden', tab !== 'menu');
+        document.getElementById('admTabReg').classList.toggle('hidden', tab !== 'reg');
+        document.getElementById('admTabSettings').classList.toggle('hidden', tab !== 'settings');
+
+        if(tab === 'menu') {
+            document.getElementById('inMenuFull').value = dailyMenuText;
+        }
+
+        if(tab === 'settings') {
+            document.getElementById('inNewAdminUser').value = adminAuth.id;
+            document.getElementById('inCurAdminPass').value = '';
+            document.getElementById('inNewAdminPass').value = '';
+        }
+
+        if(tab !== 'scanner') {
+            stopQRScanner();
+        }
+    }
+
+    function filterByPaymentCard(mode) {
+        filterMode = mode;
+        const rentNavBtn = document.getElementById('btnNavAdmRent');
+        switchAdmTab('rent', rentNavBtn);
+        renderAdmin();
+    }
+
+    function filterByFoodStatus(mode) {
+        filterMode = mode;
+        const rentNavBtn = document.getElementById('btnNavAdmRent');
+        switchAdmTab('rent', rentNavBtn);
+        renderAdmin();
+    }
+
+    function resetFilterMode() {
+        filterMode = 'all';
+        renderAdmin();
+    }
+
+    function setOrderActive(status) {
+        db.collection("settings").doc("mess_state").set({
+            isOrderActive: status,
+            menu: dailyMenuText
+        }, { merge: true }).then(() => {
+            alert(status ? "ഓർഡർ സ്വീകരിക്കുന്നത് ആരംഭിച്ചു!" : "ഓർഡർ ക്ലോസ് ചെയ്തു!");
+        });
+    }
+
+    function adminResetOrders() {
+        if(confirm("എല്ലാ വിദ്യാർത്ഥികളുടെയും ഇന്നത്തെ ഭക്ഷണ ഓർഡറുകൾ പൂജ്യമാക്കണോ?")) {
+            const batch = db.batch();
+            students.forEach(s => {
+                const ref = db.collection("students").doc(s.docId);
+                batch.update(ref, { hasFoodOrder: false, isServed: false });
+            });
+            batch.commit().then(() => {
+                alert("എല്ലാ ഓർഡറുകളും റീസെറ്റ് ചെയ്തു!");
+            });
+        }
+    }
+
+    document.getElementById('formAdminMenu').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const newMenu = document.getElementById('inMenuFull').value.trim();
+        db.collection("settings").doc("mess_state").set({
+            menu: newMenu,
+            isOrderActive: isOrderActive
+        }, { merge: true }).then(() => {
+            alert('മെനു ക്ലൗഡിൽ അപ്‌ഡേറ്റ് ചെയ്തു!');
+        });
+    });
+
+    // അഡ്മിൻ പാസ്‌വേഡ് മാറ്റുന്ന ഫോം (Update Password Logic)
+    document.getElementById('formAdminChangePass').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const curPass = document.getElementById('inCurAdminPass').value.trim();
+        const newUser = document.getElementById('inNewAdminUser').value.trim();
+        const newPass = document.getElementById('inNewAdminPass').value.trim();
+
+        if (curPass !== adminAuth.pass) {
+            alert('നിങ്ങൾ നൽകിയ നിലവിലെ പാസ്‌വേഡ് തെറ്റാണ്!');
+            return;
+        }
+
+        db.collection("settings").doc("mess_state").set({
+            adminId: newUser,
+            adminPass: newPass
+        }, { merge: true }).then(() => {
+            adminAuth.id = newUser;
+            adminAuth.pass = newPass;
+            alert('അഡ്മിൻ യൂസർനെയിമും പാസ്‌വേഡും വിജയകരമായി മാറ്റി!');
+            document.getElementById('formAdminChangePass').reset();
+        });
+    });
+
+    document.getElementById('formAdminAddStudent').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const id = document.getElementById('inNewId').value.trim().toUpperCase();
+        if(students.find(s => String(s.id).trim().toUpperCase() === id)) {
+            alert('ഈ ID നിലവിലുണ്ട്!');
+            return;
+        }
+
+        const newStudent = {
+            id,
+            name: document.getElementById('inNewName').value.trim(),
+            phone: document.getElementById('inNewPhone').value.trim(),
+            address: document.getElementById('inNewAddress').value.trim(),
+            pass: document.getElementById('inNewPass').value.trim(),
+            rent: parseInt(document.getElementById('inNewRent').value) || 4500,
+            joinDate: document.getElementById('inNewDate').value,
+            isBlocked: false,
+            paidMonths: [],
+            hasFoodOrder: false,
+            isServed: false
+        };
+
+        db.collection("students").add(newStudent).then(() => {
+            alert(`വിദ്യാർത്ഥിയെ ക്ലൗഡിൽ ചേർത്തു!\nID: ${id}`);
+            this.reset();
+            document.getElementById('inNewDate').valueAsDate = new Date();
+        });
+    });
+
+    function renderAdmin() {
+        const selMonth = document.getElementById('selectFinanceMonth').value || getCurMonthKey();
+        
+        let totalFood = 0, servedCount = 0, remainingCount = 0;
+        let collected = 0, pending = 0;
+        const container = document.getElementById('containerStudentCards');
+        container.innerHTML = '';
+
+        const banner = document.getElementById('bannerFilterState');
+        const bannerText = document.getElementById('textFilterStateTitle');
+        
+        if(filterMode === 'pending') {
+            banner.classList.remove('hidden');
+            banner.style.background = '#fee2e2';
+            banner.style.color = '#b91c1c';
+            bannerText.innerText = '⚠️ വാടക കുടിശ്ശികയുള്ളവരുടെ ലിസ്റ്റ്';
+        } else if(filterMode === 'paid') {
+            banner.classList.remove('hidden');
+            banner.style.background = '#dcfce7';
+            banner.style.color = '#15803d';
+            bannerText.innerText = '✅ വാടക അടച്ചവരുടെ ലിസ്റ്റ്';
+        } else if(filterMode === 'remaining') {
+            banner.classList.remove('hidden');
+            banner.style.background = '#fef3c7';
+            banner.style.color = '#b45309';
+            bannerText.innerText = '⏳ ഭക്ഷണം കഴിക്കാൻ ബാക്കിയുള്ളവർ';
+        } else if(filterMode === 'served') {
+            banner.classList.remove('hidden');
+            banner.style.background = '#dcfce7';
+            banner.style.color = '#15803d';
+            bannerText.innerText = '✅ ഭക്ഷണം കഴിച്ചവരുടെ ലിസ്റ്റ്';
+        } else if(filterMode === 'all-ordered') {
+            banner.classList.remove('hidden');
+            banner.style.background = '#eef2ff';
+            banner.style.color = 'var(--primary)';
+            bannerText.innerText = '🍲 ഇന്ന് ഓർഡർ ചെയ്ത കുട്ടികൾ';
+        } else {
+            banner.classList.add('hidden');
+        }
+
+        students.forEach((s, idx) => {
+            if(s.hasFoodOrder) {
+                totalFood++;
+                if(s.isServed) servedCount++;
+                else remainingCount++;
+            }
+
+            const isPaid = (s.paidMonths || []).includes(selMonth);
+            const amt = s.rent || 4500;
+            if(isPaid) collected += amt; else pending += amt;
+
+            if(filterMode === 'paid' && !isPaid) return;
+            if(filterMode === 'pending' && isPaid) return;
+            if(filterMode === 'all-ordered' && !s.hasFoodOrder) return;
+            if(filterMode === 'served' && (!s.hasFoodOrder || !s.isServed)) return;
+            if(filterMode === 'remaining' && (!s.hasFoodOrder || s.isServed)) return;
+
+            const card = document.createElement('div');
+            card.className = `student-item-card ${s.isBlocked ? 'blocked' : ''} ${s.isServed ? 'served' : ''}`;
+            card.setAttribute('data-search', `${s.name.toLowerCase()} ${s.id.toLowerCase()}`);
+
+            const waMsg = encodeURIComponent(`പ്രിയപ്പെട്ട ${s.name}, ശ്രീ മുത്തപ്പൻ മെസ്സിലെ വാടക ₹${amt} നൽകാൻ ബാക്കിയുണ്ട്. ദയവായി അടയ്ക്കുക.`);
+
+            let foodStatusBadge = '';
+            if(s.hasFoodOrder) {
+                foodStatusBadge = s.isServed 
+                    ? '<span class="badge served">കഴിച്ചു (Served)</span>' 
+                    : '<span class="badge pending-food">കഴിക്കാൻ ബാക്കി</span>';
+            } else {
+                foodStatusBadge = '<span class="badge" style="background:#f1f5f9; color:#94a3b8;">ഓർഡറില്ല</span>';
+            }
+
+            card.innerHTML = `
+                <div class="item-row-top">
+                    <div>
+                        <b style="font-size:0.95rem;">${s.name}</b> <small style="color:var(--text-muted); font-weight:700;">(${s.id})</small>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">Due: ${calculateDueDate(s.joinDate)} | വാടക: ₹${amt}</div>
+                    </div>
+                    <span class="badge ${isPaid ? 'paid' : 'unpaid'}">${isPaid ? 'PAID ✓' : 'PENDING'}</span>
+                </div>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin:2px 0;">
+                    <div>ഭക്ഷണ നില: ${foodStatusBadge}</div>
+                    ${s.hasFoodOrder && !s.isServed ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}')">✓ Serve</button>` : ''}
+                </div>
+
+                <div class="item-actions">
+                    <label style="display:flex; align-items:center; gap:4px; font-size:0.78rem; font-weight:700; cursor:pointer;">
+                        <input type="checkbox" class="pay-checkbox" ${isPaid ? 'checked' : ''} onchange="togglePay('${s.docId}', '${selMonth}', this.checked)"> വാടക അടച്ചു
+                    </label>
+
+                    <div style="margin-left:auto; display:flex; gap:6px;">
+                        <button class="btn-action-sm info" onclick="openDetailsModal(${idx})">📋 വിവരങ്ങൾ</button>
+                        ${!isPaid && s.phone ? `<a href="https://wa.me/91${s.phone}?text=${waMsg}" target="_blank" style="text-decoration:none;"><button class="btn-action-sm whatsapp">📲 WA</button></a>` : ''}
+                        <button class="btn-action-sm ${s.isBlocked ? 'unlock' : 'block'}" onclick="toggleBlock('${s.docId}', ${!s.isBlocked})">${s.isBlocked ? '🔓' : '🚫'}</button>
+                        <button class="btn-action-sm" style="background:#f1f5f9; color:#94a3b8;" onclick="deleteStudent('${s.docId}')">🗑️</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        if(container.innerHTML.trim() === '') {
+            container.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:30px; font-size:0.9rem;">ഈ വിഭാഗത്തിൽ ആരുമില്ല.</div>`;
+        }
+
+        document.getElementById('dispAdmTotalFood').innerText = totalFood;
+        document.getElementById('dispAdmServed').innerText = servedCount;
+        document.getElementById('dispAdmRemaining').innerText = remainingCount;
+
+        document.getElementById('dispAdmCollected').innerText = `₹${collected}`;
+        document.getElementById('dispAdmPending').innerText = `₹${pending}`;
+
+        const badgeOrder = document.getElementById('badgeAdminOrderActive');
+        badgeOrder.className = `badge ${isOrderActive ? 'paid' : 'unpaid'}`;
+        badgeOrder.innerText = isOrderActive ? '🟢 OPEN' : '🔴 CLOSED';
+    }
+
+    function manualServeFood(docId, name) {
+        db.collection("students").doc(docId).update({
+            isServed: true
+        }).then(() => {
+            alert(`${name} ന് ഭക്ഷണം നൽകിയതായി രേഖപ്പെടുത്തി!`);
+        });
+    }
+
+    // ================= QR SCANNER =================
+    function startQRScanner() {
+        const qrMsg = document.getElementById('scanResultMsg');
+        qrMsg.innerText = "ക്യാമറ റെഡിയാകുന്നു...";
+        
+        document.getElementById('btnStartScan').classList.add('hidden');
+        document.getElementById('btnStopScan').classList.remove('hidden');
+
+        html5QrCodeScanner = new Html5Qrcode("qrReader");
+        html5QrCodeScanner.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 220, height: 220 } },
+            (decodedText) => {
+                handleScannedQR(decodedText);
+            },
+            (errorMessage) => {}
+        ).catch(err => {
+            qrMsg.style.color = "var(--danger)";
+            qrMsg.innerText = "ക്യാമറ ആക്സസ് ലഭിച്ചില്ല!";
+            stopQRScanner();
+        });
+    }
+
+    function stopQRScanner() {
+        if(html5QrCodeScanner) {
+            html5QrCodeScanner.stop().then(() => {
+                html5QrCodeScanner.clear();
+                html5QrCodeScanner = null;
+            }).catch(e => {});
+        }
+        document.getElementById('btnStartScan').classList.remove('hidden');
+        document.getElementById('btnStopScan').classList.add('hidden');
+    }
+
+    function handleScannedQR(qrDataStr) {
+        const qrMsg = document.getElementById('scanResultMsg');
+        try {
+            const data = JSON.parse(qrDataStr);
+            const stu = students.find(s => String(s.id).trim().toUpperCase() === String(data.id).trim().toUpperCase());
+
+            if (!stu) {
+                qrMsg.style.color = "var(--danger)";
+                qrMsg.innerText = `❌ തെറ്റായ QR കോഡ്!`;
+                return;
+            }
+
+            if (stu.isBlocked) {
+                qrMsg.style.color = "var(--danger)";
+                qrMsg.innerText = `🚫 ശ്രദ്ധിക്കുക! ${stu.name} ന്റെ അക്കൗണ്ട് ബ്ലോക്ക് ചെയ്തിരിക്കുന്നു!`;
+                return;
+            }
+
+            if (!stu.hasFoodOrder) {
+                qrMsg.style.color = "var(--warning)";
+                qrMsg.innerText = `⚠️ ${stu.name} ഇന്ന് ഭക്ഷണം ഓർഡർ ചെയ്തിട്ടില്ല!`;
+                return;
+            }
+
+            if (stu.isServed) {
+                qrMsg.style.color = "var(--danger)";
+                qrMsg.innerText = `❌ ${stu.name} മുൻപ് ഭക്ഷണം വാങ്ങിയതാണ്! (Already Served)`;
+                return;
+            }
+
+            db.collection("students").doc(stu.docId).update({
+                isServed: true
+            }).then(() => {
+                qrMsg.style.color = "var(--success)";
+                qrMsg.innerText = `✅ വിജയിച്ചു! ${stu.name} (${stu.id}) ന് ഭക്ഷണം നൽകി.`;
+                if (navigator.vibrate) navigator.vibrate(200);
+            });
+
+        } catch(e) {
+            qrMsg.style.color = "var(--danger)";
+            qrMsg.innerText = "❌ അസാധുവായ QR കോഡ്!";
+        }
+    }
+
+    function openDetailsModal(idx) {
+        const s = students[idx];
+        const modalBody = document.getElementById('modalDetailsBody');
+        const quickActions = document.getElementById('modalQuickActions');
+        
+        modalBody.innerHTML = `
+            <div class="detail-row"><span>Student ID</span><b>${s.id}</b></div>
+            <div class="detail-row"><span>പേര്</span><b>${s.name}</b></div>
+            <div class="detail-row"><span>ഫോൺ നമ്പർ</span><b><a href="tel:${s.phone}" style="color:var(--primary);">📞 ${s.phone || 'N/A'}</a></b></div>
+            <div class="detail-row"><span>മേൽവിലാസം</span><b>${s.address || 'N/A'}</b></div>
+            <div class="detail-row"><span>പാസ്‌വേഡ്</span><b><code>${s.pass}</code></b></div>
+            <div class="detail-row"><span>പ്രതിമാസ വാടക</span><b>₹${s.rent || 4500}</b></div>
+            <div class="detail-row"><span>ജോയിനിംഗ് ഡേറ്റ്</span><b>${s.joinDate || 'N/A'}</b></div>
+            <div class="detail-row"><span>അക്കൗണ്ട് നില</span><b>${s.isBlocked ? '<span style="color:var(--danger)">🚫 BLOCKED</span>' : '<span style="color:var(--success)">✅ ACTIVE</span>'}</b></div>
+        `;
+
+        const waLink = s.phone ? `https://wa.me/91${s.phone}` : '#';
+        quickActions.innerHTML = `
+            <a href="tel:${s.phone || ''}" style="flex:1; text-decoration:none;"><button class="btn-main" style="background:#0284c7; font-size:0.85rem;">📞 വിളിക്കുക</button></a>
+            ${s.phone ? `<a href="${waLink}" target="_blank" style="flex:1; text-decoration:none;"><button class="btn-main whatsapp" style="font-size:0.85rem;">📲 WhatsApp</button></a>` : ''}
+        `;
+
+        document.getElementById('modalFullDetails').classList.remove('hidden');
+    }
+
+    function closeDetailsModal() {
+        document.getElementById('modalFullDetails').classList.add('hidden');
+    }
+
+    function handleModalBackdropClick(event) {
+        if(event.target.id === 'modalFullDetails') closeDetailsModal();
+    }
+
+    function togglePay(docId, mKey, isChecked) {
+        const stu = students.find(s => s.docId === docId);
+        let months = stu.paidMonths || [];
+
+        if(isChecked) {
+            if(!months.includes(mKey)) months.push(mKey);
+            db.collection("students").doc(docId).update({
+                paidMonths: months,
+                isBlocked: false
+            });
+        } else {
+            months = months.filter(m => m !== mKey);
+            db.collection("students").doc(docId).update({
+                paidMonths: months
+            });
+        }
+    }
+
+    function toggleBlock(docId, newStatus) {
+        db.collection("students").doc(docId).update({
+            isBlocked: newStatus
+        });
+    }
+
+    function deleteStudent(docId) {
+        if(confirm('വിദ്യാർത്ഥിയെ ക്ലൗഡിൽ നിന്നും നീക്കം ചെയ്യണോ?')) {
+            db.collection("students").doc(docId).delete();
+        }
+    }
+
+    function exportCSV() {
+        const mKey = document.getElementById('selectFinanceMonth').value || getCurMonthKey();
+        let csv = "data:text/csv;charset=utf-8,\uFEFFID,Name,Phone,Address,Rent,Joining Date,Status,Food Order,Food Served\n";
+        students.forEach(s => {
+            const isPaid = (s.paidMonths || []).includes(mKey);
+            const cleanAddr = (s.address || '').replace(/"/g, '""');
+            csv += `"${s.id}","${s.name}","${s.phone || ''}","${cleanAddr}","${s.rent || 4500}","${s.joinDate || ''}","${isPaid ? 'Paid' : 'Pending'}","${s.hasFoodOrder ? 'Yes' : 'No'}","${s.isServed ? 'Yes' : 'No'}"\n`;
+        });
+        const link = document.createElement("a");
+        link.setAttribute("href", encodeURI(csv));
+        link.setAttribute("download", `Mess_Cloud_Report_${mKey}.csv`);
+        link.click();
+    }
+
+    function filterStudentsList() {
+        const q = document.getElementById('inSearchStudents').value.toLowerCase();
+        document.querySelectorAll('.student-item-card').forEach(c => {
+            c.style.display = c.getAttribute('data-search').includes(q) ? 'flex' : 'none';
+        });
+    }
+
+    function calculateDueDate(joinDateStr) {
+        if (!joinDateStr) return "N/A";
+        const d = new Date(joinDateStr);
+        const today = new Date();
+        const day = d.getDate();
+        let target = new Date(today.getFullYear(), today.getMonth(), day);
+        if(today > target) target = new Date(today.getFullYear(), today.getMonth() + 1, day);
+        return target.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    }
+
+    function logout() {
+        currentUser = null;
+        stopQRScanner();
+        document.getElementById('viewLogin').classList.remove('hidden');
+        document.getElementById('viewStudent').classList.add('hidden');
+        document.getElementById('viewAdmin').classList.add('hidden');
+        document.getElementById('bottomNavBar').classList.add('hidden');
+        document.getElementById('btnLogoutTop').style.display = 'none';
+        document.getElementById('appSubHeader').innerText = "ഹോസ്റ്റൽ പോർട്ടൽ";
+        document.getElementById('formLogin').reset();
+    }
+</script>
+
+</body>
+</html>
