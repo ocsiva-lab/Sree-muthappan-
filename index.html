@@ -264,6 +264,207 @@
         .scan-result-card.warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
         .scan-result-card.danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
 
+        /* ================= CHAT STYLES ================= */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 200px);
+            min-height: 480px;
+            background: #f8fafc;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #ffffff;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h4 { margin: 0; font-size: 0.95rem; color: var(--primary); }
+
+        .chat-messages {
+            flex: 1;
+            padding: 14px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-bubble {
+            max-width: 82%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            position: relative;
+            word-break: break-word;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .chat-bubble.mine {
+            align-self: flex-end;
+            background: #4f46e5;
+            color: #ffffff;
+            border-bottom-right-radius: 3px;
+        }
+
+        .chat-bubble.theirs {
+            align-self: flex-start;
+            background: #ffffff;
+            color: var(--text-dark);
+            border-bottom-left-radius: 3px;
+            border: 1px solid var(--border);
+        }
+
+        .chat-bubble.admin-msg {
+            border-left: 4px solid #ef4444;
+            background: #fff5f5;
+            color: #7f1d1d;
+        }
+        .chat-bubble.admin-msg.mine {
+            background: #4f46e5;
+            color: #ffffff;
+            border-left: none;
+        }
+
+        .chat-sender-name {
+            font-size: 0.72rem;
+            font-weight: 700;
+            margin-bottom: 3px;
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .mine .chat-sender-name { color: #c7d2fe; }
+        .theirs .chat-sender-name { color: #6366f1; }
+
+        .chat-time {
+            font-size: 0.65rem;
+            opacity: 0.75;
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        .chat-input-bar {
+            background: #ffffff;
+            padding: 10px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-input-bar input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 20px;
+            font-size: 0.88rem;
+            background: #f1f5f9;
+        }
+
+        .chat-btn-send {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .chat-btn-voice {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .chat-btn-voice.recording {
+            background: #fee2e2;
+            color: #dc2626;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .audio-player-wrapper {
+            margin-top: 6px;
+        }
+        .audio-player-wrapper audio {
+            width: 100%;
+            height: 35px;
+            border-radius: 20px;
+        }
+
+        .chat-lock-banner {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* Toggle switch */
+        .toggle-switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #cbd5e1;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -414,6 +615,24 @@
                     <div id="boxPayAction" style="padding: 12px; border-radius: 10px; font-size: 0.85rem; line-height: 1.5;"></div>
                 </div>
             </div>
+
+            <div id="stuTabChat" class="hidden">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <h4>💬 മെസ്സ് & ഹോസ്റ്റൽ കമ്മ്യൂണിക്കേഷൻ</h4>
+                        <span id="badgeChatStatusStu" class="badge paid">🟢 Live</span>
+                    </div>
+                    <div id="chatLockBannerStu" class="chat-lock-banner hidden">
+                        🔒 അഡ്മിൻ മെസ്സേജ് അയക്കുന്നത് താൽക്കാലികമായി ലോക്ക് ചെയ്തിരിക്കുന്നു (View Only)
+                    </div>
+                    <div id="chatMessagesStudent" class="chat-messages"></div>
+                    <div id="chatInputBarStudent" class="chat-input-bar">
+                        <button id="btnVoiceRecordStu" class="chat-btn-voice" onclick="toggleVoiceRecord('student')">🎙️</button>
+                        <input type="text" id="chatInputTextStu" placeholder="മെസ്സേജ് ടൈപ്പ് ചെയ്യുക..." onkeypress="handleChatEnter(event, 'student')">
+                        <button class="chat-btn-send" onclick="sendChatMessage('student')">➤</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="viewAdmin" class="hidden">
@@ -480,7 +699,40 @@
                 </div>
             </div>
 
+            <div id="admTabChat" class="hidden">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <h4>📢 സ്റ്റുഡന്റ്സ് ബ്രോഡ്കാസ്റ്റ് & ചാറ്റ്</h4>
+                        <button class="btn-action-sm danger" onclick="clearAllChat()">🗑️ ചാറ്റ് ക്ലിയർ</button>
+                    </div>
+                    <div id="chatMessagesAdmin" class="chat-messages"></div>
+                    <div class="chat-input-bar">
+                        <button id="btnVoiceRecordAdm" class="chat-btn-voice" onclick="toggleVoiceRecord('admin')">🎙️</button>
+                        <input type="text" id="chatInputTextAdm" placeholder="എല്ലാ വിദ്യാർത്ഥികൾക്കും സന്ദേശം അയക്കുക..." onkeypress="handleChatEnter(event, 'admin')">
+                        <button class="chat-btn-send" onclick="sendChatMessage('admin')">➤</button>
+                    </div>
+                </div>
+            </div>
+
             <div id="admTabSettings" class="hidden">
+                <div class="card" style="background: #f0fdf4; border: 1.5px solid #bbf7d0;">
+                    <h3 style="margin-top:0; font-size:1rem; color:#15803d;">💬 ചാറ്റ് കൺട്രോൾ സെറ്റിംഗ്സ് (Chat Settings)</h3>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
+                        വിദ്യാർത്ഥികൾക്ക് മെസ്സേജ് അയക്കാനുള്ള അനുമതി നിയന്ത്രിക്കാം:
+                    </p>
+                    
+                    <div class="toggle-switch-container">
+                        <div>
+                            <b style="font-size:0.88rem; display:block;">🔒 അഡ്മിന് മാത്രം മെസ്സേജ് അയക്കാം (Admin-Only Mode)</b>
+                            <small style="color:var(--text-muted); font-size:0.75rem;">ഓൺ ആക്കിയാൽ കുട്ടികൾക്ക് മെസ്സേജ് അയക്കാൻ കഴിയില്ല.</small>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="chkAdminOnlyChat" onchange="toggleChatLock(this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="card" style="background: #fff1f2; border: 1.5px solid #fecdd3;">
                     <h3 style="margin-top:0; font-size:1rem; color:#b91c1c;">📄 സ്റ്റുഡന്റ്സ് PDF റിപ്പോർട്ട് (Print / Download)</h3>
                     <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">
@@ -665,1080 +917,4 @@
                 <button class="close-btn" onclick="closeStudentPassModal()">✕</button>
             </div>
             <form id="formStudentChangePass">
-                <div class="form-group">
-                    <label>പുതിയ പാസ്‌വേഡ്:</label>
-                    <input type="password" id="inStuNewPass" placeholder="പുതിയ പാസ്‌വേഡ് നൽകുക" required>
-                </div>
-                <button type="submit" class="btn-main success" style="margin-top:10px;">💾 പാസ്‌വേഡ് അപ്‌ഡേറ്റ് ചെയ്യുക</button>
-            </form>
-        </div>
-    </div>
-
-</div>
-
-<script>
-    // ================= 1. FIREBASE CONFIGURATION =================
-    const firebaseConfig = {
-        apiKey: "AIzaSyBTkHIOMTxvtazNKrEgncTAe_TNkdjrMqA",
-        authDomain: "sri-muthappan.firebaseapp.com",
-        projectId: "sri-muthappan",
-        storageBucket: "sri-muthappan.firebasestorage.app",
-        messagingSenderId: "759252398348",
-        appId: "1:759252398348:web:eaa16b56266a41b29f5929",
-        measurementId: "G-D9CTVJ2TCZ"
-    };
-
-    // Firebase Initialize
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    let adminCredentials = { user: "admin", pass: "admin123" };
-    let staffCredentials = { user: "staff", pass: "staff123" };
-
-    function getCurMonthKey() {
-        const d = new Date();
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    }
-
-    function getTodayDateKey() {
-        return new Date().toISOString().split('T')[0];
-    }
-
-    let students = [];
-    let dailyMenuText = "ചോറ്, സാമ്പാർ, മീൻ വറുത്തത്, തോരൻ";
-    let isOrderActive = true;
-    let currentUser = null;
-    let currentRole = 'student';
-    let filterMode = 'all'; 
-    let html5QrCodeScanner = null;
-
-    document.getElementById('inNewDate').valueAsDate = new Date();
-
-    // ഓട്ടോമാറ്റിക് ആയി അടുത്ത Student ID കണക്കാക്കുന്ന ഫംഗ്ഷൻ (1, 2, 3, 4...)
-    function getNextStudentId() {
-        if (!students || students.length === 0) return "1";
-        const numericIds = students
-            .map(s => parseInt(String(s.id).trim(), 10))
-            .filter(n => !isNaN(n) && n > 0);
-        
-        if (numericIds.length === 0) {
-            return (students.length + 1).toString();
-        }
-        const maxId = Math.max(...numericIds);
-        return (maxId + 1).toString();
-    }
-
-    function updateAutoStudentId() {
-        const idInput = document.getElementById('inNewId');
-        if (idInput) {
-            idInput.value = getNextStudentId();
-        }
-    }
-
-    // ================= 2. REAL-TIME CLOUD LISTENERS =================
-    db.collection("students").onSnapshot(snapshot => {
-        students = [];
-        snapshot.forEach(doc => {
-            students.push({ docId: doc.id, ...doc.data() });
-        });
-        
-        updateAutoStudentId();
-
-        if (currentUser && currentRole === 'student') {
-            const updated = students.find(s => String(s.id) === String(currentUser.id));
-            if (updated) {
-                currentUser = updated;
-                loadStudentData();
-            }
-        }
-        if (currentRole === 'admin' || currentRole === 'staff') {
-            renderAdmin();
-        }
-    });
-
-    db.collection("settings").doc("mess_state").onSnapshot(doc => {
-        if (doc.exists) {
-            const data = doc.data();
-            dailyMenuText = data.menu || "";
-            isOrderActive = data.isOrderActive ?? true;
-            if (data.adminUser && data.adminPass) {
-                adminCredentials = { user: data.adminUser, pass: data.adminPass };
-            }
-            if (data.staffUser && data.staffPass) {
-                staffCredentials = { user: data.staffUser, pass: data.staffPass };
-            }
-
-            document.getElementById('inAdmNewUser').value = adminCredentials.user;
-            document.getElementById('inAdmNewPass').value = adminCredentials.pass;
-            document.getElementById('inStaffNewUser').value = staffCredentials.user;
-            document.getElementById('inStaffNewPass').value = staffCredentials.pass;
-            
-            if (currentUser && currentRole === 'student') loadStudentData();
-            if (currentRole === 'admin' || currentRole === 'staff') renderAdmin();
-        } else {
-            db.collection("settings").doc("mess_state").set({
-                adminUser: "admin",
-                adminPass: "admin123",
-                staffUser: "staff",
-                staffPass: "staff123",
-                isOrderActive: true,
-                menu: dailyMenuText
-            });
-        }
-    });
-
-    function initMonthSelector() {
-        const sel = document.getElementById('selectFinanceMonth');
-        sel.innerHTML = '';
-        const months = ["ജനുവരി", "ഫെബ്രുവരി", "മാർച്ച്", "ഏപ്രിൽ", "മേയ്", "ജൂൺ", "ജൂലൈ", "ഓഗസ്റ്റ്", "സെപ്റ്റംബർ", "ഒക്ടോബർ", "നവംബർ", "ഡിസംബർ"];
-        const now = new Date();
-        const curYear = now.getFullYear();
-        const curKey = getCurMonthKey();
-
-        const optYearCur = document.createElement('option');
-        optYearCur.value = `YEAR-${curYear}`;
-        optYearCur.innerText = `🌟 ${curYear} ലെ മുഴുവൻ കണക്കുകൾ (Yearly)`;
-        sel.appendChild(optYearCur);
-
-        for (let y = curYear + 1; y >= curYear - 1; y--) {
-            for (let m = 11; m >= 0; m--) {
-                const k = `${y}-${String(m + 1).padStart(2, '0')}`;
-                const opt = document.createElement('option');
-                opt.value = k;
-                opt.innerText = `${months[m]} ${y}`;
-                if (k === curKey) opt.selected = true;
-                sel.appendChild(opt);
-            }
-        }
-    }
-    initMonthSelector();
-
-    function setRole(role) {
-        currentRole = role;
-        document.getElementById('inputRole').value = role;
-        document.getElementById('btnRoleStudent').classList.toggle('active', role === 'student');
-        document.getElementById('btnRoleStaff').classList.toggle('active', role === 'staff');
-        document.getElementById('btnRoleAdmin').classList.toggle('active', role === 'admin');
-
-        const lbl = document.getElementById('labelLoginId');
-        const inp = document.getElementById('inputLoginId');
-
-        if(role === 'student') {
-            lbl.innerText = 'Student ID (റോൾ നമ്പർ / റൂം നമ്പർ):';
-            inp.placeholder = 'ഉദാ: 1 അല്ലെങ്കിൽ H101';
-        } else if(role === 'staff') {
-            lbl.innerText = 'സ്റ്റാഫ് യൂസർനെയിം:';
-            inp.placeholder = 'സ്റ്റാഫ് ഐഡി';
-        } else {
-            lbl.innerText = 'അഡ്മിൻ യൂസർനെയിം:';
-            inp.placeholder = 'അഡ്മിൻ ഐഡി';
-        }
-    }
-
-    document.getElementById('formLogin').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const inputId = document.getElementById('inputLoginId').value.trim();
-        const inputPass = document.getElementById('inputLoginPass').value.trim();
-
-        if (currentRole === 'admin') {
-            if (inputId.toLowerCase() === adminCredentials.user.toLowerCase() && inputPass === adminCredentials.pass) {
-                currentUser = { role: 'admin' };
-                showView('admin');
-            } else {
-                alert('അഡ്മിൻ യൂസർനെയിം അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
-            }
-        } else if (currentRole === 'staff') {
-            if (inputId.toLowerCase() === staffCredentials.user.toLowerCase() && inputPass === staffCredentials.pass) {
-                currentUser = { role: 'staff' };
-                showView('staff');
-            } else {
-                alert('സ്റ്റാഫ് യൂസർനെയിം അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
-            }
-        } else {
-            const stu = students.find(s => 
-                String(s.id).trim().toLowerCase() === inputId.toLowerCase() && 
-                String(s.pass).trim() === inputPass
-            );
-
-            if (stu) {
-                if (stu.isBlocked) {
-                    alert('🚫 വാടക കുടിശ്ശികയുള്ളതിനാൽ അക്കൗണ്ട് ബ്ലോക്ക് ചെയ്തിരിക്കുന്നു!');
-                    return;
-                }
-                currentUser = stu;
-                showView('student');
-            } else {
-                alert('Student ID അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
-            }
-        }
-    });
-
-    function showView(role) {
-        document.getElementById('viewLogin').classList.add('hidden');
-        document.getElementById('btnLogoutTop').style.display = 'block';
-
-        const bottomBar = document.getElementById('bottomNavBar');
-        bottomBar.classList.remove('hidden');
-
-        if (role === 'student') {
-            document.getElementById('viewStudent').classList.remove('hidden');
-            document.getElementById('appSubHeader').innerText = `${currentUser.name} (ID: ${currentUser.id})`;
-            
-            bottomBar.innerHTML = `
-                <button class="nav-item active" onclick="switchStuTab('order', this)"><span class="icon">🍲</span>ഭക്ഷണം</button>
-                <button class="nav-item" onclick="switchStuTab('rent', this)"><span class="icon">💳</span>വാടക</button>
-            `;
-            loadStudentData();
-        } else if (role === 'staff') {
-            document.getElementById('viewAdmin').classList.remove('hidden');
-            document.getElementById('appSubHeader').innerText = "👨‍🍳 സ്റ്റാഫ് പാനൽ (Food Service)";
-
-            document.getElementById('secResetOrders').classList.add('hidden');
-            document.getElementById('secAdminFinance').classList.add('hidden');
-            document.getElementById('grpOrderSwitchBtns').classList.add('hidden');
-
-            bottomBar.innerHTML = `
-                <button class="nav-item active" id="btnNavAdmDash" onclick="switchAdmTab('overview', this)"><span class="icon">📊</span>ഡാഷ്‌ബോർഡ്</button>
-                <button class="nav-item" id="btnNavAdmScan" onclick="switchAdmTab('scanner', this)"><span class="icon">📷</span>സ്കാനർ</button>
-                <button class="nav-item" id="btnNavAdmRent" onclick="switchAdmTab('rent', this)"><span class="icon">🍲</span>ലിസ്റ്റ്</button>
-            `;
-            renderAdmin();
-        } else {
-            document.getElementById('viewAdmin').classList.remove('hidden');
-            document.getElementById('appSubHeader').innerText = "👑 അഡ്മിൻ ക്ലൗഡ് പാനൽ";
-
-            document.getElementById('secResetOrders').classList.remove('hidden');
-            document.getElementById('secAdminFinance').classList.remove('hidden');
-            document.getElementById('grpOrderSwitchBtns').classList.remove('hidden');
-
-            bottomBar.innerHTML = `
-                <button class="nav-item active" id="btnNavAdmDash" onclick="switchAdmTab('overview', this)"><span class="icon">📊</span>ഡാഷ്‌ബോർഡ്</button>
-                <button class="nav-item" id="btnNavAdmScan" onclick="switchAdmTab('scanner', this)"><span class="icon">📷</span>സ്കാനർ</button>
-                <button class="nav-item" id="btnNavAdmRent" onclick="switchAdmTab('rent', this)"><span class="icon">👥</span>ലിസ്റ്റ്</button>
-                <button class="nav-item" id="btnNavAdmMenu" onclick="switchAdmTab('menu', this)"><span class="icon">🍲</span>മെനു</button>
-                <button class="nav-item" id="btnNavAdmReg" onclick="switchAdmTab('reg', this)"><span class="icon">➕</span>ആഡ്</button>
-                <button class="nav-item" id="btnNavAdmSettings" onclick="switchAdmTab('settings', this)"><span class="icon">⚙️</span>സെറ്റിംഗ്സ്</button>
-            `;
-            renderAdmin();
-        }
-    }
-
-    function switchStuTab(tab, el) {
-        document.querySelectorAll('#bottomNavBar .nav-item').forEach(b => b.classList.remove('active'));
-        el.classList.add('active');
-
-        document.getElementById('stuTabOrder').classList.toggle('hidden', tab !== 'order');
-        document.getElementById('stuTabRent').classList.toggle('hidden', tab !== 'rent');
-    }
-
-    function loadStudentData() {
-        const todayStr = getTodayDateKey();
-        const curM = getCurMonthKey();
-        const isPaid = (currentUser.paidMonths || []).includes(curM);
-
-        document.getElementById('dispStuMenu').innerText = dailyMenuText || "മെനു ലഭ്യമല്ല.";
-        document.getElementById('dispStuRentAmt').innerText = currentUser.rent || 4500;
-        document.getElementById('dispStuJoinDate').innerText = currentUser.joinDate;
-        document.getElementById('dispStuDueDate').innerText = calculateDueDate(currentUser.joinDate);
-
-        const badge = document.getElementById('badgeStuRentStatus');
-        const payBox = document.getElementById('boxPayAction');
-        badge.className = `badge ${isPaid ? 'paid' : 'unpaid'}`;
-        badge.innerText = isPaid ? 'PAID ✓' : 'PENDING';
-
-        if (isPaid) {
-            payBox.style.background = '#dcfce7';
-            payBox.style.color = '#15803d';
-            payBox.innerHTML = `<b>✓ ഈ മാസത്തെ വാടക ലഭിച്ചു.</b>`;
-        } else {
-            payBox.style.background = '#fee2e2';
-            payBox.style.color = '#b91c1c';
-            payBox.innerHTML = `<b>⚠️ വാടക കുടിശ്ശികയുണ്ട്:</b> മെസ്സ് മാനേജർക്ക് വാടക നൽകുക.`;
-        }
-
-        const chkFood = document.getElementById('chkStuFood');
-        const alertBox = document.getElementById('dispOrderWindowAlert');
-        const btnOrder = document.getElementById('btnSubmitOrder');
-
-        const isAlreadyOrderedToday = (currentUser.lastOrderDate === todayStr && currentUser.hasFoodOrder);
-        chkFood.checked = currentUser.hasFoodOrder || false;
-
-        if (isAlreadyOrderedToday) {
-            alertBox.style.background = '#dcfce7';
-            alertBox.style.color = '#15803d';
-            alertBox.innerText = '✅ ഇന്നത്തെ ഭക്ഷണ ഓർഡർ രേഖപ്പെടുത്തിയിട്ടുണ്ട്';
-            chkFood.disabled = true;
-            btnOrder.disabled = true;
-            btnOrder.innerText = '🔒 ഇന്ന് ഓർഡർ രേഖപ്പെടുത്തിക്കഴിഞ്ഞു';
-        } else if (isOrderActive) {
-            alertBox.style.background = '#e0f2fe';
-            alertBox.style.color = '#0369a1';
-            alertBox.innerText = '🟢 ഓർഡർ സ്വീകരിക്കുന്നു';
-            chkFood.disabled = false;
-            btnOrder.disabled = false;
-            btnOrder.innerText = 'ഓർഡർ സേവ് ചെയ്യുക';
-        } else {
-            alertBox.style.background = '#fee2e2';
-            alertBox.style.color = '#b91c1c';
-            alertBox.innerText = '🔴 ഓർഡർ സമയം അവസാനിച്ചു (Closed)';
-            chkFood.disabled = true;
-            btnOrder.disabled = true;
-            btnOrder.innerText = 'ഓർഡർ സമയം അവസാനിച്ചു';
-        }
-
-        renderStudentQR();
-    }
-
-    document.getElementById('formStudentOrder').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const todayStr = getTodayDateKey();
-
-        if (currentUser.lastOrderDate === todayStr && currentUser.hasFoodOrder) {
-            alert('നിങ്ങൾ ഇന്ന് ഇതിനകം ഓർഡർ നൽകിയിട്ടുണ്ട്!');
-            return;
-        }
-
-        const hasOrder = document.getElementById('chkStuFood').checked;
-        if (!hasOrder) {
-            alert('ദയവായി ഓർഡർ ടിക്ക് ചെയ്യുക!');
-            return;
-        }
-        
-        db.collection("students").doc(currentUser.docId).update({
-            hasFoodOrder: true,
-            lastOrderDate: todayStr
-        }).then(() => {
-            alert('ഇന്നത്തെ ഭക്ഷണ ഓർഡർ രേഖപ്പെടുത്തി!');
-        });
-    });
-
-    function openStudentPassModal() {
-        document.getElementById('modalStudentPass').classList.remove('hidden');
-    }
-    function closeStudentPassModal() {
-        document.getElementById('modalStudentPass').classList.add('hidden');
-    }
-    function handleStudentPassBackdrop(event) {
-        if(event.target.id === 'modalStudentPass') closeStudentPassModal();
-    }
-
-    document.getElementById('formStudentChangePass').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const newP = document.getElementById('inStuNewPass').value.trim();
-        if(newP.length < 3) {
-            alert('പാസ്‌വേഡ് കുറഞ്ഞത് 3 അക്ഷരങ്ങൾ വേണം.');
-            return;
-        }
-
-        db.collection("students").doc(currentUser.docId).update({
-            pass: newP
-        }).then(() => {
-            alert('നിങ്ങളുടെ പാസ്‌വേഡ് വിജയകരമായി മാറ്റി!');
-            document.getElementById('inStuNewPass').value = '';
-            closeStudentPassModal();
-        });
-    });
-
-    document.getElementById('formAdminChangeCreds').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const newU = document.getElementById('inAdmNewUser').value.trim();
-        const newP = document.getElementById('inAdmNewPass').value.trim();
-
-        if(!newU || !newP) {
-            alert('യൂസർനെയിമും പാസ്‌വേഡും നൽകുക.');
-            return;
-        }
-
-        db.collection("settings").doc("mess_state").set({
-            adminUser: newU,
-            adminPass: newP
-        }, { merge: true }).then(() => {
-            alert('അഡ്മിൻ യൂസർനെയിമും പാസ്‌വേഡും വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്തു!');
-        });
-    });
-
-    document.getElementById('formStaffChangeCreds').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const newU = document.getElementById('inStaffNewUser').value.trim();
-        const newP = document.getElementById('inStaffNewPass').value.trim();
-
-        if(!newU || !newP) {
-            alert('സ്റ്റാഫ് വിവരങ്ങൾ നൽകുക.');
-            return;
-        }
-
-        db.collection("settings").doc("mess_state").set({
-            staffUser: newU,
-            staffPass: newP
-        }, { merge: true }).then(() => {
-            alert('സ്റ്റാഫ് ലോഗിൻ വിവരങ്ങൾ അപ്‌ഡേറ്റ് ചെയ്തു!');
-        });
-    });
-
-    function renderStudentQR() {
-        const qrBox = document.getElementById('boxStudentQR');
-        const qrContainer = document.getElementById('qrcodeContainer');
-        qrContainer.innerHTML = '';
-
-        if (currentUser.hasFoodOrder) {
-            qrBox.classList.remove('hidden');
-            document.getElementById('dispQrStudentId').innerText = `ID: ${currentUser.id} - ${currentUser.name}`;
-
-            const qrPayload = JSON.stringify({
-                id: currentUser.id,
-                date: getTodayDateKey()
-            });
-
-            new QRCode(qrContainer, {
-                text: qrPayload,
-                width: 170,
-                height: 170,
-                colorDark: "#1e1b4b",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-
-            const statusDisp = document.getElementById('dispQrServingStatus');
-            if (currentUser.isServed) {
-                statusDisp.innerHTML = `<span class="badge paid" style="font-size:0.85rem;">✅ ഭക്ഷണം സ്വീകരിച്ചു (SERVED)</span>`;
-            } else {
-                statusDisp.innerHTML = `<span class="badge unpaid" style="font-size:0.85rem;">⏳ ഭക്ഷണം നൽകാൻ ബാക്കിയുണ്ട്</span>`;
-            }
-        } else {
-            qrBox.classList.add('hidden');
-        }
-    }
-
-    function switchAdmTab(tab, el) {
-        document.querySelectorAll('#bottomNavBar .nav-item').forEach(b => b.classList.remove('active'));
-        if(el) el.classList.add('active');
-
-        document.getElementById('admTabOverview').classList.toggle('hidden', tab !== 'overview');
-        document.getElementById('admTabScanner').classList.toggle('hidden', tab !== 'scanner');
-        document.getElementById('admTabRent').classList.toggle('hidden', tab !== 'rent');
-        document.getElementById('admTabMenu').classList.toggle('hidden', tab !== 'menu');
-        document.getElementById('admTabReg').classList.toggle('hidden', tab !== 'reg');
-        
-        const setTab = document.getElementById('admTabSettings');
-        if(setTab) setTab.classList.toggle('hidden', tab !== 'settings');
-
-        if(tab === 'menu') {
-            document.getElementById('inMenuFull').value = dailyMenuText;
-        }
-
-        if(tab === 'reg') {
-            updateAutoStudentId();
-        }
-
-        if(tab !== 'scanner') {
-            stopQRScanner();
-        }
-    }
-
-    function filterByPaymentCard(mode) {
-        if(currentRole === 'staff') return;
-        filterMode = mode;
-        const rentNavBtn = document.getElementById('btnNavAdmRent');
-        switchAdmTab('rent', rentNavBtn);
-        renderAdmin();
-    }
-
-    function filterByFoodStatus(mode) {
-        filterMode = mode;
-        const rentNavBtn = document.getElementById('btnNavAdmRent');
-        switchAdmTab('rent', rentNavBtn);
-        renderAdmin();
-    }
-
-    function resetFilterMode() {
-        filterMode = 'all';
-        renderAdmin();
-    }
-
-    function setOrderActive(status) {
-        db.collection("settings").doc("mess_state").set({
-            isOrderActive: status,
-            menu: dailyMenuText
-        }, { merge: true }).then(() => {
-            alert(status ? "ഓർഡർ സ്വീകരിക്കുന്നത് ആരംഭിച്ചു!" : "ഓർഡർ ക്ലോസ് ചെയ്തു!");
-        });
-    }
-
-    function adminResetOrders() {
-        if(confirm("എല്ലാ വിദ്യാർത്ഥികളുടെയും ഇന്നത്തെ ഭക്ഷണ ഓർഡറുകൾ പൂജ്യമാക്കണോ?")) {
-            const batch = db.batch();
-            students.forEach(s => {
-                const ref = db.collection("students").doc(s.docId);
-                batch.update(ref, { 
-                    hasFoodOrder: false, 
-                    isServed: false,
-                    lastOrderDate: ""
-                });
-            });
-            batch.commit().then(() => {
-                alert("എല്ലാ ഓർഡറുകളും വിജയകരമായി റീസെറ്റ് ചെയ്തു!");
-            });
-        }
-    }
-
-    document.getElementById('formAdminMenu').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const newMenu = document.getElementById('inMenuFull').value.trim();
-        db.collection("settings").doc("mess_state").set({
-            menu: newMenu,
-            isOrderActive: isOrderActive
-        }, { merge: true }).then(() => {
-            alert('മെനു ക്ലൗഡിൽ അപ്‌ഡേറ്റ് ചെയ്തു!');
-        });
-    });
-
-    document.getElementById('formAdminAddStudent').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const id = document.getElementById('inNewId').value.trim().toUpperCase();
-        if(students.find(s => String(s.id).trim().toUpperCase() === id)) {
-            alert('ഈ ID നിലവിലുണ്ട്! ദയവായി മറ്റൊരു ID നൽകുക.');
-            return;
-        }
-
-        const newStudent = {
-            id,
-            name: document.getElementById('inNewName').value.trim(),
-            phone: document.getElementById('inNewPhone').value.trim(),
-            address: document.getElementById('inNewAddress').value.trim(),
-            pass: document.getElementById('inNewPass').value.trim(),
-            rent: parseInt(document.getElementById('inNewRent').value) || 4500,
-            joinDate: document.getElementById('inNewDate').value,
-            isBlocked: false,
-            paidMonths: [],
-            hasFoodOrder: false,
-            isServed: false,
-            lastOrderDate: ""
-        };
-
-        db.collection("students").add(newStudent).then(() => {
-            alert(`വിദ്യാർത്ഥിയെ ക്ലൗഡിൽ ചേർത്തു!\nStudent ID: ${id}`);
-            document.getElementById('inNewName').value = '';
-            document.getElementById('inNewPhone').value = '';
-            document.getElementById('inNewAddress').value = '';
-            document.getElementById('inNewPass').value = '';
-            document.getElementById('inNewRent').value = '4500';
-            document.getElementById('inNewDate').valueAsDate = new Date();
-            updateAutoStudentId();
-        });
-    });
-
-    function renderAdmin() {
-        const selVal = document.getElementById('selectFinanceMonth').value || getCurMonthKey();
-        const isYearlyMode = selVal.startsWith("YEAR-");
-        const currentYearStr = isYearlyMode ? selVal.replace("YEAR-", "") : selVal.split('-')[0];
-        
-        let totalFood = 0, servedCount = 0, remainingCount = 0;
-        let collected = 0, pending = 0;
-        const container = document.getElementById('containerStudentCards');
-        container.innerHTML = '';
-
-        const banner = document.getElementById('bannerFilterState');
-        const bannerText = document.getElementById('textFilterStateTitle');
-        
-        if(filterMode === 'pending') {
-            banner.classList.remove('hidden');
-            banner.style.background = '#fee2e2';
-            banner.style.color = '#b91c1c';
-            bannerText.innerText = '⚠️ വാടക കുടിശ്ശികയുള്ളവരുടെ ലിസ്റ്റ് (Follow-up List)';
-        } else if(filterMode === 'paid') {
-            banner.classList.remove('hidden');
-            banner.style.background = '#dcfce7';
-            banner.style.color = '#15803d';
-            bannerText.innerText = '✅ വാടക അടച്ചവരുടെ ലിസ്റ്റ്';
-        } else if(filterMode === 'remaining') {
-            banner.classList.remove('hidden');
-            banner.style.background = '#fef3c7';
-            banner.style.color = '#b45309';
-            bannerText.innerText = '⏳ ഭക്ഷണം കഴിക്കാൻ ബാക്കിയുള്ളവർ';
-        } else if(filterMode === 'served') {
-            banner.classList.remove('hidden');
-            banner.style.background = '#dcfce7';
-            banner.style.color = '#15803d';
-            bannerText.innerText = '✅ ഭക്ഷണം കഴിച്ചവരുടെ ലിസ്റ്റ്';
-        } else if(filterMode === 'all-ordered') {
-            banner.classList.remove('hidden');
-            banner.style.background = '#eef2ff';
-            banner.style.color = 'var(--primary)';
-            bannerText.innerText = '🍲 ഇന്ന് ഓർഡർ ചെയ്ത കുട്ടികൾ';
-        } else {
-            banner.classList.add('hidden');
-        }
-
-        const sortMode = document.getElementById('sortStudentsBy').value;
-        let sortedStudents = [...students];
-
-        if(sortMode === 'name') {
-            sortedStudents.sort((a, b) => a.name.localeCompare(b.name));
-        } else if(sortMode === 'pendingFirst') {
-            sortedStudents.sort((a, b) => {
-                const aPaid = (a.paidMonths || []).includes(selVal);
-                const bPaid = (b.paidMonths || []).includes(selVal);
-                return aPaid === bPaid ? 0 : aPaid ? 1 : -1;
-            });
-        }
-
-        sortedStudents.forEach((s) => {
-            const originalIndex = students.findIndex(orig => orig.docId === s.docId);
-
-            if(s.hasFoodOrder) {
-                totalFood++;
-                if(s.isServed) servedCount++;
-                else remainingCount++;
-            }
-
-            const amt = s.rent || 4500;
-            let isPaid = false;
-            let statusText = "";
-
-            if(isYearlyMode) {
-                const paidCountInYear = (s.paidMonths || []).filter(m => m.startsWith(currentYearStr)).length;
-                const yearlyTotal = amt * 12;
-                const yearlyPaid = amt * paidCountInYear;
-                collected += yearlyPaid;
-                pending += (yearlyTotal - yearlyPaid);
-                isPaid = (paidCountInYear >= 12);
-                statusText = `${paidCountInYear}/12 മാസം അടച്ചു`;
-            } else {
-                isPaid = (s.paidMonths || []).includes(selVal);
-                if(isPaid) collected += amt; else pending += amt;
-                statusText = isPaid ? 'PAID ✓' : 'PENDING';
-            }
-
-            if(filterMode === 'paid' && !isPaid) return;
-            if(filterMode === 'pending' && isPaid) return;
-            if(filterMode === 'all-ordered' && !s.hasFoodOrder) return;
-            if(filterMode === 'served' && (!s.hasFoodOrder || !s.isServed)) return;
-            if(filterMode === 'remaining' && (!s.hasFoodOrder || s.isServed)) return;
-
-            const card = document.createElement('div');
-            card.className = `student-item-card ${s.isBlocked ? 'blocked' : ''} ${s.isServed ? 'served' : ''}`;
-            card.setAttribute('data-search', `${s.name.toLowerCase()} ${s.id.toLowerCase()}`);
-
-            const waMsg = encodeURIComponent(`ശ്രീ മുത്തപ്പൻ മെസ്സ്: പ്രിയപ്പെട്ട ${s.name}, നിങ്ങളുടെ ${isYearlyMode ? currentYearStr + ' ലെ' : selVal + ' ലെ'} വാടക തുക ₹${amt} കുടിശ്ശികയായി കാണിക്കുന്നു. ദയവായി എത്രയും വേഗം അടയ്ക്കുക.`);
-
-            let foodStatusBadge = s.hasFoodOrder 
-                ? (s.isServed ? '<span class="badge served">കഴിച്ചു (Served)</span>' : '<span class="badge pending-food">കഴിക്കാൻ ബാക്കി</span>')
-                : '<span class="badge" style="background:#f1f5f9; color:#94a3b8;">ഓർഡറില്ല</span>';
-
-            if(currentRole === 'staff') {
-                card.innerHTML = `
-                    <div class="item-row-top">
-                        <div>
-                            <b style="font-size:0.95rem;">${s.name}</b> <small style="color:var(--text-muted); font-weight:700;">(ID: ${s.id})</small>
-                        </div>
-                        <div>${foodStatusBadge}</div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-                        <span style="font-size:0.8rem; color:var(--text-muted);">${s.isBlocked ? '🚫 അക്കൗണ്ട് ബ്ലോക്കാണ്' : (s.hasFoodOrder ? 'ഭക്ഷണ ഓർഡർ ഉണ്ട്' : 'ഓർഡറില്ല')}</span>
-                        ${s.hasFoodOrder && !s.isServed && !s.isBlocked ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}')">✓ Serve</button>` : ''}
-                    </div>
-                `;
-            } else {
-                card.innerHTML = `
-                    <div class="item-row-top">
-                        <div>
-                            <b style="font-size:0.95rem;">${s.name}</b> <small style="color:var(--text-muted); font-weight:700;">(ID: ${s.id})</small>
-                            <div style="font-size:0.75rem; color:var(--text-muted);">Due: ${calculateDueDate(s.joinDate)} | വാടക: ₹${amt}</div>
-                        </div>
-                        <span class="badge ${isPaid ? 'paid' : 'unpaid'}">${statusText}</span>
-                    </div>
-                    
-                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin:2px 0;">
-                        <div>ഭക്ഷണ നില: ${foodStatusBadge}</div>
-                        ${s.hasFoodOrder && !s.isServed ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}')">✓ Serve</button>` : ''}
-                    </div>
-
-                    <div class="item-actions">
-                        ${!isYearlyMode ? `
-                        <label style="display:flex; align-items:center; gap:4px; font-size:0.78rem; font-weight:700; cursor:pointer;">
-                            <input type="checkbox" class="pay-checkbox" ${isPaid ? 'checked' : ''} onchange="togglePay('${s.docId}', '${selVal}', this.checked)"> ഈ മാസം അടച്ചു
-                        </label>` : `<span style="font-size:0.75rem; color:var(--text-muted);">മാസം തിരഞ്ഞെടുത്ത് ടിക്ക് ചെയ്യുക</span>`}
-
-                        <div style="margin-left:auto; display:flex; gap:6px;">
-                            ${s.phone ? `<a href="tel:${s.phone}" style="text-decoration:none;"><button class="btn-action-sm call">📞 Call</button></a>` : ''}
-                            ${!isPaid && s.phone ? `<a href="https://wa.me/91${s.phone}?text=${waMsg}" target="_blank" style="text-decoration:none;"><button class="btn-action-sm whatsapp">📲 WA</button></a>` : ''}
-                            <button class="btn-action-sm edit" onclick="openEditModal(${originalIndex})">✏️</button>
-                            <button class="btn-action-sm info" onclick="openDetailsModal(${originalIndex})">📋</button>
-                            <button class="btn-action-sm ${s.isBlocked ? 'unlock' : 'block'}" onclick="toggleBlock('${s.docId}', ${!s.isBlocked})">${s.isBlocked ? '🔓' : '🚫'}</button>
-                            <button class="btn-action-sm" style="background:#f1f5f9; color:#94a3b8;" onclick="deleteStudent('${s.docId}')">🗑️</button>
-                        </div>
-                    </div>
-                `;
-            }
-
-            container.appendChild(card);
-        });
-
-        if(container.innerHTML.trim() === '') {
-            container.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:30px; font-size:0.9rem;">ഈ വിഭാഗത്തിൽ ആരുമില്ല.</div>`;
-        }
-
-        document.getElementById('dispAdmTotalFood').innerText = totalFood;
-        document.getElementById('dispAdmServed').innerText = servedCount;
-        document.getElementById('dispAdmRemaining').innerText = remainingCount;
-
-        document.getElementById('dispAdmCollected').innerText = `₹${collected}`;
-        document.getElementById('dispAdmPending').innerText = `₹${pending}`;
-
-        const badgeOrder = document.getElementById('badgeAdminOrderActive');
-        badgeOrder.className = `badge ${isOrderActive ? 'paid' : 'unpaid'}`;
-        badgeOrder.innerText = isOrderActive ? '🟢 OPEN' : '🔴 CLOSED';
-    }
-
-    function manualServeFood(docId, name) {
-        if(confirm(`${name} ന് ഭക്ഷണം നൽകിയതായി രേഖപ്പെടുത്തണോ?`)) {
-            db.collection("students").doc(docId).update({
-                isServed: true
-            });
-        }
-    }
-
-    // ================= 3. PDF GENERATION (ID ORDER) =================
-    function generateStudentsPDF() {
-        if (!students || students.length === 0) {
-            alert('ഡൗൺലോഡ് ചെയ്യാൻ വിദ്യാർത്ഥികളുടെ വിവരങ്ങൾ ലഭ്യമല്ല!');
-            return;
-        }
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
-
-        // Student ID അനുസരിച്ച് ക്രോഡീകരിക്കുന്നു (1, 2, 3, 4...)
-        const sortedList = [...students].sort((a, b) => {
-            const numA = parseInt(String(a.id).trim(), 10);
-            const numB = parseInt(String(b.id).trim(), 10);
-            if (!isNaN(numA) && !isNaN(numB)) {
-                return numA - numB;
-            }
-            return String(a.id).localeCompare(String(b.id), undefined, { numeric: true, sensitivity: 'base' });
-        });
-
-        // Header ഡിസൈൻ
-        doc.setFillColor(79, 70, 229); // Primary Indigo
-        doc.rect(0, 0, 210, 28, 'F');
-
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(16);
-        doc.setFont('helvetica', 'bold');
-        doc.text('SRI MUTHAPPAN HOSTEL & MESS', 14, 12);
-
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Students Master Directory & Records', 14, 18);
-        doc.text(`Generated Date: ${new Date().toLocaleDateString('en-GB')}  |  Total Students: ${sortedList.length}`, 14, 24);
-
-        // ടേബിൾ ഡാറ്റ തയ്യാറാക്കുന്നു
-        const tableBody = sortedList.map((s, idx) => [
-            s.id || (idx + 1).toString(),
-            s.name || '-',
-            s.phone || '-',
-            s.address || '-',
-            `Rs. ${s.rent || 4500}`,
-            s.joinDate || '-',
-            s.isBlocked ? 'Blocked' : 'Active'
-        ]);
-
-        doc.autoTable({
-            startY: 32,
-            head: [['ID', 'Name', 'Phone Number', 'Address', 'Rent', 'Join Date', 'Status']],
-            body: tableBody,
-            theme: 'grid',
-            headStyles: {
-                fillColor: [79, 70, 229],
-                textColor: [255, 255, 255],
-                fontStyle: 'bold',
-                fontSize: 9,
-                halign: 'center'
-            },
-            bodyStyles: {
-                fontSize: 8.5,
-                textColor: [15, 23, 42],
-                cellPadding: 3
-            },
-            columnStyles: {
-                0: { halign: 'center', fontStyle: 'bold', cellWidth: 15 },
-                1: { fontStyle: 'bold', cellWidth: 35 },
-                2: { halign: 'center', cellWidth: 28 },
-                3: { cellWidth: 55 },
-                4: { halign: 'right', cellWidth: 20 },
-                5: { halign: 'center', cellWidth: 22 },
-                6: { halign: 'center', cellWidth: 15 }
-            },
-            alternateRowStyles: {
-                fillColor: [248, 250, 252]
-            },
-            didDrawPage: function (data) {
-                // Footer
-                const pageCount = doc.internal.getNumberOfPages();
-                doc.setFontSize(8);
-                doc.setTextColor(148, 163, 184);
-                doc.text(
-                    `Page ${data.pageNumber} of ${pageCount}  |  Sri Muthappan Hostel & Mess System`,
-                    105,
-                    290,
-                    { align: 'center' }
-                );
-            }
-        });
-
-        doc.save(`Students_Directory_List_${getTodayDateKey()}.pdf`);
-    }
-
-    // ================= QR SCANNER =================
-    function startQRScanner() {
-        const resBox = document.getElementById('scanResultContainer');
-        resBox.classList.add('hidden');
-        
-        document.getElementById('btnStartScan').classList.add('hidden');
-        document.getElementById('btnStopScan').classList.remove('hidden');
-
-        html5QrCodeScanner = new Html5Qrcode("qrReader");
-        html5QrCodeScanner.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: { width: 220, height: 220 } },
-            (decodedText) => {
-                handleScannedQR(decodedText);
-            },
-            (errorMessage) => {}
-        ).catch(err => {
-            alert("ക്യാമറ ആക്സസ് ലഭിച്ചില്ല!");
-            stopQRScanner();
-        });
-    }
-
-    function stopQRScanner() {
-        if(html5QrCodeScanner) {
-            html5QrCodeScanner.stop().then(() => {
-                html5QrCodeScanner.clear();
-                html5QrCodeScanner = null;
-            }).catch(e => {});
-        }
-        document.getElementById('btnStartScan').classList.remove('hidden');
-        document.getElementById('btnStopScan').classList.add('hidden');
-    }
-
-    function handleScannedQR(qrDataStr) {
-        const resBox = document.getElementById('scanResultContainer');
-        resBox.classList.remove('hidden');
-
-        try {
-            const data = JSON.parse(qrDataStr);
-            const stu = students.find(s => String(s.id).trim().toUpperCase() === String(data.id).trim().toUpperCase());
-
-            if (!stu) {
-                resBox.className = "scan-result-card danger";
-                resBox.innerHTML = `<h3>❌ അസാധുവായ ടോക്കൺ!</h3><p>ഈ വിദ്യാർത്ഥിയുടെ വിവരങ്ങൾ സിസ്റ്റത്തിൽ ലഭ്യമല്ല.</p>`;
-                return;
-            }
-
-            if (stu.isBlocked) {
-                resBox.className = "scan-result-card danger";
-                resBox.innerHTML = `<h3>🚫 അക്കൗണ്ട് ബ്ലോക്ക് ചെയ്തിരിക്കുന്നു!</h3><p><b>${stu.name} (${stu.id})</b> വാടക കുടിശ്ശികയുള്ളതിനാൽ ഭക്ഷണം നൽകരുത്.</p>`;
-                return;
-            }
-
-            if (!stu.hasFoodOrder) {
-                resBox.className = "scan-result-card warning";
-                resBox.innerHTML = `
-                    <h3>⚠️ ഇന്ന് ഓർഡർ ചെയ്തിട്ടില്ല! (No Food Order)</h3>
-                    <p><b>പേര്:</b> ${stu.name} (ID: ${stu.id})<br>
-                    ഇന്ന് ഈ കുട്ടി ഭക്ഷണം ഓർഡർ ചെയ്തിട്ടില്ല.</p>
-                `;
-                return;
-            }
-
-            if (stu.isServed) {
-                resBox.className = "scan-result-card danger";
-                resBox.innerHTML = `
-                    <h3>❌ മുൻപ് ഭക്ഷണം വാങ്ങിയതാണ്! (Already Served)</h3>
-                    <p><b>പേര്:</b> ${stu.name} (ID: ${stu.id})<br>
-                    ഇന്നത്തെ ടോക്കൺ ഉപയോഗിച്ച് ഇതിനകം ഭക്ഷണം വാങ്ങിയിട്ടുണ്ട്.</p>
-                `;
-                return;
-            }
-
-            db.collection("students").doc(stu.docId).update({
-                isServed: true
-            }).then(() => {
-                if (navigator.vibrate) navigator.vibrate(200);
-                resBox.className = "scan-result-card success";
-                resBox.innerHTML = `
-                    <div style="font-size:1.15rem; font-weight:800; margin-bottom:4px;">✅ ടോക്കൺ സ്വീകരിച്ചു! (SERVED)</div>
-                    <div style="font-size:0.95rem; margin-bottom:8px;"><b>${stu.name}</b> (ID: ${stu.id})</div>
-                    <span class="badge paid" style="font-size:0.8rem;">🍽️ ഭക്ഷണം നൽകുക (1 Meal)</span>
-                `;
-            });
-
-        } catch(e) {
-            resBox.className = "scan-result-card danger";
-            resBox.innerHTML = `<h3>❌ തെറ്റായ QR കോഡ്!</h3>`;
-        }
-    }
-
-    // ================= EDIT MODAL FUNCTIONS =================
-    function openEditModal(idx) {
-        const s = students[idx];
-        document.getElementById('editDocId').value = s.docId;
-        document.getElementById('editName').value = s.name || '';
-        document.getElementById('editId').value = s.id || '';
-        document.getElementById('editPhone').value = s.phone || '';
-        document.getElementById('editAddress').value = s.address || '';
-        document.getElementById('editPass').value = s.pass || '';
-        document.getElementById('editRent').value = s.rent || 4500;
-        document.getElementById('editDate').value = s.joinDate || '';
-
-        document.getElementById('modalEditStudent').classList.remove('hidden');
-    }
-
-    function closeEditModal() {
-        document.getElementById('modalEditStudent').classList.add('hidden');
-    }
-
-    function handleEditBackdropClick(event) {
-        if (event.target.id === 'modalEditStudent') closeEditModal();
-    }
-
-    document.getElementById('formEditStudent').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const docId = document.getElementById('editDocId').value;
-        const updatedId = document.getElementById('editId').value.trim().toUpperCase();
-
-        const exists = students.find(s => s.docId !== docId && String(s.id).trim().toUpperCase() === updatedId);
-        if(exists) {
-            alert('ഈ Student ID മറ്റൊരാൾക്ക് നൽകിയിട്ടുണ്ട്! ദയവായി മറ്റൊരു ID നൽകുക.');
-            return;
-        }
-
-        const updateData = {
-            name: document.getElementById('editName').value.trim(),
-            id: updatedId,
-            phone: document.getElementById('editPhone').value.trim(),
-            address: document.getElementById('editAddress').value.trim(),
-            pass: document.getElementById('editPass').value.trim(),
-            rent: parseInt(document.getElementById('editRent').value) || 4500,
-            joinDate: document.getElementById('editDate').value
-        };
-
-        db.collection("students").doc(docId).update(updateData).then(() => {
-            alert('വിവരങ്ങൾ വിജയകരമായി അപ്ഡേറ്റ് ചെയ്തു!');
-            closeEditModal();
-        }).catch(err => {
-            alert('അപ്ഡേറ്റ് ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു: ' + err.message);
-        });
-    });
-
-    // ================= DETAILS MODAL =================
-    function openDetailsModal(idx) {
-        const s = students[idx];
-        const modalBody = document.getElementById('modalDetailsBody');
-        const quickActions = document.getElementById('modalQuickActions');
-        
-        modalBody.innerHTML = `
-            <div class="detail-row"><span>Student ID</span><b>${s.id}</b></div>
-            <div class="detail-row"><span>പേര്</span><b>${s.name}</b></div>
-            <div class="detail-row"><span>ഫോൺ നമ്പർ</span><b><a href="tel:${s.phone}" style="color:var(--primary);">📞 ${s.phone || 'N/A'}</a></b></div>
-            <div class="detail-row"><span>മേൽവിലാസം</span><b>${s.address || 'N/A'}</b></div>
-            <div class="detail-row"><span>പ്രതിമാസ വാടക</span><b>₹${s.rent || 4500}</b></div>
-            <div class="detail-row"><span>ജോയിനിംഗ് ഡേറ്റ്</span><b>${s.joinDate || 'N/A'}</b></div>
-            <div class="detail-row"><span>അടച്ച മാസങ്ങൾ</span><b>${(s.paidMonths || []).join(', ') || 'ഒന്നും അടച്ചിട്ടില്ല'}</b></div>
-            <div class="detail-row"><span>അക്കൗണ്ട് നില</span><b>${s.isBlocked ? '<span style="color:var(--danger)">🚫 BLOCKED</span>' : '<span style="color:var(--success)">✅ ACTIVE</span>'}</b></div>
-        `;
-
-        const waLink = s.phone ? `https://wa.me/91${s.phone}` : '#';
-        quickActions.innerHTML = `
-            <a href="tel:${s.phone || ''}" style="flex:1; text-decoration:none;"><button class="btn-main" style="background:#0284c7; font-size:0.85rem;">📞 വിളിക്കുക</button></a>
-            ${s.phone ? `<a href="${waLink}" target="_blank" style="flex:1; text-decoration:none;"><button class="btn-main whatsapp" style="font-size:0.85rem;">📲 WhatsApp</button></a>` : ''}
-        `;
-
-        document.getElementById('modalFullDetails').classList.remove('hidden');
-    }
-
-    function closeDetailsModal() {
-        document.getElementById('modalFullDetails').classList.add('hidden');
-    }
-
-    function handleModalBackdropClick(event) {
-        if(event.target.id === 'modalFullDetails') closeDetailsModal();
-    }
-
-    function togglePay(docId, mKey, isChecked) {
-        const stu = students.find(s => s.docId === docId);
-        let months = stu.paidMonths || [];
-
-        if(isChecked) {
-            if(!months.includes(mKey)) months.push(mKey);
-            db.collection("students").doc(docId).update({
-                paidMonths: months,
-                isBlocked: false
-            });
-        } else {
-            months = months.filter(m => m !== mKey);
-            db.collection("students").doc(docId).update({
-                paidMonths: months
-            });
-        }
-    }
-
-    function toggleBlock(docId, newStatus) {
-        db.collection("students").doc(docId).update({
-            isBlocked: newStatus
-        });
-    }
-
-    function deleteStudent(docId) {
-        if(confirm('വിദ്യാർത്ഥിയെ ക്ലൗഡിൽ നിന്നും നീക്കം ചെയ്യണോ?')) {
-            db.collection("students").doc(docId).delete();
-        }
-    }
-
-    function exportCSV() {
-        const selVal = document.getElementById('selectFinanceMonth').value || getCurMonthKey();
-        let csv = "data:text/csv;charset=utf-8,\uFEFFID,Name,Phone,Address,Rent,Joining Date,Paid Months\n";
-        students.forEach(s => {
-            const cleanAddr = (s.address || '').replace(/"/g, '""');
-            const paidStr = (s.paidMonths || []).join('; ');
-            csv += `"${s.id}","${s.name}","${s.phone || ''}","${cleanAddr}","${s.rent || 4500}","${s.joinDate || ''}","${paidStr}"\n`;
-        });
-        const link = document.createElement("a");
-        link.setAttribute("href", encodeURI(csv));
-        link.setAttribute("download", `Mess_Cloud_Report_${selVal}.csv`);
-        link.click();
-    }
-
-    function filterStudentsList() {
-        const q = document.getElementById('inSearchStudents').value.toLowerCase();
-        document.querySelectorAll('.student-item-card').forEach(c => {
-            c.style.display = c.getAttribute('data-search').includes(q) ? 'flex' : 'none';
-        });
-    }
-
-    function calculateDueDate(joinDateStr) {
-        if (!joinDateStr) return "N/A";
-        const d = new Date(joinDateStr);
-        const today = new Date();
-        const day = d.getDate();
-        let target = new Date(today.getFullYear(), today.getMonth(), day);
-        if(today > target) target = new Date(today.getFullYear(), today.getMonth() + 1, day);
-        return target.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-    }
-
-    function logout() {
-        currentUser = null;
-        stopQRScanner();
-        document.getElementById('viewLogin').classList.remove('hidden');
-        document.getElementById('viewStudent').classList.add('hidden');
-        document.getElementById('viewAdmin').classList.add('hidden');
-        document.getElementById('bottomNavBar').classList.add('hidden');
-        document.getElementById('btnLogoutTop').style.display = 'none';
-        document.getElementById('appSubHeader').innerText = "ഹോസ്റ്റൽ പോർട്ടൽ";
-        document.getElementById('formLogin').reset();
-    }
-</script>
-
-</body>
-</html>
+                <div class="form
