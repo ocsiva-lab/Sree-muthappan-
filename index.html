@@ -9,6 +9,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -162,6 +165,7 @@
         button.btn-main.success { background: var(--success); }
         button.btn-main.danger { background: var(--danger); }
         button.btn-main.warning { background: #fef3c7; color: #92400e; border: 1.5px solid #fde68a; }
+        button.btn-main.pdf-btn { background: #dc2626; color: #ffffff; }
         button.btn-main:disabled { background: #94a3b8; cursor: not-allowed; }
 
         .stats-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
@@ -339,7 +343,7 @@
             <form id="formLogin" class="card">
                 <input type="hidden" id="inputRole" value="student">
                 <div class="form-group">
-                    <label id="labelLoginId">Student ID (റൂം നമ്പർ / റോൾ നമ്പർ):</label>
+                    <label id="labelLoginId">Student ID (റോൾ നമ്പർ / റൂം നമ്പർ):</label>
                     <input type="text" id="inputLoginId" placeholder="ഉദാ: 1 അല്ലെങ്കിൽ H101" required autocomplete="off">
                 </div>
                 <div class="form-group">
@@ -477,6 +481,16 @@
             </div>
 
             <div id="admTabSettings" class="hidden">
+                <div class="card" style="background: #fff1f2; border: 1.5px solid #fecdd3;">
+                    <h3 style="margin-top:0; font-size:1rem; color:#b91c1c;">📄 സ്റ്റുഡന്റ്സ് PDF റിപ്പോർട്ട് (Print / Download)</h3>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">
+                        എല്ലാ വിദ്യാർത്ഥികളുടെയും പേര്, ഫോൺ നമ്പർ, അഡ്രസ്സ്, വാടക എന്നിവ <b>Student ID ക്രമത്തിൽ</b> ലിസ്റ്റ് ചെയ്ത PDF ഡൗൺലോഡ് ചെയ്യാം.
+                    </p>
+                    <button class="btn-main pdf-btn" onclick="generateStudentsPDF()">
+                        📥 സ്റ്റുഡന്റ്സ് PDF ഡൗൺലോഡ് ചെയ്യുക
+                    </button>
+                </div>
+
                 <form id="formAdminChangeCreds" class="card">
                     <h3 style="margin-top:0; font-size:1rem; color:var(--primary);">👑 അഡ്മിൻ പാസ്‌വേഡ് മാറ്റുക</h3>
                     <div class="form-group">
@@ -1209,7 +1223,7 @@
             document.getElementById('inNewPass').value = '';
             document.getElementById('inNewRent').value = '4500';
             document.getElementById('inNewDate').valueAsDate = new Date();
-            updateAutoStudentId(); // അടുത്ത നമ്പർ സ്വയം ലോഡ് ചെയ്യും
+            updateAutoStudentId();
         });
     });
 
@@ -1382,6 +1396,97 @@
                 isServed: true
             });
         }
+    }
+
+    // ================= 3. PDF GENERATION (ID ORDER) =================
+    function generateStudentsPDF() {
+        if (!students || students.length === 0) {
+            alert('ഡൗൺലോഡ് ചെയ്യാൻ വിദ്യാർത്ഥികളുടെ വിവരങ്ങൾ ലഭ്യമല്ല!');
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+
+        // Student ID അനുസരിച്ച് ക്രോഡീകരിക്കുന്നു (1, 2, 3, 4...)
+        const sortedList = [...students].sort((a, b) => {
+            const numA = parseInt(String(a.id).trim(), 10);
+            const numB = parseInt(String(b.id).trim(), 10);
+            if (!isNaN(numA) && !isNaN(numB)) {
+                return numA - numB;
+            }
+            return String(a.id).localeCompare(String(b.id), undefined, { numeric: true, sensitivity: 'base' });
+        });
+
+        // Header ഡിസൈൻ
+        doc.setFillColor(79, 70, 229); // Primary Indigo
+        doc.rect(0, 0, 210, 28, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text('SRI MUTHAPPAN HOSTEL & MESS', 14, 12);
+
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Students Master Directory & Records', 14, 18);
+        doc.text(`Generated Date: ${new Date().toLocaleDateString('en-GB')}  |  Total Students: ${sortedList.length}`, 14, 24);
+
+        // ടേബിൾ ഡാറ്റ തയ്യാറാക്കുന്നു
+        const tableBody = sortedList.map((s, idx) => [
+            s.id || (idx + 1).toString(),
+            s.name || '-',
+            s.phone || '-',
+            s.address || '-',
+            `Rs. ${s.rent || 4500}`,
+            s.joinDate || '-',
+            s.isBlocked ? 'Blocked' : 'Active'
+        ]);
+
+        doc.autoTable({
+            startY: 32,
+            head: [['ID', 'Name', 'Phone Number', 'Address', 'Rent', 'Join Date', 'Status']],
+            body: tableBody,
+            theme: 'grid',
+            headStyles: {
+                fillColor: [79, 70, 229],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 9,
+                halign: 'center'
+            },
+            bodyStyles: {
+                fontSize: 8.5,
+                textColor: [15, 23, 42],
+                cellPadding: 3
+            },
+            columnStyles: {
+                0: { halign: 'center', fontStyle: 'bold', cellWidth: 15 },
+                1: { fontStyle: 'bold', cellWidth: 35 },
+                2: { halign: 'center', cellWidth: 28 },
+                3: { cellWidth: 55 },
+                4: { halign: 'right', cellWidth: 20 },
+                5: { halign: 'center', cellWidth: 22 },
+                6: { halign: 'center', cellWidth: 15 }
+            },
+            alternateRowStyles: {
+                fillColor: [248, 250, 252]
+            },
+            didDrawPage: function (data) {
+                // Footer
+                const pageCount = doc.internal.getNumberOfPages();
+                doc.setFontSize(8);
+                doc.setTextColor(148, 163, 184);
+                doc.text(
+                    `Page ${data.pageNumber} of ${pageCount}  |  Sri Muthappan Hostel & Mess System`,
+                    105,
+                    290,
+                    { align: 'center' }
+                );
+            }
+        });
+
+        doc.save(`Students_Directory_List_${getTodayDateKey()}.pdf`);
     }
 
     // ================= QR SCANNER =================
