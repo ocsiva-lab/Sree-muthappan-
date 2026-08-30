@@ -12,8 +12,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
     <style>
         :root {
@@ -427,7 +429,6 @@
             font-weight: 700;
         }
 
-        /* Toggle switch */
         .toggle-switch-container {
             display: flex;
             align-items: center;
@@ -894,8 +895,8 @@
                     <textarea id="editAddress" rows="2" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label>പാസ്‌വേഡ്:</label>
-                    <input type="text" id="editPass" required>
+                    <label>പുതിയ പാസ്‌വേഡ് (മാറ്റണമെങ്കിൽ മാത്രം):</label>
+                    <input type="text" id="editPass" placeholder="മാറ്റമില്ലെങ്കിൽ ഒഴിവാക്കാം">
                 </div>
                 <div class="form-group">
                     <label>മാസ വാടക (₹):</label>
@@ -940,12 +941,19 @@
         measurementId: "G-D9CTVJ2TCZ"
     };
 
-    // Firebase Initialize
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const storage = firebase.storage();
 
-    let adminCredentials = { user: "admin", pass: "admin123" };
-    let staffCredentials = { user: "staff", pass: "staff123" };
+    async function hashPassword(plainText) {
+        const msgUint8 = new TextEncoder().encode(plainText);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    let adminCredentials = { user: "admin", passHash: "" };
+    let staffCredentials = { user: "staff", passHash: "" };
 
     function getCurMonthKey() {
         const d = new Date();
@@ -960,13 +968,12 @@
     let chatMessages = [];
     let dailyMenuText = "ചോറ്, സാമ്പാർ, മീൻ വറുത്തത്, തോരൻ";
     let isOrderActive = true;
-    let isAdminOnlyChat = false; // Chat Lock Switch State
+    let isAdminOnlyChat = false;
     let currentUser = null;
     let currentRole = 'student';
     let filterMode = 'all'; 
     let html5QrCodeScanner = null;
 
-    // Audio recording state
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecording = false;
@@ -993,45 +1000,47 @@
         }
     }
 
-    // ================= 2. REAL-TIME CLOUD LISTENERS =================
-    db.collection("students").onSnapshot(snapshot => {
-        students = [];
-        snapshot.forEach(doc => {
-            students.push({ docId: doc.id, ...doc.data() });
-        });
-        
-        updateAutoStudentId();
+    let studentUnsubscribe = null;
 
-        if (currentUser && currentRole === 'student') {
-            const updated = students.find(s => String(s.id) === String(currentUser.id));
-            if (updated) {
-                currentUser = updated;
-                loadStudentData();
+    function attachStudentsListener() {
+        if (studentUnsubscribe) studentUnsubscribe();
+
+        studentUnsubscribe = db.collection("students").onSnapshot(snapshot => {
+            students = [];
+            snapshot.forEach(doc => {
+                students.push({ docId: doc.id, ...doc.data() });
+            });
+            
+            updateAutoStudentId();
+
+            if (currentUser && currentRole === 'student') {
+                const updated = students.find(s => String(s.id) === String(currentUser.id));
+                if (updated) {
+                    currentUser = updated;
+                    loadStudentData();
+                }
             }
-        }
-        if (currentRole === 'admin' || currentRole === 'staff') {
-            renderAdmin();
-        }
-    });
+            if (currentRole === 'admin' || currentRole === 'staff') {
+                renderAdmin();
+            }
+        });
+    }
 
-    db.collection("settings").doc("mess_state").onSnapshot(doc => {
+    db.collection("settings").doc("mess_state").onSnapshot(async doc => {
         if (doc.exists) {
             const data = doc.data();
             dailyMenuText = data.menu || "";
             isOrderActive = data.isOrderActive ?? true;
             isAdminOnlyChat = data.isAdminOnlyChat ?? false;
 
-            if (data.adminUser && data.adminPass) {
-                adminCredentials = { user: data.adminUser, pass: data.adminPass };
-            }
-            if (data.staffUser && data.staffPass) {
-                staffCredentials = { user: data.staffUser, pass: data.staffPass };
-            }
+            adminCredentials.user = data.adminUser || "admin";
+            adminCredentials.passHash = data.adminPassHash || await hashPassword("admin123");
+
+            staffCredentials.user = data.staffUser || "staff";
+            staffCredentials.passHash = data.staffPassHash || await hashPassword("staff123");
 
             document.getElementById('inAdmNewUser').value = adminCredentials.user;
-            document.getElementById('inAdmNewPass').value = adminCredentials.pass;
             document.getElementById('inStaffNewUser').value = staffCredentials.user;
-            document.getElementById('inStaffNewPass').value = staffCredentials.pass;
             
             const chkLock = document.getElementById('chkAdminOnlyChat');
             if(chkLock) chkLock.checked = isAdminOnlyChat;
@@ -1041,11 +1050,14 @@
             if (currentUser && currentRole === 'student') loadStudentData();
             if (currentRole === 'admin' || currentRole === 'staff') renderAdmin();
         } else {
+            const defaultAdminHash = await hashPassword("admin123");
+            const defaultStaffHash = await hashPassword("staff123");
+
             db.collection("settings").doc("mess_state").set({
                 adminUser: "admin",
-                adminPass: "admin123",
+                adminPassHash: defaultAdminHash,
                 staffUser: "staff",
-                staffPass: "staff123",
+                staffPassHash: defaultStaffHash,
                 isOrderActive: true,
                 isAdminOnlyChat: false,
                 menu: dailyMenuText
@@ -1053,14 +1065,17 @@
         }
     });
 
-    // Realtime Chat Listener
-    db.collection("chats").orderBy("timestamp", "asc").onSnapshot(snapshot => {
-        chatMessages = [];
-        snapshot.forEach(doc => {
-            chatMessages.push({ docId: doc.id, ...doc.data() });
-        });
-        renderChatMessages();
-    });
+    // Realtime Chat Listener (Last 50 messages)
+    db.collection("chats")
+      .orderBy("timestamp", "asc")
+      .limitToLast(50)
+      .onSnapshot(snapshot => {
+          chatMessages = [];
+          snapshot.forEach(doc => {
+              chatMessages.push({ docId: doc.id, ...doc.data() });
+          });
+          renderChatMessages();
+      });
 
     function initMonthSelector() {
         const sel = document.getElementById('selectFinanceMonth');
@@ -1110,41 +1125,68 @@
         }
     }
 
-    document.getElementById('formLogin').addEventListener('submit', function(e) {
+    document.getElementById('formLogin').addEventListener('submit', async function(e) {
         e.preventDefault();
         const inputId = document.getElementById('inputLoginId').value.trim();
         const inputPass = document.getElementById('inputLoginPass').value.trim();
+        const hashedInput = await hashPassword(inputPass);
 
         if (currentRole === 'admin') {
-            if (inputId.toLowerCase() === adminCredentials.user.toLowerCase() && inputPass === adminCredentials.pass) {
+            if (inputId.toLowerCase() === adminCredentials.user.toLowerCase() && hashedInput === adminCredentials.passHash) {
                 currentUser = { role: 'admin', name: '👑 Admin' };
+                attachStudentsListener();
                 showView('admin');
             } else {
                 alert('അഡ്മിൻ യൂസർനെയിം അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
             }
         } else if (currentRole === 'staff') {
-            if (inputId.toLowerCase() === staffCredentials.user.toLowerCase() && inputPass === staffCredentials.pass) {
+            if (inputId.toLowerCase() === staffCredentials.user.toLowerCase() && hashedInput === staffCredentials.passHash) {
                 currentUser = { role: 'staff', name: '👨‍🍳 Staff' };
+                attachStudentsListener();
                 showView('staff');
             } else {
                 alert('സ്റ്റാഫ് യൂസർനെയിം അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
             }
         } else {
-            const stu = students.find(s => 
-                String(s.id).trim().toLowerCase() === inputId.toLowerCase() && 
-                String(s.pass).trim() === inputPass
-            );
+            db.collection("students")
+              .where("id", "==", inputId)
+              .get()
+              .then(snapshot => {
+                  if (snapshot.empty) {
+                      alert('Student ID അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
+                      return;
+                  }
+                  let found = null;
+                  snapshot.forEach(doc => {
+                      const data = doc.data();
+                      if (data.passHash === hashedInput || data.pass === inputPass) {
+                          found = { docId: doc.id, ...data };
+                      }
+                  });
 
-            if (stu) {
-                if (stu.isBlocked) {
-                    alert('🚫 വാടക കുടിശ്ശികയുള്ളതിനാൽ അക്കൗണ്ട് ബ്ലോക്ക് ചെയ്തിരിക്കുന്നു!');
-                    return;
-                }
-                currentUser = stu;
-                showView('student');
-            } else {
-                alert('Student ID അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
-            }
+                  if (found) {
+                      if (found.isBlocked) {
+                          alert('🚫 വാടക കുടിശ്ശികയുള്ളതിനാൽ അക്കൗണ്ട് ബ്ലോക്ക് ചെയ്തിരിക്കുന്നു!');
+                          return;
+                      }
+                      currentUser = found;
+                      
+                      if (studentUnsubscribe) studentUnsubscribe();
+                      studentUnsubscribe = db.collection("students").doc(found.docId).onSnapshot(doc => {
+                          if (doc.exists) {
+                              currentUser = { docId: doc.id, ...doc.data() };
+                              loadStudentData();
+                          }
+                      });
+
+                      showView('student');
+                  } else {
+                      alert('Student ID അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
+                  }
+              })
+              .catch(err => {
+                  alert('ലോഗിൻ ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു: ' + err.message);
+              });
         }
     });
 
@@ -1334,7 +1376,7 @@
         if(event.target.id === 'modalStudentPass') closeStudentPassModal();
     }
 
-    document.getElementById('formStudentChangePass').addEventListener('submit', function(e) {
+    document.getElementById('formStudentChangePass').addEventListener('submit', async function(e) {
         e.preventDefault();
         const newP = document.getElementById('inStuNewPass').value.trim();
         if(newP.length < 3) {
@@ -1342,8 +1384,11 @@
             return;
         }
 
+        const passHash = await hashPassword(newP);
+
         db.collection("students").doc(currentUser.docId).update({
-            pass: newP
+            passHash: passHash,
+            pass: firebase.firestore.FieldValue.delete()
         }).then(() => {
             alert('നിങ്ങളുടെ പാസ്‌വേഡ് വിജയകരമായി മാറ്റി!');
             document.getElementById('inStuNewPass').value = '';
@@ -1351,7 +1396,7 @@
         });
     });
 
-    document.getElementById('formAdminChangeCreds').addEventListener('submit', function(e) {
+    document.getElementById('formAdminChangeCreds').addEventListener('submit', async function(e) {
         e.preventDefault();
         const newU = document.getElementById('inAdmNewUser').value.trim();
         const newP = document.getElementById('inAdmNewPass').value.trim();
@@ -1361,15 +1406,19 @@
             return;
         }
 
+        const newHash = await hashPassword(newP);
+
         db.collection("settings").doc("mess_state").set({
             adminUser: newU,
-            adminPass: newP
+            adminPassHash: newHash,
+            adminPass: firebase.firestore.FieldValue.delete()
         }, { merge: true }).then(() => {
-            alert('അഡ്മിൻ യൂസർനെയിമും പാസ്‌വേഡും വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്തു!');
+            alert('അഡ്മിൻ വിവരങ്ങൾ വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്തു!');
+            document.getElementById('inAdmNewPass').value = '';
         });
     });
 
-    document.getElementById('formStaffChangeCreds').addEventListener('submit', function(e) {
+    document.getElementById('formStaffChangeCreds').addEventListener('submit', async function(e) {
         e.preventDefault();
         const newU = document.getElementById('inStaffNewUser').value.trim();
         const newP = document.getElementById('inStaffNewPass').value.trim();
@@ -1379,11 +1428,15 @@
             return;
         }
 
+        const newHash = await hashPassword(newP);
+
         db.collection("settings").doc("mess_state").set({
             staffUser: newU,
-            staffPass: newP
+            staffPassHash: newHash,
+            staffPass: firebase.firestore.FieldValue.delete()
         }, { merge: true }).then(() => {
             alert('സ്റ്റാഫ് ലോഗിൻ വിവരങ്ങൾ അപ്‌ഡേറ്റ് ചെയ്തു!');
+            document.getElementById('inStaffNewPass').value = '';
         });
     });
 
@@ -1421,7 +1474,7 @@
         }
     }
 
-    // ================= CHAT LOGIC (TEXT & VOICE) =================
+    // ================= CHAT LOGIC (FIREBASE STORAGE & CLOUD DELETION) =================
     function updateChatLockUI() {
         const inputBarStu = document.getElementById('chatInputBarStudent');
         const bannerStu = document.getElementById('chatLockBannerStu');
@@ -1501,7 +1554,7 @@
                 contentHtml = `
                     <div class="audio-player-wrapper">
                         <div style="font-size:0.75rem; margin-bottom:4px;">🎙️ വോയ്‌സ് നോട്ട്:</div>
-                        <audio controls src="${m.audioData}"></audio>
+                        <audio controls preload="metadata" src="${m.audioUrl}"></audio>
                     </div>
                 `;
             } else {
@@ -1538,7 +1591,6 @@
         }, 50);
     }
 
-    // Voice Recording Logic
     async function toggleVoiceRecord(role) {
         if (role === 'student' && isAdminOnlyChat) {
             alert('അഡ്മിൻ ചാറ്റ് ലോക്ക് ചെയ്തിരിക്കുന്നു!');
@@ -1557,14 +1609,13 @@
                     if (event.data.size > 0) audioChunks.push(event.data);
                 };
 
-                mediaRecorder.onstop = () => {
+                mediaRecorder.onstop = async () => {
                     const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const reader = new FileReader();
-                    reader.readAsDataURL(audioBlob);
-                    reader.onloadend = () => {
-                        const base64Audio = reader.result;
-                        uploadVoiceMessage(base64Audio, role);
-                    };
+                    btn.disabled = true;
+                    btn.innerText = '⏳';
+                    await uploadVoiceToStorage(audioBlob, role);
+                    btn.disabled = false;
+                    btn.innerText = '🎙️';
                 };
 
                 mediaRecorder.start();
@@ -1581,11 +1632,10 @@
             }
             isRecording = false;
             btn.classList.remove('recording');
-            btn.innerText = '🎙️';
         }
     }
 
-    function uploadVoiceMessage(base64Data, senderRole) {
+    async function uploadVoiceToStorage(audioBlob, senderRole) {
         let senderName = "Admin";
         let senderId = "ADMIN";
 
@@ -1594,33 +1644,64 @@
             senderId = currentUser.id;
         }
 
-        const newVoiceMsg = {
-            senderRole: senderRole,
-            senderName: senderName,
-            senderId: senderId,
-            audioData: base64Data,
-            type: 'voice',
-            timestamp: Date.now()
-        };
+        try {
+            const fileName = `voice_${Date.now()}_${senderId}.webm`;
+            const storageRef = storage.ref(`voice_messages/${fileName}`);
+            
+            const snapshot = await storageRef.put(audioBlob);
+            const downloadUrl = await snapshot.ref.getDownloadURL();
 
-        db.collection("chats").add(newVoiceMsg).then(() => {
-            console.log("Voice message sent!");
-        }).catch(err => {
-            alert('വോയ്സ് അയക്കുന്നതിൽ പരാജയപ്പെട്ടു: ' + err.message);
-        });
+            const newVoiceMsg = {
+                senderRole: senderRole,
+                senderName: senderName,
+                senderId: senderId,
+                audioUrl: downloadUrl,
+                type: 'voice',
+                timestamp: Date.now()
+            };
+
+            await db.collection("chats").add(newVoiceMsg);
+        } catch (err) {
+            alert('വോയ്സ് അപ്‌ലോഡ് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു: ' + err.message);
+        }
     }
 
-    function clearAllChat() {
-        if (confirm("എല്ലാ സന്ദേശങ്ങളും ചാറ്റിൽ നിന്ന് നീക്കം ചെയ്യണോ?")) {
-            db.collection("chats").get().then(snapshot => {
-                const batch = db.batch();
-                snapshot.forEach(doc => {
-                    batch.delete(doc.ref);
-                });
-                return batch.commit();
-            }).then(() => {
-                alert("ചാറ്റ് പൂർണ്ണമായി ക്ലിയർ ചെയ്തു!");
+    // Complete storage cleanup with Firestore deletion
+    async function clearAllChat() {
+        if (!confirm("എല്ലാ സന്ദേശങ്ങളും അനുബന്ധ ഓഡിയോ ഫയലുകളും ക്ലൗഡിൽ നിന്ന് നീക്കം ചെയ്യണോ?")) {
+            return;
+        }
+
+        try {
+            const snapshot = await db.collection("chats").get();
+            const deletePromises = [];
+            const batch = db.batch();
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                
+                // 1. Storage file deletion
+                if (data.type === 'voice' && data.audioUrl) {
+                    try {
+                        const storageRef = storage.refFromURL(data.audioUrl);
+                        deletePromises.push(storageRef.delete().catch(err => {
+                            console.warn("Storage ഫയൽ ഡിലീറ്റ് ചെയ്യുന്നതിൽ പിശക്:", err);
+                        }));
+                    } catch (e) {
+                        console.warn("Invalid Storage URL:", e);
+                    }
+                }
+
+                // 2. Firestore document deletion
+                batch.delete(doc.ref);
             });
+
+            await Promise.all(deletePromises);
+            await batch.commit();
+
+            alert("എല്ലാ സന്ദേശങ്ങളും ഓഡിയോ ഫയലുകളും വിജയകരമായി നീക്കം ചെയ്തു! സ്റ്റോറേജ് സ്പേസ് ക്ലിയർ ആയി.");
+        } catch (err) {
+            alert("ചാറ്റ് ക്ലിയർ ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു: " + err.message);
         }
     }
 
@@ -1681,7 +1762,7 @@
         });
     });
 
-    document.getElementById('formAdminAddStudent').addEventListener('submit', function(e) {
+    document.getElementById('formAdminAddStudent').addEventListener('submit', async function(e) {
         e.preventDefault();
         const id = document.getElementById('inNewId').value.trim().toUpperCase();
         if(students.find(s => String(s.id).trim().toUpperCase() === id)) {
@@ -1689,12 +1770,15 @@
             return;
         }
 
+        const rawPass = document.getElementById('inNewPass').value.trim();
+        const passHash = await hashPassword(rawPass);
+
         const newStudent = {
             id,
             name: document.getElementById('inNewName').value.trim(),
             phone: document.getElementById('inNewPhone').value.trim(),
             address: document.getElementById('inNewAddress').value.trim(),
-            pass: document.getElementById('inNewPass').value.trim(),
+            passHash: passHash,
             rent: parseInt(document.getElementById('inNewRent').value) || 4500,
             joinDate: document.getElementById('inNewDate').value,
             isBlocked: false,
@@ -1887,7 +1971,6 @@
         }
     }
 
-    // ================= 3. PDF GENERATION =================
     function generateStudentsPDF() {
         if (!students || students.length === 0) {
             alert('ഡൗൺലോഡ് ചെയ്യാൻ വിദ്യാർത്ഥികളുടെ വിവരങ്ങൾ ലഭ്യമല്ല!');
@@ -1974,7 +2057,6 @@
         doc.save(`Students_Directory_List_${getTodayDateKey()}.pdf`);
     }
 
-    // ================= QR SCANNER =================
     function startQRScanner() {
         const resBox = document.getElementById('scanResultContainer');
         resBox.classList.add('hidden');
@@ -2065,7 +2147,6 @@
         }
     }
 
-    // ================= EDIT MODAL FUNCTIONS =================
     function openEditModal(idx) {
         const s = students[idx];
         document.getElementById('editDocId').value = s.docId;
@@ -2073,7 +2154,7 @@
         document.getElementById('editId').value = s.id || '';
         document.getElementById('editPhone').value = s.phone || '';
         document.getElementById('editAddress').value = s.address || '';
-        document.getElementById('editPass').value = s.pass || '';
+        document.getElementById('editPass').value = '';
         document.getElementById('editRent').value = s.rent || 4500;
         document.getElementById('editDate').value = s.joinDate || '';
 
@@ -2088,7 +2169,7 @@
         if (event.target.id === 'modalEditStudent') closeEditModal();
     }
 
-    document.getElementById('formEditStudent').addEventListener('submit', function(e) {
+    document.getElementById('formEditStudent').addEventListener('submit', async function(e) {
         e.preventDefault();
         const docId = document.getElementById('editDocId').value;
         const updatedId = document.getElementById('editId').value.trim().toUpperCase();
@@ -2104,10 +2185,15 @@
             id: updatedId,
             phone: document.getElementById('editPhone').value.trim(),
             address: document.getElementById('editAddress').value.trim(),
-            pass: document.getElementById('editPass').value.trim(),
             rent: parseInt(document.getElementById('editRent').value) || 4500,
             joinDate: document.getElementById('editDate').value
         };
+
+        const newPlainPass = document.getElementById('editPass').value.trim();
+        if (newPlainPass) {
+            updateData.passHash = await hashPassword(newPlainPass);
+            updateData.pass = firebase.firestore.FieldValue.delete();
+        }
 
         db.collection("students").doc(docId).update(updateData).then(() => {
             alert('വിവരങ്ങൾ വിജയകരമായി അപ്ഡേറ്റ് ചെയ്തു!');
@@ -2117,7 +2203,6 @@
         });
     });
 
-    // ================= DETAILS MODAL =================
     function openDetailsModal(idx) {
         const s = students[idx];
         const modalBody = document.getElementById('modalDetailsBody');
@@ -2213,6 +2298,10 @@
     }
 
     function logout() {
+        if (studentUnsubscribe) {
+            studentUnsubscribe();
+            studentUnsubscribe = null;
+        }
         currentUser = null;
         stopQRScanner();
         document.getElementById('viewLogin').classList.remove('hidden');
