@@ -6,11 +6,9 @@
     <title>ശ്രീ മുത്തപ്പൻ ഹോസ്റ്റൽ & മെസ്സ് (Live Cloud)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- QR Code & Scanner Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -221,10 +219,11 @@
             gap: 4px;
         }
 
+        .btn-action-sm.call { background: #e0f2fe; color: #0284c7; }
         .btn-action-sm.whatsapp { background: #dcfce7; color: #15803d; }
         .btn-action-sm.block { background: #fee2e2; color: #b91c1c; }
         .btn-action-sm.unlock { background: #e0e7ff; color: var(--primary); }
-        .btn-action-sm.info { background: #e0f2fe; color: #0369a1; }
+        .btn-action-sm.info { background: #f1f5f9; color: #475569; }
         .btn-action-sm.edit { background: #fef3c7; color: #92400e; }
         .btn-action-sm.serve { background: #10b981; color: #ffffff; }
 
@@ -317,7 +316,6 @@
 
 <div class="app-shell">
 
-    <!-- TOP BAR -->
     <div class="top-app-bar">
         <div class="brand-badge">
             <span class="brand-icon">🚩</span>
@@ -329,10 +327,8 @@
         <button id="btnLogoutTop" class="btn-action-sm" style="background:#f1f5f9; display:none;" onclick="logout()">Logout</button>
     </div>
 
-    <!-- MAIN BODY -->
     <div class="app-content">
 
-        <!-- 1. ലോഗിൻ വ്യൂ -->
         <div id="viewLogin">
             <div class="role-pill-switch-3">
                 <button class="role-pill-btn active" id="btnRoleStudent" onclick="setRole('student')">👨‍🎓 വിദ്യാർത്ഥി</button>
@@ -343,8 +339,8 @@
             <form id="formLogin" class="card">
                 <input type="hidden" id="inputRole" value="student">
                 <div class="form-group">
-                    <label id="labelLoginId">Student ID (റൂം നമ്പർ):</label>
-                    <input type="text" id="inputLoginId" placeholder="ഉദാ: H101" required autocomplete="off">
+                    <label id="labelLoginId">Student ID (റൂം നമ്പർ / റോൾ നമ്പർ):</label>
+                    <input type="text" id="inputLoginId" placeholder="ഉദാ: 1 അല്ലെങ്കിൽ H101" required autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label>പാസ്‌വേഡ്:</label>
@@ -354,7 +350,6 @@
             </form>
         </div>
 
-        <!-- 2. വിദ്യാർത്ഥി ഡാഷ്‌ബോർഡ് (സിംഗിൾ ഓർഡർ മാത്രം) -->
         <div id="viewStudent" class="hidden">
             <div id="stuTabOrder">
                 <div class="card" style="background:#fffbeb; border-color:#fde68a;">
@@ -373,7 +368,6 @@
                                 🍽️ ഇന്ന് ഭക്ഷണം വേണം (Order Food)
                             </label>
                         </div>
-
                         <button type="submit" id="btnSubmitOrder" class="btn-main">ഓർഡർ സേവ് ചെയ്യുക</button>
                     </form>
                 </div>
@@ -418,7 +412,6 @@
             </div>
         </div>
 
-        <!-- 3. അഡ്മിൻ & സ്റ്റാഫ് ഷെയർ ചെയ്യുന്ന ഡാഷ്‌ബോർഡ് വ്യൂ -->
         <div id="viewAdmin" class="hidden">
             <div id="admTabOverview">
                 <div id="secOrderSwitch" class="card" style="display:flex; justify-content:space-between; align-items:center;">
@@ -456,32 +449,33 @@
                     </button>
                 </div>
 
-                <!-- അഡ്മിന് മാത്രം കാണേണ്ട ഫിനാൻസ് കാർഡ് -->
                 <div id="secAdminFinance" class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <label style="margin:0;">📅 മാസം തിരഞ്ഞെടുക്കുക:</label>
-                        <select id="selectFinanceMonth" style="width:auto; padding:6px 10px; font-size:0.85rem;" onchange="renderAdmin()"></select>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                        <label style="margin:0; font-size:0.85rem;">📅 കാലയളവ് തിരഞ്ഞെടുക്കുക:</label>
+                        <select id="selectFinanceMonth" style="width:auto; padding:6px 12px; font-size:0.85rem; font-weight:700;" onchange="renderAdmin()"></select>
                     </div>
 
                     <div class="stats-grid-2">
                         <div class="stat-card-sm green" onclick="filterByPaymentCard('paid')">
                             <div class="label">ലഭിച്ച തുക</div>
                             <div class="num" id="dispAdmCollected">₹0</div>
-                            <div class="hint">👉 തന്നവർ</div>
+                            <div class="hint">👉 തന്നവർ (Paid)</div>
                         </div>
 
                         <div class="stat-card-sm red" onclick="filterByPaymentCard('pending')">
                             <div class="label">കുടിശ്ശിക (ബാക്കി)</div>
                             <div class="num" id="dispAdmPending">₹0</div>
-                            <div class="hint">👉 ബാക്കിയുള്ളവർ</div>
+                            <div class="hint">👉 ബാക്കിയുള്ളവർ (Pending)</div>
                         </div>
                     </div>
 
-                    <button class="btn-main" style="background:#f1f5f9; color:var(--text-dark); font-size:0.85rem;" onclick="exportCSV()">📥 എക്സൽ (CSV) റിപ്പോർട്ട് ഡൗൺലോഡ്</button>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-main" style="background:#f1f5f9; color:var(--text-dark); font-size:0.82rem; flex:1;" onclick="exportCSV()">📥 എക്സൽ റിപ്പോർട്ട്</button>
+                        <button class="btn-main" style="background:#fee2e2; color:#b91c1c; font-size:0.82rem; flex:1;" onclick="filterByPaymentCard('pending')">⚠️ കുടിശ്ശിക ലിസ്റ്റ്</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- പ്രത്യേക സെറ്റിംഗ്സ് & പാസ്‌വേഡ് മാനേജ്‌മെന്റ് ടാബ് -->
             <div id="admTabSettings" class="hidden">
                 <form id="formAdminChangeCreds" class="card">
                     <h3 style="margin-top:0; font-size:1rem; color:var(--primary);">👑 അഡ്മിൻ പാസ്‌വേഡ് മാറ്റുക</h3>
@@ -510,7 +504,6 @@
                 </form>
             </div>
 
-            <!-- സ്കാനർ ടാബ് -->
             <div id="admTabScanner" class="hidden">
                 <div class="card" style="text-align:center;">
                     <h3 style="margin-top:0; font-size:1.05rem;">📷 QR കോഡ് സ്കാനർ (Food Serving)</h3>
@@ -541,13 +534,16 @@
             <div id="admTabReg" class="hidden">
                 <form id="formAdminAddStudent" class="card">
                     <h3 style="margin-top:0; font-size:1rem;">➕ പുതിയ വിദ്യാർത്ഥിയെ ചേർക്കുക</h3>
+                    
+                    <div class="form-group">
+                        <label>Student ID (ഓട്ടോമാറ്റിക് ആയി നൽകിയത്):</label>
+                        <input type="text" id="inNewId" placeholder="1" required style="font-weight: 800; color: var(--primary);">
+                        <small style="color: var(--text-muted); font-size: 0.72rem;">* നമ്പർ തനിയെ വരും. വേണമെങ്കിൽ മാറ്റിയെഴുതാവുന്നതാണ്.</small>
+                    </div>
+                    
                     <div class="form-group">
                         <label>വിദ്യാർത്ഥിയുടെ പേര്:</label>
                         <input type="text" id="inNewName" placeholder="ഉദാ: Rahul M" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Student ID (റൂം നമ്പർ / ലോഗിൻ ID):</label>
-                        <input type="text" id="inNewId" placeholder="ഉദാ: H-101" required>
                     </div>
                     <div class="form-group">
                         <label>വാട്സാപ്പ് നമ്പർ:</label>
@@ -579,8 +575,13 @@
                     <button class="btn-action-sm" style="background:#ffffff; color:var(--primary);" onclick="resetFilterMode()">മുഴുവൻ കാണിക്കുക</button>
                 </div>
 
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                    <input type="text" id="inSearchStudents" onkeyup="filterStudentsList()" placeholder="🔍 പേര് / ID സെർച്ച്..." style="padding:8px 12px; font-size:0.85rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px;">
+                    <input type="text" id="inSearchStudents" onkeyup="filterStudentsList()" placeholder="🔍 പേര് / ID സെർച്ച്..." style="padding:8px 12px; font-size:0.85rem; flex:1;">
+                    <select id="sortStudentsBy" onchange="renderAdmin()" style="width:auto; padding:8px; font-size:0.8rem; font-weight:700;">
+                        <option value="default">ക്രമം: സാധാരണ</option>
+                        <option value="pendingFirst">⚠️ ബാക്കിയുള്ളവർ മുകളിൽ</option>
+                        <option value="name">പേര് (A-Z)</option>
+                    </select>
                 </div>
                 
                 <div id="containerStudentCards"></div>
@@ -589,10 +590,8 @@
 
     </div>
 
-    <!-- BOTTOM APP NAVIGATION BAR -->
     <div id="bottomNavBar" class="bottom-nav hidden"></div>
 
-    <!-- വിവരങ്ങൾ കാണാനുള്ള ബോക്സ് -->
     <div id="modalFullDetails" class="modal-overlay hidden" onclick="handleModalBackdropClick(event)">
         <div class="modal-card">
             <div class="modal-header">
@@ -604,7 +603,6 @@
         </div>
     </div>
 
-    <!-- വിവരങ്ങൾ എഡിറ്റ് ചെയ്യാനുള്ള ബോക്സ് -->
     <div id="modalEditStudent" class="modal-overlay hidden" onclick="handleEditBackdropClick(event)">
         <div class="modal-card">
             <div class="modal-header">
@@ -618,7 +616,7 @@
                     <input type="text" id="editName" required>
                 </div>
                 <div class="form-group">
-                    <label>Student ID (റൂം നമ്പർ):</label>
+                    <label>Student ID:</label>
                     <input type="text" id="editId" required>
                 </div>
                 <div class="form-group">
@@ -646,7 +644,6 @@
         </div>
     </div>
 
-    <!-- വിദ്യാർത്ഥിക്ക് പാസ്‌വേഡ് മാറ്റാനുള്ള പ്രത്യേക പോപ്പ്-അപ്പ് -->
     <div id="modalStudentPass" class="modal-overlay hidden" onclick="handleStudentPassBackdrop(event)">
         <div class="modal-card">
             <div class="modal-header">
@@ -703,6 +700,27 @@
 
     document.getElementById('inNewDate').valueAsDate = new Date();
 
+    // ഓട്ടോമാറ്റിക് ആയി അടുത്ത Student ID കണക്കാക്കുന്ന ഫംഗ്ഷൻ (1, 2, 3, 4...)
+    function getNextStudentId() {
+        if (!students || students.length === 0) return "1";
+        const numericIds = students
+            .map(s => parseInt(String(s.id).trim(), 10))
+            .filter(n => !isNaN(n) && n > 0);
+        
+        if (numericIds.length === 0) {
+            return (students.length + 1).toString();
+        }
+        const maxId = Math.max(...numericIds);
+        return (maxId + 1).toString();
+    }
+
+    function updateAutoStudentId() {
+        const idInput = document.getElementById('inNewId');
+        if (idInput) {
+            idInput.value = getNextStudentId();
+        }
+    }
+
     // ================= 2. REAL-TIME CLOUD LISTENERS =================
     db.collection("students").onSnapshot(snapshot => {
         students = [];
@@ -710,8 +728,10 @@
             students.push({ docId: doc.id, ...doc.data() });
         });
         
+        updateAutoStudentId();
+
         if (currentUser && currentRole === 'student') {
-            const updated = students.find(s => s.id === currentUser.id);
+            const updated = students.find(s => String(s.id) === String(currentUser.id));
             if (updated) {
                 currentUser = updated;
                 loadStudentData();
@@ -761,6 +781,11 @@
         const curYear = now.getFullYear();
         const curKey = getCurMonthKey();
 
+        const optYearCur = document.createElement('option');
+        optYearCur.value = `YEAR-${curYear}`;
+        optYearCur.innerText = `🌟 ${curYear} ലെ മുഴുവൻ കണക്കുകൾ (Yearly)`;
+        sel.appendChild(optYearCur);
+
         for (let y = curYear + 1; y >= curYear - 1; y--) {
             for (let m = 11; m >= 0; m--) {
                 const k = `${y}-${String(m + 1).padStart(2, '0')}`;
@@ -785,8 +810,8 @@
         const inp = document.getElementById('inputLoginId');
 
         if(role === 'student') {
-            lbl.innerText = 'Student ID (റൂം നമ്പർ):';
-            inp.placeholder = 'ഉദാ: H101';
+            lbl.innerText = 'Student ID (റോൾ നമ്പർ / റൂം നമ്പർ):';
+            inp.placeholder = 'ഉദാ: 1 അല്ലെങ്കിൽ H101';
         } else if(role === 'staff') {
             lbl.innerText = 'സ്റ്റാഫ് യൂസർനെയിം:';
             inp.placeholder = 'സ്റ്റാഫ് ഐഡി';
@@ -921,9 +946,7 @@
         const alertBox = document.getElementById('dispOrderWindowAlert');
         const btnOrder = document.getElementById('btnSubmitOrder');
 
-        // ഇന്ന് ഇതിനകം ഓർഡർ ചെയ്തിട്ടുണ്ടോ എന്ന് പരിശോധിക്കുന്നു
         const isAlreadyOrderedToday = (currentUser.lastOrderDate === todayStr && currentUser.hasFoodOrder);
-
         chkFood.checked = currentUser.hasFoodOrder || false;
 
         if (isAlreadyOrderedToday) {
@@ -952,7 +975,6 @@
         renderStudentQR();
     }
 
-    // വിദ്യാർത്ഥി ഓർഡർ സേവ് ചെയ്യുമ്പോൾ
     document.getElementById('formStudentOrder').addEventListener('submit', function(e) {
         e.preventDefault();
         const todayStr = getTodayDateKey();
@@ -963,7 +985,6 @@
         }
 
         const hasOrder = document.getElementById('chkStuFood').checked;
-
         if (!hasOrder) {
             alert('ദയവായി ഓർഡർ ടിക്ക് ചെയ്യുക!');
             return;
@@ -977,7 +998,6 @@
         });
     });
 
-    // വിദ്യാർത്ഥി പാസ്‌വേഡ് മോഡൽ
     function openStudentPassModal() {
         document.getElementById('modalStudentPass').classList.remove('hidden');
     }
@@ -1005,7 +1025,6 @@
         });
     });
 
-    // അഡ്മിൻ പാസ്‌വേഡ് മാറ്റൽ
     document.getElementById('formAdminChangeCreds').addEventListener('submit', function(e) {
         e.preventDefault();
         const newU = document.getElementById('inAdmNewUser').value.trim();
@@ -1024,7 +1043,6 @@
         });
     });
 
-    // സ്റ്റാഫ് പാസ്‌വേഡ് മാറ്റൽ
     document.getElementById('formStaffChangeCreds').addEventListener('submit', function(e) {
         e.preventDefault();
         const newU = document.getElementById('inStaffNewUser').value.trim();
@@ -1094,6 +1112,10 @@
             document.getElementById('inMenuFull').value = dailyMenuText;
         }
 
+        if(tab === 'reg') {
+            updateAutoStudentId();
+        }
+
         if(tab !== 'scanner') {
             stopQRScanner();
         }
@@ -1160,7 +1182,7 @@
         e.preventDefault();
         const id = document.getElementById('inNewId').value.trim().toUpperCase();
         if(students.find(s => String(s.id).trim().toUpperCase() === id)) {
-            alert('ഈ ID നിലവിലുണ്ട്!');
+            alert('ഈ ID നിലവിലുണ്ട്! ദയവായി മറ്റൊരു ID നൽകുക.');
             return;
         }
 
@@ -1180,14 +1202,21 @@
         };
 
         db.collection("students").add(newStudent).then(() => {
-            alert(`വിദ്യാർത്ഥിയെ ക്ലൗഡിൽ ചേർത്തു!\nID: ${id}`);
-            this.reset();
+            alert(`വിദ്യാർത്ഥിയെ ക്ലൗഡിൽ ചേർത്തു!\nStudent ID: ${id}`);
+            document.getElementById('inNewName').value = '';
+            document.getElementById('inNewPhone').value = '';
+            document.getElementById('inNewAddress').value = '';
+            document.getElementById('inNewPass').value = '';
+            document.getElementById('inNewRent').value = '4500';
             document.getElementById('inNewDate').valueAsDate = new Date();
+            updateAutoStudentId(); // അടുത്ത നമ്പർ സ്വയം ലോഡ് ചെയ്യും
         });
     });
 
     function renderAdmin() {
-        const selMonth = document.getElementById('selectFinanceMonth').value || getCurMonthKey();
+        const selVal = document.getElementById('selectFinanceMonth').value || getCurMonthKey();
+        const isYearlyMode = selVal.startsWith("YEAR-");
+        const currentYearStr = isYearlyMode ? selVal.replace("YEAR-", "") : selVal.split('-')[0];
         
         let totalFood = 0, servedCount = 0, remainingCount = 0;
         let collected = 0, pending = 0;
@@ -1201,7 +1230,7 @@
             banner.classList.remove('hidden');
             banner.style.background = '#fee2e2';
             banner.style.color = '#b91c1c';
-            bannerText.innerText = '⚠️ വാടക കുടിശ്ശികയുള്ളവരുടെ ലിസ്റ്റ്';
+            bannerText.innerText = '⚠️ വാടക കുടിശ്ശികയുള്ളവരുടെ ലിസ്റ്റ് (Follow-up List)';
         } else if(filterMode === 'paid') {
             banner.classList.remove('hidden');
             banner.style.background = '#dcfce7';
@@ -1226,16 +1255,45 @@
             banner.classList.add('hidden');
         }
 
-        students.forEach((s, idx) => {
+        const sortMode = document.getElementById('sortStudentsBy').value;
+        let sortedStudents = [...students];
+
+        if(sortMode === 'name') {
+            sortedStudents.sort((a, b) => a.name.localeCompare(b.name));
+        } else if(sortMode === 'pendingFirst') {
+            sortedStudents.sort((a, b) => {
+                const aPaid = (a.paidMonths || []).includes(selVal);
+                const bPaid = (b.paidMonths || []).includes(selVal);
+                return aPaid === bPaid ? 0 : aPaid ? 1 : -1;
+            });
+        }
+
+        sortedStudents.forEach((s) => {
+            const originalIndex = students.findIndex(orig => orig.docId === s.docId);
+
             if(s.hasFoodOrder) {
                 totalFood++;
                 if(s.isServed) servedCount++;
                 else remainingCount++;
             }
 
-            const isPaid = (s.paidMonths || []).includes(selMonth);
             const amt = s.rent || 4500;
-            if(isPaid) collected += amt; else pending += amt;
+            let isPaid = false;
+            let statusText = "";
+
+            if(isYearlyMode) {
+                const paidCountInYear = (s.paidMonths || []).filter(m => m.startsWith(currentYearStr)).length;
+                const yearlyTotal = amt * 12;
+                const yearlyPaid = amt * paidCountInYear;
+                collected += yearlyPaid;
+                pending += (yearlyTotal - yearlyPaid);
+                isPaid = (paidCountInYear >= 12);
+                statusText = `${paidCountInYear}/12 മാസം അടച്ചു`;
+            } else {
+                isPaid = (s.paidMonths || []).includes(selVal);
+                if(isPaid) collected += amt; else pending += amt;
+                statusText = isPaid ? 'PAID ✓' : 'PENDING';
+            }
 
             if(filterMode === 'paid' && !isPaid) return;
             if(filterMode === 'pending' && isPaid) return;
@@ -1247,22 +1305,17 @@
             card.className = `student-item-card ${s.isBlocked ? 'blocked' : ''} ${s.isServed ? 'served' : ''}`;
             card.setAttribute('data-search', `${s.name.toLowerCase()} ${s.id.toLowerCase()}`);
 
-            const waMsg = encodeURIComponent(`പ്രിയപ്പെട്ട ${s.name}, ശ്രീ മുത്തപ്പൻ മെസ്സിലെ വാടക ₹${amt} നൽകാൻ ബാക്കിയുണ്ട്. ദയവായി അടയ്ക്കുക.`);
+            const waMsg = encodeURIComponent(`ശ്രീ മുത്തപ്പൻ മെസ്സ്: പ്രിയപ്പെട്ട ${s.name}, നിങ്ങളുടെ ${isYearlyMode ? currentYearStr + ' ലെ' : selVal + ' ലെ'} വാടക തുക ₹${amt} കുടിശ്ശികയായി കാണിക്കുന്നു. ദയവായി എത്രയും വേഗം അടയ്ക്കുക.`);
 
-            let foodStatusBadge = '';
-            if(s.hasFoodOrder) {
-                foodStatusBadge = s.isServed 
-                    ? `<span class="badge served">കഴിച്ചു (Served)</span>` 
-                    : `<span class="badge pending-food">കഴിക്കാൻ ബാക്കി</span>`;
-            } else {
-                foodStatusBadge = '<span class="badge" style="background:#f1f5f9; color:#94a3b8;">ഓർഡറില്ല</span>';
-            }
+            let foodStatusBadge = s.hasFoodOrder 
+                ? (s.isServed ? '<span class="badge served">കഴിച്ചു (Served)</span>' : '<span class="badge pending-food">കഴിക്കാൻ ബാക്കി</span>')
+                : '<span class="badge" style="background:#f1f5f9; color:#94a3b8;">ഓർഡറില്ല</span>';
 
             if(currentRole === 'staff') {
                 card.innerHTML = `
                     <div class="item-row-top">
                         <div>
-                            <b style="font-size:0.95rem;">${s.name}</b> <small style="color:var(--text-muted); font-weight:700;">(റൂം: ${s.id})</small>
+                            <b style="font-size:0.95rem;">${s.name}</b> <small style="color:var(--text-muted); font-weight:700;">(ID: ${s.id})</small>
                         </div>
                         <div>${foodStatusBadge}</div>
                     </div>
@@ -1275,10 +1328,10 @@
                 card.innerHTML = `
                     <div class="item-row-top">
                         <div>
-                            <b style="font-size:0.95rem;">${s.name}</b> <small style="color:var(--text-muted); font-weight:700;">(${s.id})</small>
+                            <b style="font-size:0.95rem;">${s.name}</b> <small style="color:var(--text-muted); font-weight:700;">(ID: ${s.id})</small>
                             <div style="font-size:0.75rem; color:var(--text-muted);">Due: ${calculateDueDate(s.joinDate)} | വാടക: ₹${amt}</div>
                         </div>
-                        <span class="badge ${isPaid ? 'paid' : 'unpaid'}">${isPaid ? 'PAID ✓' : 'PENDING'}</span>
+                        <span class="badge ${isPaid ? 'paid' : 'unpaid'}">${statusText}</span>
                     </div>
                     
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin:2px 0;">
@@ -1287,14 +1340,16 @@
                     </div>
 
                     <div class="item-actions">
+                        ${!isYearlyMode ? `
                         <label style="display:flex; align-items:center; gap:4px; font-size:0.78rem; font-weight:700; cursor:pointer;">
-                            <input type="checkbox" class="pay-checkbox" ${isPaid ? 'checked' : ''} onchange="togglePay('${s.docId}', '${selMonth}', this.checked)"> വാടക അടച്ചു
-                        </label>
+                            <input type="checkbox" class="pay-checkbox" ${isPaid ? 'checked' : ''} onchange="togglePay('${s.docId}', '${selVal}', this.checked)"> ഈ മാസം അടച്ചു
+                        </label>` : `<span style="font-size:0.75rem; color:var(--text-muted);">മാസം തിരഞ്ഞെടുത്ത് ടിക്ക് ചെയ്യുക</span>`}
 
                         <div style="margin-left:auto; display:flex; gap:6px;">
-                            <button class="btn-action-sm edit" onclick="openEditModal(${idx})">✏️ എഡിറ്റ്</button>
-                            <button class="btn-action-sm info" onclick="openDetailsModal(${idx})">📋</button>
+                            ${s.phone ? `<a href="tel:${s.phone}" style="text-decoration:none;"><button class="btn-action-sm call">📞 Call</button></a>` : ''}
                             ${!isPaid && s.phone ? `<a href="https://wa.me/91${s.phone}?text=${waMsg}" target="_blank" style="text-decoration:none;"><button class="btn-action-sm whatsapp">📲 WA</button></a>` : ''}
+                            <button class="btn-action-sm edit" onclick="openEditModal(${originalIndex})">✏️</button>
+                            <button class="btn-action-sm info" onclick="openDetailsModal(${originalIndex})">📋</button>
                             <button class="btn-action-sm ${s.isBlocked ? 'unlock' : 'block'}" onclick="toggleBlock('${s.docId}', ${!s.isBlocked})">${s.isBlocked ? '🔓' : '🚫'}</button>
                             <button class="btn-action-sm" style="background:#f1f5f9; color:#94a3b8;" onclick="deleteStudent('${s.docId}')">🗑️</button>
                         </div>
@@ -1386,7 +1441,7 @@
                 resBox.className = "scan-result-card warning";
                 resBox.innerHTML = `
                     <h3>⚠️ ഇന്ന് ഓർഡർ ചെയ്തിട്ടില്ല! (No Food Order)</h3>
-                    <p><b>പേര്:</b> ${stu.name} (റൂം: ${stu.id})<br>
+                    <p><b>പേര്:</b> ${stu.name} (ID: ${stu.id})<br>
                     ഇന്ന് ഈ കുട്ടി ഭക്ഷണം ഓർഡർ ചെയ്തിട്ടില്ല.</p>
                 `;
                 return;
@@ -1396,7 +1451,7 @@
                 resBox.className = "scan-result-card danger";
                 resBox.innerHTML = `
                     <h3>❌ മുൻപ് ഭക്ഷണം വാങ്ങിയതാണ്! (Already Served)</h3>
-                    <p><b>പേര്:</b> ${stu.name} (റൂം: ${stu.id})<br>
+                    <p><b>പേര്:</b> ${stu.name} (ID: ${stu.id})<br>
                     ഇന്നത്തെ ടോക്കൺ ഉപയോഗിച്ച് ഇതിനകം ഭക്ഷണം വാങ്ങിയിട്ടുണ്ട്.</p>
                 `;
                 return;
@@ -1409,7 +1464,7 @@
                 resBox.className = "scan-result-card success";
                 resBox.innerHTML = `
                     <div style="font-size:1.15rem; font-weight:800; margin-bottom:4px;">✅ ടോക്കൺ സ്വീകരിച്ചു! (SERVED)</div>
-                    <div style="font-size:0.95rem; margin-bottom:8px;"><b>${stu.name}</b> (റൂം: ${stu.id})</div>
+                    <div style="font-size:0.95rem; margin-bottom:8px;"><b>${stu.name}</b> (ID: ${stu.id})</div>
                     <span class="badge paid" style="font-size:0.8rem;">🍽️ ഭക്ഷണം നൽകുക (1 Meal)</span>
                 `;
             });
@@ -1483,9 +1538,9 @@
             <div class="detail-row"><span>പേര്</span><b>${s.name}</b></div>
             <div class="detail-row"><span>ഫോൺ നമ്പർ</span><b><a href="tel:${s.phone}" style="color:var(--primary);">📞 ${s.phone || 'N/A'}</a></b></div>
             <div class="detail-row"><span>മേൽവിലാസം</span><b>${s.address || 'N/A'}</b></div>
-            <div class="detail-row"><span>പാസ്‌വേഡ്</span><b><code>${s.pass}</code></b></div>
             <div class="detail-row"><span>പ്രതിമാസ വാടക</span><b>₹${s.rent || 4500}</b></div>
             <div class="detail-row"><span>ജോയിനിംഗ് ഡേറ്റ്</span><b>${s.joinDate || 'N/A'}</b></div>
+            <div class="detail-row"><span>അടച്ച മാസങ്ങൾ</span><b>${(s.paidMonths || []).join(', ') || 'ഒന്നും അടച്ചിട്ടില്ല'}</b></div>
             <div class="detail-row"><span>അക്കൗണ്ട് നില</span><b>${s.isBlocked ? '<span style="color:var(--danger)">🚫 BLOCKED</span>' : '<span style="color:var(--success)">✅ ACTIVE</span>'}</b></div>
         `;
 
@@ -1537,16 +1592,16 @@
     }
 
     function exportCSV() {
-        const mKey = document.getElementById('selectFinanceMonth').value || getCurMonthKey();
-        let csv = "data:text/csv;charset=utf-8,\uFEFFID,Name,Phone,Address,Rent,Joining Date,Status,Food Order,Food Served\n";
+        const selVal = document.getElementById('selectFinanceMonth').value || getCurMonthKey();
+        let csv = "data:text/csv;charset=utf-8,\uFEFFID,Name,Phone,Address,Rent,Joining Date,Paid Months\n";
         students.forEach(s => {
-            const isPaid = (s.paidMonths || []).includes(mKey);
             const cleanAddr = (s.address || '').replace(/"/g, '""');
-            csv += `"${s.id}","${s.name}","${s.phone || ''}","${cleanAddr}","${s.rent || 4500}","${s.joinDate || ''}","${isPaid ? 'Paid' : 'Pending'}","${s.hasFoodOrder ? 'Yes' : 'No'}","${s.isServed ? 'Yes' : 'No'}"\n`;
+            const paidStr = (s.paidMonths || []).join('; ');
+            csv += `"${s.id}","${s.name}","${s.phone || ''}","${cleanAddr}","${s.rent || 4500}","${s.joinDate || ''}","${paidStr}"\n`;
         });
         const link = document.createElement("a");
         link.setAttribute("href", encodeURI(csv));
-        link.setAttribute("download", `Mess_Cloud_Report_${mKey}.csv`);
+        link.setAttribute("download", `Mess_Cloud_Report_${selVal}.csv`);
         link.click();
     }
 
