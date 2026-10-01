@@ -594,14 +594,24 @@
             </div>
 
             <div id="admTabSettings" class="hidden">
+                <!-- PDF Reports Section in Settings -->
                 <div class="card" style="background: #fff1f2; border: 1.5px solid #fecdd3;">
-                    <h3 style="margin-top:0; font-size:1rem; color:#b91c1c;">📄 സ്റ്റുഡന്റ്സ് PDF റിപ്പോർട്ട് (Print / Download)</h3>
+                    <h3 style="margin-top:0; font-size:1rem; color:#b91c1c;">📄 PDF റിപ്പോർട്ടുകൾ (Download / Print)</h3>
                     <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">
-                        എല്ലാ വിദ്യാർത്ഥികളുടെയും പേര്, ഫോൺ നമ്പർ, അഡ്രസ്സ്, വാടക എന്നിവ <b>Student ID ക്രമത്തിൽ</b> ലിസ്റ്റ് ചെയ്ത PDF ഡൗൺലോഡ് ചെയ്യാം.
+                        ഹോസ്റ്റൽ ആവശ്യങ്ങൾക്കായി വിദ്യാർത്ഥികളുടെ വിവരങ്ങളും കുടിശ്ശിക ലിസ്റ്റും പ്രത്യേകം PDF ആയി ഡൗൺലോഡ് ചെയ്യാം:
                     </p>
-                    <button class="btn-main pdf-btn" onclick="generateStudentsPDF()">
-                        📥 സ്റ്റുഡന്റ്സ് PDF ഡൗൺലോഡ് ചെയ്യുക
-                    </button>
+
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <!-- Button 1: Pending Dues Only -->
+                        <button class="btn-main" style="background:#b91c1c; font-size:0.88rem;" onclick="generatePendingDuesPDF()">
+                            ⚠️ വാടക കുടിശ്ശികയുള്ളവരുടെ PDF ഡൗൺലോഡ് ചെയ്യുക
+                        </button>
+
+                        <!-- Button 2: All Students Master List -->
+                        <button class="btn-main pdf-btn" style="background:#4338ca; font-size:0.88rem;" onclick="generateStudentsPDF()">
+                            📋 മുഴുവൻ വിദ്യാർത്ഥികളുടെയും PDF ഡൗൺലോഡ് ചെയ്യുക
+                        </button>
+                    </div>
                 </div>
 
                 <form id="formAdminChangeCreds" class="card">
@@ -625,7 +635,7 @@
                     </div>
                     <div class="form-group">
                         <label>സ്റ്റാഫ് പാസ്‌വേഡ്:</label>
-                        <input type="password" id="inStaffNewPass" placeholder="പുതിയ പാസ്‌വേഡ്" required>
+                        <input type="password" id="inStaffNewPass" placeholder="പുതിയ പാസ്‌‌വേഡ്" required>
                     </div>
                     <button type="submit" class="btn-main" style="background:#0284c7; font-size:0.85rem;">💾 സ്റ്റാഫ് വിവരങ്ങൾ സേവ് ചെയ്യുക</button>
                 </form>
@@ -897,11 +907,10 @@
         return months;
     }
 
-    // Accurate calculation of financial breakdown including partial payments
     function calculateStudentFinancials(student) {
         const allMonths = getAllStudentApplicableMonths(student.joinDate);
         const paidMonths = student.paidMonths || [];
-        const partials = student.partialPayments || {}; // { "2026-05": 2000 }
+        const partials = student.partialPayments || {};
         const monthlyRent = student.rent || 4500;
 
         let totalExpected = allMonths.length * monthlyRent;
@@ -1300,7 +1309,7 @@
             `).join('');
 
             payBox.innerHTML = `
-                <div style="font-size:0.95rem; font-weight:800; margin-bottom:4px;">⚠️ വാടക കുടിശ്ശികയുണ്ട്!</div>
+                <div style="font-size:0.95rem; font-weight:800; margin-bottom:4px;">⚠️️ വാടക കുടിശ്ശികയുണ്ട്!</div>
                 <div style="margin-top:4px;"><b>ആകെ അടയ്ക്കാനുള്ള ബാലൻസ് തുക:</b> <span style="font-size:1.15rem; font-weight:800; color:#b91c1c;">₹${fin.totalPending}</span></div>
                 <ul style="margin:6px 0 6px 18px; padding:0; font-size:0.82rem; line-height:1.5;">${pendingDetailsHtml}</ul>
                 <div style="margin-top:6px; font-size:0.8rem;">മെസ്സ് മാനേജറുമായി ബന്ധപ്പെട്ട് വാടക അടയ്ക്കുക.</div>
@@ -1892,15 +1901,12 @@
         let paidMonths = stu.paidMonths ? [...stu.paidMonths] : [];
 
         if (paidAmt >= fullRent) {
-            // Full Payment
             if(!paidMonths.includes(mKey)) paidMonths.push(mKey);
             delete partials[mKey];
         } else if (paidAmt > 0) {
-            // Partial
             paidMonths = paidMonths.filter(m => m !== mKey);
             partials[mKey] = paidAmt;
         } else {
-            // Reset to unpaid
             paidMonths = paidMonths.filter(m => m !== mKey);
             delete partials[mKey];
         }
@@ -1932,6 +1938,118 @@
         });
     }
 
+    // 1. Pending Rent Dues PDF Generator (NEW)
+    function generatePendingDuesPDF() {
+        if (!students || students.length === 0) {
+            alert('ഡൗൺലോഡ് ചെയ്യാൻ വിവരങ്ങൾ ലഭ്യമല്ല!');
+            return;
+        }
+
+        // Filter only students who have pending amounts
+        const pendingStudents = students
+            .map(s => ({ ...s, fin: calculateStudentFinancials(s) }))
+            .filter(s => s.fin.totalPending > 0);
+
+        if (pendingStudents.length === 0) {
+            alert('നിലവിൽ ആർക്കും വാടക കുടിശ്ശികയില്ല! (All Rent Dues Cleared)');
+            return;
+        }
+
+        // Sort by highest pending amount first
+        pendingStudents.sort((a, b) => b.fin.totalPending - a.fin.totalPending);
+
+        const totalOverallDue = pendingStudents.reduce((acc, curr) => acc + curr.fin.totalPending, 0);
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+
+        // Header Background
+        doc.setFillColor(185, 28, 28); // Danger Red
+        doc.rect(0, 0, 210, 28, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(15);
+        doc.setFont('helvetica', 'bold');
+        doc.text('SRI MUTHAPPAN HOSTEL & MESS', 14, 11);
+
+        doc.setFontSize(9.5);
+        doc.setFont('helvetica', 'normal');
+        doc.text('RENT DUES & OUTSTANDING BALANCE REPORT', 14, 17);
+        doc.text(`Generated: ${new Date().toLocaleDateString('en-GB')}  |  Defaulters Count: ${pendingStudents.length} Students`, 14, 23);
+
+        // Summary Bar below header
+        doc.setFillColor(254, 242, 242);
+        doc.rect(14, 32, 182, 12, 'F');
+        doc.setDrawColor(252, 165, 165);
+        doc.rect(14, 32, 182, 12, 'S');
+
+        doc.setTextColor(153, 27, 27);
+        doc.setFontSize(9.5);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`TOTAL PENDING RENT TO BE COLLECTED: Rs. ${totalOverallDue}`, 18, 39.5);
+
+        const tableBody = pendingStudents.map(s => {
+            const dueMonthsStr = s.fin.pendingMonthsList
+                .map(p => `${p.month} (Rs. ${p.due})`)
+                .join(', ');
+
+            return [
+                s.id || '-',
+                s.name || '-',
+                s.phone || '-',
+                `Rs. ${s.rent || 4500}`,
+                `Rs. ${s.fin.totalPending}`,
+                dueMonthsStr,
+                s.isBlocked ? 'Blocked' : 'Active'
+            ];
+        });
+
+        doc.autoTable({
+            startY: 48,
+            head: [['ID', 'Name', 'Phone', 'Rent', 'Due Balance', 'Due Months & Amount', 'Status']],
+            body: tableBody,
+            theme: 'grid',
+            headStyles: {
+                fillColor: [185, 28, 28],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 8.5,
+                halign: 'center'
+            },
+            bodyStyles: {
+                fontSize: 8,
+                textColor: [15, 23, 42],
+                cellPadding: 3
+            },
+            columnStyles: {
+                0: { halign: 'center', fontStyle: 'bold', cellWidth: 14 },
+                1: { fontStyle: 'bold', cellWidth: 35 },
+                2: { halign: 'center', cellWidth: 26 },
+                3: { halign: 'right', cellWidth: 18 },
+                4: { halign: 'right', fontStyle: 'bold', textColor: [185, 28, 28], cellWidth: 24 },
+                5: { cellWidth: 48 },
+                6: { halign: 'center', cellWidth: 17 }
+            },
+            alternateRowStyles: {
+                fillColor: [255, 245, 245]
+            },
+            didDrawPage: function (data) {
+                const pageCount = doc.internal.getNumberOfPages();
+                doc.setFontSize(8);
+                doc.setTextColor(148, 163, 184);
+                doc.text(
+                    `Page ${data.pageNumber} of ${pageCount}  |  Sri Muthappan Hostel & Mess Accounts`,
+                    105,
+                    290,
+                    { align: 'center' }
+                );
+            }
+        });
+
+        doc.save(`Rent_Dues_Defaulters_${getTodayDateKey()}.pdf`);
+    }
+
+    // 2. Master Directory PDF (All Students)
     function generateStudentsPDF() {
         if (!students || students.length === 0) {
             alert('ഡൗൺലോഡ് ചെയ്യാൻ വിദ്യാർത്ഥികളുടെ വിവരങ്ങൾ ലഭ്യമല്ല!');
@@ -2249,7 +2367,7 @@
         students.forEach(s => {
             const cleanAddr = (s.address || '').replace(/"/g, '""');
             const fin = calculateStudentFinancials(s);
-            csv += `"${s.id}","${s.name}","${s.phone || ''}","${cleanAddr}","${s.rent || 4500}","${s.joinDate || ''}","₹${fin.totalPending}"\n`;
+            csv += `"${s.id}","${s.name}","${s.phone || ''}","${cleanAddr}","${s.rent || 4500}","${s.joinDate || ''}","Rs. ${fin.totalPending}"\n`;
         });
         const link = document.createElement("a");
         link.setAttribute("href", encodeURI(csv));
