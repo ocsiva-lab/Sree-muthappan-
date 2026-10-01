@@ -168,6 +168,7 @@
         button.btn-main.danger { background: var(--danger); }
         button.btn-main.warning { background: #fef3c7; color: #92400e; border: 1.5px solid #fde68a; }
         button.btn-main.pdf-btn { background: #dc2626; color: #ffffff; }
+        button.btn-main.whatsapp-btn { background: #25d366; color: #ffffff; }
         button.btn-main:disabled { background: #94a3b8; cursor: not-allowed; }
 
         .stats-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
@@ -403,6 +404,29 @@
         .month-matrix-item.paid { background: #f0fdf4; border-color: #86efac; color: #166534; }
         .month-matrix-item.pending { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
         .month-matrix-item.partial { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+
+        .timer-config-box {
+            background: #f8fafc;
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        /* Edit Mode Bar */
+        .edit-mode-bar {
+            background: #fef3c7;
+            border: 1.5px solid #fde68a;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #92400e;
+        }
     </style>
 </head>
 <body>
@@ -514,14 +538,40 @@
         <!-- Admin View -->
         <div id="viewAdmin" class="hidden">
             <div id="admTabOverview">
-                <div id="secOrderSwitch" class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">ഓർഡർ വിൻഡോ</div>
-                        <span id="badgeAdminOrderActive" class="badge open" style="margin-top:4px;">🟢 OPEN</span>
+                <!-- Order Window & Auto Timer Config -->
+                <div id="secOrderSwitch" class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">ഓർഡർ വിൻഡോ നില</div>
+                            <span id="badgeAdminOrderActive" class="badge open" style="margin-top:4px;">🟢 OPEN</span>
+                        </div>
+                        <div id="grpOrderSwitchBtns" style="display:flex; gap:6px;">
+                            <button class="btn-action-sm" style="background:#dcfce7; color:#15803d;" onclick="setOrderActive(true)">Start</button>
+                            <button class="btn-action-sm" style="background:#fee2e2; color:#b91c1c;" onclick="setOrderActive(false)">Close</button>
+                        </div>
                     </div>
-                    <div id="grpOrderSwitchBtns" style="display:flex; gap:6px;">
-                        <button class="btn-action-sm" style="background:#dcfce7; color:#15803d;" onclick="setOrderActive(true)">Start</button>
-                        <button class="btn-action-sm" style="background:#fee2e2; color:#b91c1c;" onclick="setOrderActive(false)">Close</button>
+
+                    <!-- Auto Timer Controls -->
+                    <div class="timer-config-box">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem; margin-bottom:8px;">
+                            <input type="checkbox" id="chkAutoTimerEnabled" style="width:18px; height:18px; accent-color:var(--primary);" onchange="toggleAutoTimerSwitch()">
+                            ⏰ എല്ലാ ദിവസവും ഓട്ടോമാറ്റിക് ടൈമർ പ്രവർത്തിപ്പിക്കുക
+                        </label>
+                        <div id="boxTimerInputs" style="display:none; grid-template-columns: 1fr 1fr; gap:8px; margin-top:8px;">
+                            <div>
+                                <small style="font-size:0.7rem; color:var(--text-muted); font-weight:700;">തുടങ്ങുന്ന സമയം:</small>
+                                <input type="time" id="inTimerStartTime" value="06:00" style="padding:8px; font-size:0.85rem;">
+                            </div>
+                            <div>
+                                <small style="font-size:0.7rem; color:var(--text-muted); font-weight:700;">അവസാനിക്കുന്ന സമയം:</small>
+                                <input type="time" id="inTimerEndTime" value="22:00" style="padding:8px; font-size:0.85rem;">
+                            </div>
+                            <div style="grid-column: span 2;">
+                                <button type="button" class="btn-main success" style="padding:8px; font-size:0.8rem;" onclick="saveAutoTimerSettings()">
+                                    💾 സമയം ക്ലൗഡിൽ സേവ് ചെയ്യുക
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -545,7 +595,7 @@
 
                 <div id="secResetOrders" style="margin-bottom: 16px;">
                     <button class="btn-main warning" onclick="adminResetOrders()">
-                        🔄 ഇന്നത്തെ ഭക്ഷണ ഓർഡറുകൾ റീസെറ്റ് ചെയ്യുക (Reset)
+                        🔄 ഇന്നത്തെ ഭക്ഷണ ഓർഡറുകൾ മാനുവലായി റീസെറ്റ് ചെയ്യുക
                     </button>
                 </div>
 
@@ -576,25 +626,65 @@
                 </div>
             </div>
 
+            <!-- Notice & WhatsApp Broadcast Section -->
             <div id="admTabNotice" class="hidden">
                 <form id="formAdminNotice" class="card">
                     <h3 style="margin-top:0; font-size:1rem; color:var(--primary);">📢 വിദ്യാർത്ഥികൾക്ക് നോട്ടിഫിക്കേഷൻ അയക്കുക</h3>
                     <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
-                        ഇവിടെ നൽകുന്ന സന്ദേശം വിദ്യാർത്ഥികൾ ലോഗിൻ ചെയ്യുമ്പോൾ തന്നെ അവരുടെ ഹോം സ്ക്രീനിൽ മുകളിലായി കാണിക്കും.
+                        ഇവിടെ നൽകുന്ന സന്ദേശം വിദ്യാർത്ഥികൾ ലോഗിൻ ചെയ്യുമ്പോൾ അവരുടെ സ്ക്രീനിൽ കാണിക്കും.
                     </p>
                     <div class="form-group">
                         <label>നോട്ടിഫിക്കേഷൻ സന്ദേശം (Notice Text):</label>
-                        <textarea id="inNoticeText" rows="4" placeholder="ഉദാ: നാളെ രാവിലെ 9 മണിക്ക് വെള്ളം തടസ്സപ്പെടുന്നതാണ്..." required></textarea>
+                        <textarea id="inNoticeText" rows="3" required></textarea>
                     </div>
-                    <div style="display:flex; gap:8px;">
+                    <div style="display:flex; gap:8px; margin-bottom:14px;">
                         <button type="submit" class="btn-main success" style="flex:2;">🚀 അറിയിപ്പ് പ്രസിദ്ധീകരിക്കുക</button>
                         <button type="button" class="btn-main danger" style="flex:1;" onclick="clearAdminNotice()">🗑️ ഒഴിവാക്കുക</button>
                     </div>
                 </form>
+
+                <!-- Bulk WhatsApp Broadcast Card -->
+                <div class="card" style="background:#f0fdf4; border:1.5px solid #86efac;">
+                    <h3 style="margin-top:0; font-size:1rem; color:#166534;">📲 വാട്‌സാപ്പ് ഗ്രൂപ്പ് / ബൾക്ക് മെസ്സേജ് അയക്കുക</h3>
+                    <p style="font-size:0.8rem; color:#14532d; margin-bottom:12px;">
+                        വാടക കുടിശ്ശികയുള്ള മുഴുവൻ പേർക്കും അവരുടെ കൃത്യമായ തുക സഹിതമോ, അല്ലെങ്കിൽ എല്ലാ കുട്ടികൾക്കുമായോ ഒന്നിനുപിറകെ ഒന്നായി വേഗത്തിൽ വാട്സാപ്പ് വഴി അയക്കാം.
+                    </p>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <button type="button" class="btn-main whatsapp-btn" onclick="startBulkWhatsAppBroadcast('dueOnly')">
+                            📲 വാടക ബാക്കിയുള്ളവർക്ക് മാത്രം അയക്കുക (Due Reminder)
+                        </button>
+                        <button type="button" class="btn-main" style="background:#0284c7; color:#ffffff;" onclick="startBulkWhatsAppBroadcast('allNotice')">
+                            📢 എല്ലാ വിദ്യാർത്ഥികൾക്കും നോട്ടിഫിക്കേഷൻ അയക്കുക (General)
+                        </button>
+                    </div>
+                </div>
             </div>
 
+            <!-- Settings Tab with Auto Reset Time Controls -->
             <div id="admTabSettings" class="hidden">
-                <!-- PDF Reports Section in Settings -->
+                <!-- Daily Auto Reset Food Orders Schedule Card -->
+                <div class="card" style="background: #eff6ff; border: 1.5px solid #bfdbfe;">
+                    <h3 style="margin-top:0; font-size:1rem; color:#1d4ed8;">⏰ ദിവസേനയുള്ള ഭക്ഷണ ഓർഡറുകൾ ഓട്ടോ റീസെറ്റ്</h3>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
+                        എല്ലാ ദിവസവും നിശ്ചിത സമയത്ത് (ഉദാ: രാത്രി 10:00 മണിക്ക്) വിദ്യാർത്ഥികളുടെ ഭക്ഷണ ഓർഡറുകൾ തനിയെ റീസെറ്റ് ആവാനുള്ള സൗകര്യം:
+                    </p>
+
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem; margin-bottom:10px; font-weight:700;">
+                        <input type="checkbox" id="chkAutoResetOrdersEnabled" style="width:18px; height:18px; accent-color:var(--primary);" onchange="toggleAutoResetOrdersSwitch()">
+                        🔄 ദിവസേന ഓട്ടോമാറ്റിക് റീസെറ്റ് പ്രവർത്തിപ്പിക്കുക
+                    </label>
+
+                    <div id="boxAutoResetInputs" style="display:none; flex-direction:column; gap:8px;">
+                        <div class="form-group" style="margin-bottom:8px;">
+                            <label style="font-size:0.8rem;">റീസെറ്റ് ചെയ്യേണ്ട സമയം:</label>
+                            <input type="time" id="inAutoResetTime" value="22:00" style="padding:8px; font-size:0.88rem;">
+                        </div>
+                        <button type="button" class="btn-main success" style="padding:10px; font-size:0.82rem;" onclick="saveAutoResetSettings()">
+                            💾 റീസെറ്റ് സമയം ക്ലൗഡിൽ സേവ് ചെയ്യുക
+                        </button>
+                    </div>
+                </div>
+
                 <div class="card" style="background: #fff1f2; border: 1.5px solid #fecdd3;">
                     <h3 style="margin-top:0; font-size:1rem; color:#b91c1c;">📄 PDF റിപ്പോർട്ടുകൾ (Download / Print)</h3>
                     <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">
@@ -602,12 +692,9 @@
                     </p>
 
                     <div style="display:flex; flex-direction:column; gap:10px;">
-                        <!-- Button 1: Pending Dues Only -->
                         <button class="btn-main" style="background:#b91c1c; font-size:0.88rem;" onclick="generatePendingDuesPDF()">
                             ⚠️ വാടക കുടിശ്ശികയുള്ളവരുടെ PDF ഡൗൺലോഡ് ചെയ്യുക
                         </button>
-
-                        <!-- Button 2: All Students Master List -->
                         <button class="btn-main pdf-btn" style="background:#4338ca; font-size:0.88rem;" onclick="generateStudentsPDF()">
                             📋 മുഴുവൻ വിദ്യാർത്ഥികളുടെയും PDF ഡൗൺലോഡ് ചെയ്യുക
                         </button>
@@ -635,7 +722,7 @@
                     </div>
                     <div class="form-group">
                         <label>സ്റ്റാഫ് പാസ്‌വേഡ്:</label>
-                        <input type="password" id="inStaffNewPass" placeholder="പുതിയ പാസ്‌‌വേഡ്" required>
+                        <input type="password" id="inStaffNewPass" placeholder="പുതിയ പാസ്‌വേഡ്" required>
                     </div>
                     <button type="submit" class="btn-main" style="background:#0284c7; font-size:0.85rem;">💾 സ്റ്റാഫ് വിവരങ്ങൾ സേവ് ചെയ്യുക</button>
                 </form>
@@ -707,6 +794,15 @@
             </div>
 
             <div id="admTabRent" class="hidden">
+                <!-- EDIT MODE TOGGLE BAR -->
+                <div class="edit-mode-bar">
+                    <span id="txtEditModeStatus">🔒 എഡിറ്റ് മോഡ് ഓഫാണ് (ലോക്ക് ചെയ്തിരിക്കുന്നു)</span>
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="checkbox" id="chkToggleEditMode" style="width:18px; height:18px; accent-color:var(--primary);" onchange="toggleEditModeState(this.checked)">
+                        എഡിറ്റ് മോഡ് ഓൺ ചെയ്യുക
+                    </label>
+                </div>
+
                 <div id="bannerFilterState" class="filter-status-banner hidden">
                     <span id="textFilterStateTitle">ഫിൽട്ടർ ചെയ്ത ലിസ്റ്റ്</span>
                     <button class="btn-action-sm" style="background:#ffffff; color:var(--primary);" onclick="resetFilterMode()">മുഴുവൻ കാണിക്കുക</button>
@@ -776,6 +872,26 @@
                     <button type="button" class="btn-main danger" style="flex:1;" onclick="clearPartialPayment()">റദ്ദാക്കുക</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Bulk WhatsApp Queue Modal -->
+    <div id="modalBulkWhatsApp" class="modal-overlay hidden">
+        <div class="modal-card" style="max-width: 420px; text-align: center;">
+            <div class="modal-header">
+                <h3>📲 ബൾക്ക് വാട്‌സാപ്പ് പ്രൊസസ്സ്</h3>
+                <button class="close-btn" onclick="closeBulkWhatsAppModal()">✕</button>
+            </div>
+            <div style="padding: 10px 0;">
+                <p id="bulkProgressText" style="font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-bottom: 12px;"></p>
+                <div id="bulkNextStudentInfo" style="background:#f8fafc; border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:16px; text-align:left; font-size:0.88rem;"></div>
+                <button id="btnSendNextWhatsApp" class="btn-main whatsapp-btn" onclick="openCurrentBulkWhatsAppLink()">
+                    👉 ഇയാൾക്ക് WhatsApp അയക്കുക & അടുത്തതിലേക്ക്
+                </button>
+                <button type="button" class="btn-main" style="background:#f1f5f9; color:var(--text-muted); margin-top:8px;" onclick="closeBulkWhatsAppModal()">
+                    നിർത്തുക (Cancel)
+                </button>
+            </div>
         </div>
     </div>
 
@@ -953,7 +1069,17 @@
     let students = [];
     let dailyMenuText = "ചോറ്, സാമ്പാർ, മീൻ വറുത്തത്, തോരൻ";
     let isOrderActive = true;
-    let broadcastNotice = "";
+    let autoTimerEnabled = false;
+    let timerStartTime = "06:00";
+    let timerEndTime = "22:00";
+    
+    // Auto Reset Orders Settings
+    let autoResetOrdersEnabled = false;
+    let autoResetTime = "22:00";
+    let lastResetDateExecuted = "";
+
+    let isEditModeActive = false; // Global toggle to lock accidental clicks
+    let broadcastNotice = "ഈ മാസം പണം അടക്കാനുള്ളവർ ഉടൻ അടയ്ക്കണമെന്ന് വിനീതമായി അഭ്യർത്ഥിക്കുന്നു";
     let currentUser = null;
     let currentRole = 'student';
     let filterMode = 'all'; 
@@ -1011,13 +1137,75 @@
         });
     }
 
+    // Auto Order Window Timer Logic
+    function checkAutoTimerExecution() {
+        if (!autoTimerEnabled || !timerStartTime || !timerEndTime) return;
+        const now = new Date();
+        const curHM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+        let shouldBeOpen = false;
+        if (timerStartTime <= timerEndTime) {
+            shouldBeOpen = (curHM >= timerStartTime && curHM < timerEndTime);
+        } else {
+            shouldBeOpen = (curHM >= timerStartTime || curHM < timerEndTime);
+        }
+
+        if (isOrderActive !== shouldBeOpen) {
+            db.collection("settings").doc("mess_state").set({
+                isOrderActive: shouldBeOpen
+            }, { merge: true });
+        }
+    }
+
+    // Daily Auto Order Reset Functionality (Every Day at specified time e.g., 22:00)
+    function checkDailyAutoResetOrders() {
+        if (!autoResetOrdersEnabled || !autoResetTime) return;
+
+        const now = new Date();
+        const todayStr = getTodayDateKey();
+        const curHM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+        if (curHM === autoResetTime && lastResetDateExecuted !== todayStr) {
+            lastResetDateExecuted = todayStr;
+            db.collection("settings").doc("mess_state").set({
+                lastResetDateExecuted: todayStr
+            }, { merge: true });
+
+            const batch = db.batch();
+            students.forEach(s => {
+                const ref = db.collection("students").doc(s.docId);
+                batch.update(ref, { 
+                    hasFoodOrder: false, 
+                    isServed: false,
+                    lastOrderDate: ""
+                });
+            });
+            batch.commit().then(() => {
+                console.log(`[Auto-Reset] എല്ലാ ഓർഡറുകളും ഓട്ടോമാറ്റിക് ആയി ${curHM} ന് റീസെറ്റ് ചെയ്തു.`);
+            });
+        }
+    }
+
+    setInterval(() => {
+        checkAutoTimerExecution();
+        checkDailyAutoResetOrders();
+    }, 15000);
+
     // App Settings Listener
     db.collection("settings").doc("mess_state").onSnapshot(async doc => {
         if (doc.exists) {
             const data = doc.data();
             dailyMenuText = data.menu || "";
             isOrderActive = data.isOrderActive ?? true;
-            broadcastNotice = data.notice || "";
+            autoTimerEnabled = data.autoTimerEnabled ?? false;
+            timerStartTime = data.timerStartTime || "06:00";
+            timerEndTime = data.timerEndTime || "22:00";
+            
+            autoResetOrdersEnabled = data.autoResetOrdersEnabled ?? false;
+            autoResetTime = data.autoResetTime || "22:00";
+            lastResetDateExecuted = data.lastResetDateExecuted || "";
+
+            broadcastNotice = data.notice !== undefined ? data.notice : "ഈ മാസം പണം അടക്കാനുള്ളവർ ഉടൻ അടയ്ക്കണമെന്ന് വിനീതമായി അഭ്യർത്ഥിക്കുന്നു";
 
             adminCredentials.user = data.adminUser || "admin";
             adminCredentials.passHash = data.adminPassHash || await hashPassword("admin123");
@@ -1030,6 +1218,25 @@
             
             const noticeInput = document.getElementById('inNoticeText');
             if (noticeInput) noticeInput.value = broadcastNotice;
+
+            // Timer UI
+            const chkTimer = document.getElementById('chkAutoTimerEnabled');
+            const boxInputs = document.getElementById('boxTimerInputs');
+            if (chkTimer && boxInputs) {
+                chkTimer.checked = autoTimerEnabled;
+                boxInputs.style.display = autoTimerEnabled ? 'grid' : 'none';
+                document.getElementById('inTimerStartTime').value = timerStartTime;
+                document.getElementById('inTimerEndTime').value = timerEndTime;
+            }
+
+            // Auto Reset UI in Settings
+            const chkReset = document.getElementById('chkAutoResetOrdersEnabled');
+            const boxReset = document.getElementById('boxAutoResetInputs');
+            if (chkReset && boxReset) {
+                chkReset.checked = autoResetOrdersEnabled;
+                boxReset.style.display = autoResetOrdersEnabled ? 'flex' : 'none';
+                document.getElementById('inAutoResetTime').value = autoResetTime;
+            }
 
             renderBroadcastNotice();
 
@@ -1045,11 +1252,66 @@
                 staffUser: "staff",
                 staffPassHash: defaultStaffHash,
                 isOrderActive: true,
+                autoTimerEnabled: false,
+                timerStartTime: "06:00",
+                timerEndTime: "22:00",
+                autoResetOrdersEnabled: false,
+                autoResetTime: "22:00",
+                lastResetDateExecuted: "",
                 menu: dailyMenuText,
-                notice: ""
+                notice: "ഈ മാസം പണം അടക്കാനുള്ളവർ ഉടൻ അടയ്ക്കണമെന്ന് വിനീതമായി അഭ്യർത്ഥിക്കുന്നു"
             });
         }
     });
+
+    function toggleAutoTimerSwitch() {
+        const isChecked = document.getElementById('chkAutoTimerEnabled').checked;
+        document.getElementById('boxTimerInputs').style.display = isChecked ? 'grid' : 'none';
+    }
+
+    function saveAutoTimerSettings() {
+        const isEnabled = document.getElementById('chkAutoTimerEnabled').checked;
+        const startT = document.getElementById('inTimerStartTime').value;
+        const endT = document.getElementById('inTimerEndTime').value;
+
+        db.collection("settings").doc("mess_state").set({
+            autoTimerEnabled: isEnabled,
+            timerStartTime: startT,
+            timerEndTime: endT
+        }, { merge: true }).then(() => {
+            alert('ഓട്ടോമാറ്റിക് ടൈമർ സെറ്റിംഗ്സ് വിജയകരമായി സേവ് ചെയ്തു!');
+            checkAutoTimerExecution();
+        });
+    }
+
+    // Auto Reset Orders Settings UI Functions
+    function toggleAutoResetOrdersSwitch() {
+        const isChecked = document.getElementById('chkAutoResetOrdersEnabled').checked;
+        document.getElementById('boxAutoResetInputs').style.display = isChecked ? 'flex' : 'none';
+    }
+
+    function saveAutoResetSettings() {
+        const isEnabled = document.getElementById('chkAutoResetOrdersEnabled').checked;
+        const resetT = document.getElementById('inAutoResetTime').value;
+
+        db.collection("settings").doc("mess_state").set({
+            autoResetOrdersEnabled: isEnabled,
+            autoResetTime: resetT
+        }, { merge: true }).then(() => {
+            alert('ഡെയ്‌ലി ഓട്ടോ റീസെറ്റ് സെറ്റിംഗ്സ് വിജയകരമായി സേവ് ചെയ്തു!');
+        });
+    }
+
+    function toggleEditModeState(isChecked) {
+        isEditModeActive = isChecked;
+        const statusTxt = document.getElementById('txtEditModeStatus');
+        if (isEditModeActive) {
+            statusTxt.innerHTML = "🔓 <span style='color:#15803d;'>എഡിറ്റ് മോഡ് ഓണാണ് (ഇപ്പോൾ മാറ്റങ്ങൾ വരുത്താം)</span>";
+        } else {
+            statusTxt.innerHTML = "🔒 <span>എഡിറ്റ് മോഡ് ഓഫാണ് (ലോക്ക് ചെയ്തിരിക്കുന്നു)</span>";
+        }
+        renderAdmin();
+    }
 
     function renderBroadcastNotice() {
         const noticeBox = document.getElementById('studentNoticeBox');
@@ -1309,7 +1571,7 @@
             `).join('');
 
             payBox.innerHTML = `
-                <div style="font-size:0.95rem; font-weight:800; margin-bottom:4px;">⚠️️ വാടക കുടിശ്ശികയുണ്ട്!</div>
+                <div style="font-size:0.95rem; font-weight:800; margin-bottom:4px;">⚠️ വാടക കുടിശ്ശികയുണ്ട്!</div>
                 <div style="margin-top:4px;"><b>ആകെ അടയ്ക്കാനുള്ള ബാലൻസ് തുക:</b> <span style="font-size:1.15rem; font-weight:800; color:#b91c1c;">₹${fin.totalPending}</span></div>
                 <ul style="margin:6px 0 6px 18px; padding:0; font-size:0.82rem; line-height:1.5;">${pendingDetailsHtml}</ul>
                 <div style="margin-top:6px; font-size:0.8rem;">മെസ്സ് മാനേജറുമായി ബന്ധപ്പെട്ട് വാടക അടയ്ക്കുക.</div>
@@ -1408,7 +1670,7 @@
         db.collection("settings").doc("mess_state").set({
             notice: noticeTxt
         }, { merge: true }).then(() => {
-            alert('അറിയിപ്പ് വിജയകരമായി പ്രസിദ്ധീകരിച്ചു! എല്ലാ വിദ്യാർത്ഥികളുടെയും സ്ക്രീനിൽ ഇത് കാണാം.');
+            alert('അറിയിപ്പ് വിജയകരമായി പ്രസിദ്ധീകരിച്ചു!');
         });
     });
 
@@ -1423,13 +1685,83 @@
         }
     }
 
+    let bulkQueue = [];
+    let bulkIndex = 0;
+
+    function startBulkWhatsAppBroadcast(type) {
+        bulkQueue = [];
+        bulkIndex = 0;
+
+        if (type === 'dueOnly') {
+            students.forEach(s => {
+                const fin = calculateStudentFinancials(s);
+                if (fin.totalPending > 0 && s.phone) {
+                    const dueDetails = fin.pendingMonthsList.map(p => `${formatMonthKeyML(p.month)} (₹${p.due})`).join(', ');
+                    const msg = `ശ്രീ മുത്തപ്പൻ മെസ്സ്: പ്രിയപ്പെട്ട ${s.name}, നിങ്ങളുടെ ആകെ വാടക കുടിശ്ശിക തുക ₹${fin.totalPending} ആണ് [${dueDetails}]. ഈ മാസം പണം അടക്കാനുള്ളവർ ഉടൻ അടയ്ക്കണമെന്ന് വിനീതമായി അഭ്യർത്ഥിക്കുന്നു.`;
+                    bulkQueue.push({ name: s.name, phone: s.phone, msg: msg, due: fin.totalPending });
+                }
+            });
+        } else {
+            const generalMsg = broadcastNotice || "ഈ മാസം പണം അടക്കാനുള്ളവർ ഉടൻ അടയ്ക്കണമെന്ന് വിനീതമായി അഭ്യർത്ഥിക്കുന്നു";
+            students.forEach(s => {
+                if (s.phone) {
+                    const msg = `ശ്രീ മുത്തപ്പൻ മെസ്സ് അറിയിപ്പ്: പ്രിയപ്പെട്ട ${s.name},\n${generalMsg}`;
+                    bulkQueue.push({ name: s.name, phone: s.phone, msg: msg, due: 0 });
+                }
+            });
+        }
+
+        if (bulkQueue.length === 0) {
+            alert('അയക്കാൻ വിദ്യാർത്ഥികളുടെ ഫോൺ നമ്പറുകൾ ലഭ്യമല്ല!');
+            return;
+        }
+
+        document.getElementById('modalBulkWhatsApp').classList.remove('hidden');
+        renderBulkProgress();
+    }
+
+    function renderBulkProgress() {
+        if (bulkIndex >= bulkQueue.length) {
+            document.getElementById('bulkProgressText').innerText = "✅ എല്ലാവർക്കും അയച്ചു കഴിഞ്ഞു!";
+            document.getElementById('bulkNextStudentInfo').innerHTML = "മുഴുവൻ പേർക്കുമുള്ള ലിസ്റ്റ് പൂർത്തിയായി.";
+            document.getElementById('btnSendNextWhatsApp').style.display = 'none';
+            return;
+        }
+
+        document.getElementById('btnSendNextWhatsApp').style.display = 'block';
+        const current = bulkQueue[bulkIndex];
+        document.getElementById('bulkProgressText').innerText = `അയക്കുന്നു: ${bulkIndex + 1} / ${bulkQueue.length}`;
+        document.getElementById('bulkNextStudentInfo').innerHTML = `
+            <b>പേര്:</b> ${current.name}<br>
+            <b>ഫോൺ:</b> ${current.phone}<br>
+            ${current.due > 0 ? `<b>കുടിശ്ശിക:</b> ₹${current.due}<br>` : ''}
+            <div style="margin-top:6px; font-size:0.75rem; color:var(--text-muted);">മെസ്സേജ് ഓട്ടോമാറ്റിക് ആയി വാട്സാപ്പിൽ വരുന്നതാണ്.</div>
+        `;
+    }
+
+    function openCurrentBulkWhatsAppLink() {
+        if (bulkIndex < bulkQueue.length) {
+            const current = bulkQueue[bulkIndex];
+            const url = `https://wa.me/91${current.phone}?text=${encodeURIComponent(current.msg)}`;
+            window.open(url, '_blank');
+            bulkIndex++;
+            renderBulkProgress();
+        }
+    }
+
+    function closeBulkWhatsAppModal() {
+        document.getElementById('modalBulkWhatsApp').classList.add('hidden');
+        bulkQueue = [];
+        bulkIndex = 0;
+    }
+
     document.getElementById('formAdminChangeCreds').addEventListener('submit', async function(e) {
         e.preventDefault();
         const newU = document.getElementById('inAdmNewUser').value.trim();
         const newP = document.getElementById('inAdmNewPass').value.trim();
 
         if(!newU || !newP) {
-            alert('യൂസർനെയിമും പാസ്‌വേഡും നൽകുക.');
+            alert('യൂസർനെയിമും പാസ്‌‌വേഡും നൽകുക.');
             return;
         }
 
@@ -1699,7 +2031,7 @@
             card.setAttribute('data-search', `${s.name.toLowerCase()} ${s.id.toLowerCase()}`);
 
             const waDetails = stuPendingList.map(p => `${formatMonthKeyML(p.month)} (₹${p.due} ബാക്കി)`).join(', ');
-            const waMsg = encodeURIComponent(`ശ്രീ മുത്തപ്പൻ മെസ്സ്: പ്രിയപ്പെട്ട ${s.name}, നിങ്ങളുടെ ആകെ വാടക കുടിശ്ശിക തുക ₹${stuPendingAmt} ആണ് [${waDetails}]. ദയവായി എത്രയും വേഗം അടയ്ക്കുക.`);
+            const waMsg = encodeURIComponent(`ശ്രീ മുത്തപ്പൻ മെസ്സ്: പ്രിയപ്പെട്ട ${s.name}, നിങ്ങളുടെ ആകെ വാടക കുടിശ്ശിക തുക ₹${stuPendingAmt} ആണ് [${waDetails}]. ഈ മാസം പണം അടക്കാനുള്ളവർ ഉടൻ അടയ്ക്കണമെന്ന് വിനീതമായി അഭ്യർത്ഥിക്കുന്നു.`);
 
             let foodStatusBadge = s.hasFoodOrder 
                 ? (s.isServed ? '<span class="badge served">കഴിച്ചു (Served)</span>' : '<span class="badge pending-food">കഴിക്കാൻ ബാക്കി</span>')
@@ -1723,9 +2055,9 @@
                 if (stuPendingAmt > 0) {
                     const pillItems = stuPendingList.map(p => `
                         <div class="month-check-pill ${p.isPartial ? 'partial-item' : ''}">
-                            <input type="checkbox" title="മുഴുവൻ തുക ലഭിച്ചതായി അടയാളപ്പെടുത്തുക" onchange="togglePay('${s.docId}', '${p.month}', this.checked)">
+                            <input type="checkbox" title="മുഴുവൻ തുക ലഭിച്ചതായി അടയാളപ്പെടുത്തുക" ${!isEditModeActive ? 'disabled' : ''} onchange="togglePay('${s.docId}', '${p.month}', this.checked)">
                             <span>${formatMonthKeyML(p.month)}: <b>₹${p.due}</b> ${p.isPartial ? '(പകുതി അടച്ചു)' : ''}</span>
-                            <button type="button" style="border:none; background:#ffffff; border-radius:4px; font-size:0.7rem; font-weight:700; cursor:pointer; padding:2px 5px; color:#4338ca; box-shadow:0 1px 3px rgba(0,0,0,0.1);" onclick="openPartialPayModal('${s.docId}', '${p.month}', ${amt}, ${p.paid})">
+                            <button type="button" style="border:none; background:#ffffff; border-radius:4px; font-size:0.7rem; font-weight:700; cursor:${isEditModeActive ? 'pointer' : 'not-allowed'}; padding:2px 5px; color:#4338ca; box-shadow:0 1px 3px rgba(0,0,0,0.1); opacity:${isEditModeActive ? '1' : '0.6'};" ${!isEditModeActive ? 'disabled' : ''} onclick="openPartialPayModal('${s.docId}', '${p.month}', ${amt}, ${p.paid})">
                                 ✏️ തുക
                             </button>
                         </div>
@@ -1762,18 +2094,18 @@
 
                     <div class="item-actions">
                         ${!isYearlyMode ? `
-                        <label style="display:flex; align-items:center; gap:4px; font-size:0.78rem; font-weight:700; cursor:pointer;">
-                            <input type="checkbox" class="pay-checkbox" ${isPaidForSelectedMonth ? 'checked' : ''} onchange="togglePay('${s.docId}', '${selVal}', this.checked)"> ഈ മാസം (${formatMonthKeyML(selVal)}) ഫുൾ അടച്ചു
+                        <label style="display:flex; align-items:center; gap:4px; font-size:0.78rem; font-weight:700; cursor:${isEditModeActive ? 'pointer' : 'not-allowed'}; opacity:${isEditModeActive ? '1' : '0.6'};">
+                            <input type="checkbox" class="pay-checkbox" ${!isEditModeActive ? 'disabled' : ''} ${isPaidForSelectedMonth ? 'checked' : ''} onchange="togglePay('${s.docId}', '${selVal}', this.checked)"> ഈ മാസം (${formatMonthKeyML(selVal)}) ഫുൾ അടച്ചു
                         </label>` : `<span style="font-size:0.75rem; color:var(--text-muted);">${statusText}</span>`}
 
                         <div style="margin-left:auto; display:flex; gap:6px;">
                             ${stuPendingAmt === 0 ? `<button class="btn-action-sm payment-mgr" onclick="openPaymentHistoryModal('${s.docId}')">💳 ഹിസ്റ്ററി</button>` : ''}
                             ${s.phone ? `<a href="tel:${s.phone}" style="text-decoration:none;"><button class="btn-action-sm call">📞 Call</button></a>` : ''}
                             ${stuPendingAmt > 0 && s.phone ? `<a href="https://wa.me/91${s.phone}?text=${waMsg}" target="_blank" style="text-decoration:none;"><button class="btn-action-sm whatsapp">📲 WA</button></a>` : ''}
-                            <button class="btn-action-sm edit" onclick="openEditModal(${originalIndex})">✏️</button>
+                            <button class="btn-action-sm edit" style="opacity:${isEditModeActive ? '1' : '0.6'}; cursor:${isEditModeActive ? 'pointer' : 'not-allowed'};" ${!isEditModeActive ? 'disabled' : ''} onclick="openEditModal(${originalIndex})">✏️</button>
                             <button class="btn-action-sm info" onclick="openDetailsModal(${originalIndex})">📋</button>
-                            <button class="btn-action-sm ${s.isBlocked ? 'unlock' : 'block'}" onclick="toggleBlock('${s.docId}', ${!s.isBlocked})">${s.isBlocked ? '🔓' : '🚫'}</button>
-                            <button class="btn-action-sm" style="background:#f1f5f9; color:#94a3b8;" onclick="deleteStudent('${s.docId}')">🗑️</button>
+                            <button class="btn-action-sm ${s.isBlocked ? 'unlock' : 'block'}" style="opacity:${isEditModeActive ? '1' : '0.6'}; cursor:${isEditModeActive ? 'pointer' : 'not-allowed'};" ${!isEditModeActive ? 'disabled' : ''} onclick="toggleBlock('${s.docId}', ${!s.isBlocked})">${s.isBlocked ? '🔓' : '🚫'}</button>
+                            <button class="btn-action-sm" style="background:#f1f5f9; color:#94a3b8; opacity:${isEditModeActive ? '1' : '0.6'}; cursor:${isEditModeActive ? 'pointer' : 'not-allowed'};" ${!isEditModeActive ? 'disabled' : ''} onclick="deleteStudent('${s.docId}')">🗑️</button>
                         </div>
                     </div>
                 `;
@@ -1806,7 +2138,6 @@
         }
     }
 
-    // Modal to Manage All Months for a Student
     function openPaymentHistoryModal(docId) {
         selectedStudentDocIdForPayHistory = docId;
         renderPaymentHistoryMatrix(docId);
@@ -1855,11 +2186,11 @@
                     <div style="font-size:0.75rem; margin-top:2px;">${statusLabel}</div>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <button type="button" class="btn-action-sm edit" style="padding:4px 8px; font-size:0.75rem;" onclick="openPartialPayModal('${student.docId}', '${item.month}', ${student.rent || 4500}, ${item.paidAmt})">
+                    <button type="button" class="btn-action-sm edit" style="padding:4px 8px; font-size:0.75rem; opacity:${isEditModeActive ? '1' : '0.6'}; cursor:${isEditModeActive ? 'pointer' : 'not-allowed'};" ${!isEditModeActive ? 'disabled' : ''} onclick="openPartialPayModal('${student.docId}', '${item.month}', ${student.rent || 4500}, ${item.paidAmt})">
                         ✏️ തുക നൽകുക
                     </button>
-                    <label style="display:flex; align-items:center; gap:4px; font-size:0.75rem; cursor:pointer;">
-                        <input type="checkbox" class="pay-checkbox" ${item.status === 'paid' ? 'checked' : ''} onchange="togglePay('${student.docId}', '${item.month}', this.checked)"> ഫുൾ
+                    <label style="display:flex; align-items:center; gap:4px; font-size:0.75rem; cursor:${isEditModeActive ? 'pointer' : 'not-allowed'}; opacity:${isEditModeActive ? '1' : '0.6'};">
+                        <input type="checkbox" class="pay-checkbox" ${!isEditModeActive ? 'disabled' : ''} ${item.status === 'paid' ? 'checked' : ''} onchange="togglePay('${student.docId}', '${item.month}', this.checked)"> ഫുൾ
                     </label>
                 </div>
             `;
@@ -1867,8 +2198,11 @@
         });
     }
 
-    // Partial Payment Handlers
     function openPartialPayModal(docId, mKey, fullRent, currentPaid) {
+        if (!isEditModeActive) {
+            alert('മാറ്റങ്ങൾ വരുത്താൻ ആദ്യം "എഡിറ്റ് മോഡ്" ഓൺ ചെയ്യുക!');
+            return;
+        }
         document.getElementById('partDocId').value = docId;
         document.getElementById('partMonthKey').value = mKey;
         document.getElementById('lblPartialMonth').innerText = `മാസം: ${formatMonthKeyML(mKey)}`;
@@ -1938,14 +2272,12 @@
         });
     }
 
-    // 1. Pending Rent Dues PDF Generator (NEW)
     function generatePendingDuesPDF() {
         if (!students || students.length === 0) {
             alert('ഡൗൺലോഡ് ചെയ്യാൻ വിവരങ്ങൾ ലഭ്യമല്ല!');
             return;
         }
 
-        // Filter only students who have pending amounts
         const pendingStudents = students
             .map(s => ({ ...s, fin: calculateStudentFinancials(s) }))
             .filter(s => s.fin.totalPending > 0);
@@ -1955,16 +2287,13 @@
             return;
         }
 
-        // Sort by highest pending amount first
         pendingStudents.sort((a, b) => b.fin.totalPending - a.fin.totalPending);
-
         const totalOverallDue = pendingStudents.reduce((acc, curr) => acc + curr.fin.totalPending, 0);
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
 
-        // Header Background
-        doc.setFillColor(185, 28, 28); // Danger Red
+        doc.setFillColor(185, 28, 28);
         doc.rect(0, 0, 210, 28, 'F');
 
         doc.setTextColor(255, 255, 255);
@@ -1977,7 +2306,6 @@
         doc.text('RENT DUES & OUTSTANDING BALANCE REPORT', 14, 17);
         doc.text(`Generated: ${new Date().toLocaleDateString('en-GB')}  |  Defaulters Count: ${pendingStudents.length} Students`, 14, 23);
 
-        // Summary Bar below header
         doc.setFillColor(254, 242, 242);
         doc.rect(14, 32, 182, 12, 'F');
         doc.setDrawColor(252, 165, 165);
@@ -2049,7 +2377,6 @@
         doc.save(`Rent_Dues_Defaulters_${getTodayDateKey()}.pdf`);
     }
 
-    // 2. Master Directory PDF (All Students)
     function generateStudentsPDF() {
         if (!students || students.length === 0) {
             alert('ഡൗൺലോഡ് ചെയ്യാൻ വിദ്യാർത്ഥികളുടെ വിവരങ്ങൾ ലഭ്യമല്ല!');
@@ -2230,6 +2557,10 @@
     }
 
     function openEditModal(idx) {
+        if (!isEditModeActive) {
+            alert('വിവരങ്ങൾ മാറ്റാൻ ആദ്യം "എഡിറ്റ് മോഡ്" ഓൺ ചെയ്യുക!');
+            return;
+        }
         const s = students[idx];
         document.getElementById('editDocId').value = s.docId;
         document.getElementById('editName').value = s.name || '';
@@ -2325,6 +2656,12 @@
     }
 
     function togglePay(docId, mKey, isChecked) {
+        if (!isEditModeActive) {
+            alert('പേയ്‌മെന്റ് മാറ്റങ്ങൾ വരുത്താൻ ആദ്യം "എഡിറ്റ് മോഡ്" ഓൺ ചെയ്യുക!');
+            renderAdmin();
+            return;
+        }
+
         const stu = students.find(s => s.docId === docId);
         if(!stu) return;
 
@@ -2350,12 +2687,20 @@
     }
 
     function toggleBlock(docId, newStatus) {
+        if (!isEditModeActive) {
+            alert('മാറ്റങ്ങൾ വരുത്താൻ ആദ്യം "എഡിറ്റ് മോഡ്" ഓൺ ചെയ്യുക!');
+            return;
+        }
         db.collection("students").doc(docId).update({
             isBlocked: newStatus
         });
     }
 
     function deleteStudent(docId) {
+        if (!isEditModeActive) {
+            alert('ഡിലീറ്റ് ചെയ്യാൻ ആദ്യം "എഡിറ്റ് മോഡ്" ഓൺ ചെയ്യുക!');
+            return;
+        }
         if(confirm('വിദ്യാർത്ഥിയെ ക്ലൗഡിൽ നിന്നും നീക്കം ചെയ്യണോ?')) {
             db.collection("students").doc(docId).delete();
         }
@@ -2398,6 +2743,7 @@
             studentUnsubscribe = null;
         }
         currentUser = null;
+        isEditModeActive = false;
         stopQRScanner();
         document.getElementById('viewLogin').classList.remove('hidden');
         document.getElementById('viewStudent').classList.add('hidden');
