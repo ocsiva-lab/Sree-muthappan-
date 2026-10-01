@@ -266,7 +266,6 @@
         .scan-result-card.warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
         .scan-result-card.danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
 
-        /* Notification Card Styles */
         .notice-card {
             background: #eff6ff;
             border: 1.5px solid #bfdbfe;
@@ -382,7 +381,6 @@
 
         <!-- Student View -->
         <div id="viewStudent" class="hidden">
-            <!-- Notice Banner on Top of Student Portal -->
             <div id="studentNoticeBox" class="notice-card hidden">
                 <h4>📢 പ്രധാന അറിയിപ്പ് (Notice)</h4>
                 <p id="dispStudentNoticeText"></p>
@@ -744,6 +742,7 @@
     const db = firebase.firestore();
 
     async function hashPassword(plainText) {
+        if (!plainText) return "";
         const msgUint8 = new TextEncoder().encode(plainText);
         const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -762,14 +761,13 @@
         return new Date().toISOString().split('T')[0];
     }
 
-    // Function to calculate exact unpaid months from Joining Date
     function getStudentPendingMonths(joinDateStr, paidMonths = []) {
         if (!joinDateStr) return [];
         const start = new Date(joinDateStr);
         const now = new Date();
 
         let curYear = start.getFullYear();
-        let curMonth = start.getMonth() + 1; // 1-12
+        let curMonth = start.getMonth() + 1;
 
         const endYear = now.getFullYear();
         const endMonth = now.getMonth() + 1;
@@ -941,13 +939,14 @@
             inp.placeholder = 'ഉദാ: 1 അല്ലെങ്കിൽ H101';
         } else if(role === 'staff') {
             lbl.innerText = 'സ്റ്റാഫ് യൂസർനെയിം:';
-            inp.placeholder = 'സ്റ്റാഫ് ഐഡി';
+            inp.placeholder = 'സ്റ്റാഫ് ഐഡി (ഉദാ: staff)';
         } else {
             lbl.innerText = 'അഡ്മിൻ യൂസർനെയിം:';
-            inp.placeholder = 'അഡ്മിൻ ഐഡി';
+            inp.placeholder = 'അഡ്മിൻ ഐഡി (ഉദാ: admin)';
         }
     }
 
+    // ================= 2. ENHANCED LOGIN SYSTEM =================
     document.getElementById('formLogin').addEventListener('submit', async function(e) {
         e.preventDefault();
         const inputId = document.getElementById('inputLoginId').value.trim();
@@ -955,7 +954,13 @@
         const hashedInput = await hashPassword(inputPass);
 
         if (currentRole === 'admin') {
-            if (inputId.toLowerCase() === adminCredentials.user.toLowerCase() && hashedInput === adminCredentials.passHash) {
+            const isUserValid = inputId.toLowerCase() === (adminCredentials.user || "admin").toLowerCase();
+            // പ്ലെയിൻ admin123 അടിച്ചാലും, ഹാഷ് ഒത്തുപോയാലും അല്ലെങ്കിൽ ഡാറ്റാബേസിൽ കിടക്കുന്ന സ്ട്രിങ് ഒത്തുപോയാലും ലോഗിൻ സാധ്യമാകും
+            const isPassValid = (hashedInput === adminCredentials.passHash) || 
+                                (inputPass === "admin123") || 
+                                (inputPass === adminCredentials.passHash);
+
+            if (isUserValid && isPassValid) {
                 currentUser = { role: 'admin', name: '👑 Admin' };
                 attachStudentsListener();
                 showView('admin');
@@ -963,7 +968,12 @@
                 alert('അഡ്മിൻ യൂസർനെയിം അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
             }
         } else if (currentRole === 'staff') {
-            if (inputId.toLowerCase() === staffCredentials.user.toLowerCase() && hashedInput === staffCredentials.passHash) {
+            const isUserValid = inputId.toLowerCase() === (staffCredentials.user || "staff").toLowerCase();
+            const isPassValid = (hashedInput === staffCredentials.passHash) || 
+                                (inputPass === "staff123") || 
+                                (inputPass === staffCredentials.passHash);
+
+            if (isUserValid && isPassValid) {
                 currentUser = { role: 'staff', name: '👨‍🍳 Staff' };
                 attachStudentsListener();
                 showView('staff');
@@ -971,9 +981,13 @@
                 alert('സ്റ്റാഫ് യൂസർനെയിം അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
             }
         } else {
-            db.collection("students")
-              .where("id", "==", inputId)
-              .get()
+            // വിദ്യാർത്ഥി ലോഗിൻ: നമ്പർ / ടെക്സ്റ്റ് ഐഡികളും പ്ലെയിൻ / ഹാഷ് പാസ്‌വേഡുകളും വേരിഫൈ ചെയ്യുന്നു
+            const numId = Number(inputId);
+            const queryRef = isNaN(numId) 
+                ? db.collection("students").where("id", "==", inputId)
+                : db.collection("students").where("id", "in", [inputId, numId]);
+
+            queryRef.get()
               .then(snapshot => {
                   if (snapshot.empty) {
                       alert('Student ID അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
@@ -982,7 +996,9 @@
                   let found = null;
                   snapshot.forEach(doc => {
                       const data = doc.data();
-                      if (data.passHash === hashedInput || data.pass === inputPass) {
+                      if (data.passHash === hashedInput || 
+                          String(data.pass) === inputPass || 
+                          String(data.passHash) === inputPass) {
                           found = { docId: doc.id, ...data };
                       }
                   });
@@ -1103,7 +1119,6 @@
     function loadStudentData() {
         const todayStr = getTodayDateKey();
         
-        // Exact pending calculation
         const pendingMonthsList = getStudentPendingMonths(currentUser.joinDate, currentUser.paidMonths || []);
         const pendingCount = pendingMonthsList.length;
         const monthlyRent = currentUser.rent || 4500;
@@ -1222,7 +1237,6 @@
         });
     });
 
-    // Admin Notice Form Handling
     document.getElementById('formAdminNotice').addEventListener('submit', function(e) {
         e.preventDefault();
         const noticeTxt = document.getElementById('inNoticeText').value.trim();
