@@ -266,205 +266,29 @@
         .scan-result-card.warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
         .scan-result-card.danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
 
-        /* ================= CHAT STYLES ================= */
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 200px);
-            min-height: 480px;
-            background: #f8fafc;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-
-        .chat-header {
-            background: #ffffff;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-header h4 { margin: 0; font-size: 0.95rem; color: var(--primary); }
-
-        .chat-messages {
-            flex: 1;
-            padding: 14px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .chat-bubble {
-            max-width: 82%;
-            padding: 10px 14px;
+        /* Notification Card Styles */
+        .notice-card {
+            background: #eff6ff;
+            border: 1.5px solid #bfdbfe;
             border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+        .notice-card h4 {
+            margin: 0 0 6px 0;
+            color: #1d4ed8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.95rem;
+        }
+        .notice-card p {
+            margin: 0;
             font-size: 0.88rem;
-            position: relative;
-            word-break: break-word;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            color: #1e3a8a;
+            white-space: pre-wrap;
+            line-height: 1.4;
         }
-
-        .chat-bubble.mine {
-            align-self: flex-end;
-            background: #4f46e5;
-            color: #ffffff;
-            border-bottom-right-radius: 3px;
-        }
-
-        .chat-bubble.theirs {
-            align-self: flex-start;
-            background: #ffffff;
-            color: var(--text-dark);
-            border-bottom-left-radius: 3px;
-            border: 1px solid var(--border);
-        }
-
-        .chat-bubble.admin-msg {
-            border-left: 4px solid #ef4444;
-            background: #fff5f5;
-            color: #7f1d1d;
-        }
-        .chat-bubble.admin-msg.mine {
-            background: #4f46e5;
-            color: #ffffff;
-            border-left: none;
-        }
-
-        .chat-sender-name {
-            font-size: 0.72rem;
-            font-weight: 700;
-            margin-bottom: 3px;
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-        }
-        .mine .chat-sender-name { color: #c7d2fe; }
-        .theirs .chat-sender-name { color: #6366f1; }
-
-        .chat-time {
-            font-size: 0.65rem;
-            opacity: 0.75;
-            text-align: right;
-            margin-top: 4px;
-        }
-
-        .chat-input-bar {
-            background: #ffffff;
-            padding: 10px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .chat-input-bar input {
-            flex: 1;
-            padding: 10px 14px;
-            border-radius: 20px;
-            font-size: 0.88rem;
-            background: #f1f5f9;
-        }
-
-        .chat-btn-send {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }
-
-        .chat-btn-voice {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #f1f5f9;
-            color: #475569;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }
-
-        .chat-btn-voice.recording {
-            background: #fee2e2;
-            color: #dc2626;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .audio-player-wrapper {
-            margin-top: 6px;
-        }
-        .audio-player-wrapper audio {
-            width: 100%;
-            height: 35px;
-            border-radius: 20px;
-        }
-
-        .chat-lock-banner {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 8px 12px;
-            text-align: center;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-
-        .toggle-switch-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 14px;
-            background: #f8fafc;
-            border-radius: 12px;
-            border: 1.5px solid var(--border);
-            margin-bottom: 12px;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 46px;
-            height: 24px;
-        }
-
-        .switch input { opacity: 0; width: 0; height: 0; }
-
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #cbd5e1;
-            transition: .3s;
-            border-radius: 24px;
-        }
-
-        .slider:before {
-            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
-            background-color: white;
-            transition: .3s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider { background-color: var(--primary); }
-        input:checked + .slider:before { transform: translateX(22px); }
 
         .modal-overlay {
             position: fixed;
@@ -556,7 +380,14 @@
             </form>
         </div>
 
+        <!-- Student View -->
         <div id="viewStudent" class="hidden">
+            <!-- Notice Banner on Top of Student Portal -->
+            <div id="studentNoticeBox" class="notice-card hidden">
+                <h4>📢 പ്രധാന അറിയിപ്പ് (Notice)</h4>
+                <p id="dispStudentNoticeText"></p>
+            </div>
+
             <div id="stuTabOrder">
                 <div class="card" style="background:#fffbeb; border-color:#fde68a;">
                     <div style="font-size: 0.85rem; font-weight: 700; color: #b45309; margin-bottom: 6px;">🍲 ഇന്നത്തെ സ്പെഷ്യൽ മെനു:</div>
@@ -602,7 +433,7 @@
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                         <div>
-                            <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">ഈ മാസത്തെ വാടക നിരക്ക്</span>
+                            <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">പ്രതിമാസ വാടക നിരക്ക്</span>
                             <div style="font-size:1.6rem; font-weight:800; color:var(--primary);">₹<span id="dispStuRentAmt">4500</span></div>
                         </div>
                         <span id="badgeStuRentStatus" class="badge">PENDING</span>
@@ -616,26 +447,9 @@
                     <div id="boxPayAction" style="padding: 12px; border-radius: 10px; font-size: 0.85rem; line-height: 1.5;"></div>
                 </div>
             </div>
-
-            <div id="stuTabChat" class="hidden">
-                <div class="chat-container">
-                    <div class="chat-header">
-                        <h4>💬 മെസ്സ് & ഹോസ്റ്റൽ കമ്മ്യൂണിക്കേഷൻ</h4>
-                        <span id="badgeChatStatusStu" class="badge paid">🟢 Live</span>
-                    </div>
-                    <div id="chatLockBannerStu" class="chat-lock-banner hidden">
-                        🔒 അഡ്മിൻ മെസ്സേജ് അയക്കുന്നത് താൽക്കാലികമായി ലോക്ക് ചെയ്തിരിക്കുന്നു (View Only)
-                    </div>
-                    <div id="chatMessagesStudent" class="chat-messages"></div>
-                    <div id="chatInputBarStudent" class="chat-input-bar">
-                        <button id="btnVoiceRecordStu" class="chat-btn-voice" onclick="toggleVoiceRecord('student')">🎙️</button>
-                        <input type="text" id="chatInputTextStu" placeholder="മെസ്സേജ് ടൈപ്പ് ചെയ്യുക..." onkeypress="handleChatEnter(event, 'student')">
-                        <button class="chat-btn-send" onclick="sendChatMessage('student')">➤</button>
-                    </div>
-                </div>
-            </div>
         </div>
 
+        <!-- Admin View -->
         <div id="viewAdmin" class="hidden">
             <div id="admTabOverview">
                 <div id="secOrderSwitch" class="card" style="display:flex; justify-content:space-between; align-items:center;">
@@ -700,40 +514,25 @@
                 </div>
             </div>
 
-            <div id="admTabChat" class="hidden">
-                <div class="chat-container">
-                    <div class="chat-header">
-                        <h4>📢 സ്റ്റുഡന്റ്സ് ബ്രോഡ്കാസ്റ്റ് & ചാറ്റ്</h4>
-                        <button class="btn-action-sm danger" onclick="clearAllChat()">🗑️ ചാറ്റ് ക്ലിയർ</button>
+            <!-- Admin Notice Management Tab -->
+            <div id="admTabNotice" class="hidden">
+                <form id="formAdminNotice" class="card">
+                    <h3 style="margin-top:0; font-size:1rem; color:var(--primary);">📢 വിദ്യാർത്ഥികൾക്ക് നോട്ടിഫിക്കേഷൻ അയക്കുക</h3>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
+                        ഇവിടെ നൽകുന്ന സന്ദേശം വിദ്യാർത്ഥികൾ ലോഗിൻ ചെയ്യുമ്പോൾ തന്നെ അവരുടെ ഹോം സ്ക്രീനിൽ മുകളിലായി കാണിക്കും.
+                    </p>
+                    <div class="form-group">
+                        <label>നോട്ടിഫിക്കേഷൻ സന്ദേശം (Notice Text):</label>
+                        <textarea id="inNoticeText" rows="4" placeholder="ഉദാ: നാളെ രാവിലെ 9 മണിക്ക് വെള്ളം തടസ്സപ്പെടുന്നതാണ്..." required></textarea>
                     </div>
-                    <div id="chatMessagesAdmin" class="chat-messages"></div>
-                    <div class="chat-input-bar">
-                        <button id="btnVoiceRecordAdm" class="chat-btn-voice" onclick="toggleVoiceRecord('admin')">🎙️</button>
-                        <input type="text" id="chatInputTextAdm" placeholder="എല്ലാ വിദ്യാർത്ഥികൾക്കും സന്ദേശം അയക്കുക..." onkeypress="handleChatEnter(event, 'admin')">
-                        <button class="chat-btn-send" onclick="sendChatMessage('admin')">➤</button>
+                    <div style="display:flex; gap:8px;">
+                        <button type="submit" class="btn-main success" style="flex:2;">🚀 അറിയിപ്പ് പ്രസിദ്ധീകരിക്കുക</button>
+                        <button type="button" class="btn-main danger" style="flex:1;" onclick="clearAdminNotice()">🗑️ ഒഴിവാക്കുക</button>
                     </div>
-                </div>
+                </form>
             </div>
 
             <div id="admTabSettings" class="hidden">
-                <div class="card" style="background: #f0fdf4; border: 1.5px solid #bbf7d0;">
-                    <h3 style="margin-top:0; font-size:1rem; color:#15803d;">💬 ചാറ്റ് കൺട്രോൾ സെറ്റിംഗ്സ് (Chat Settings)</h3>
-                    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
-                        വിദ്യാർത്ഥികൾക്ക് മെസ്സേജ് അയക്കാനുള്ള അനുമതി നിയന്ത്രിക്കാം:
-                    </p>
-                    
-                    <div class="toggle-switch-container">
-                        <div>
-                            <b style="font-size:0.88rem; display:block;">🔒 അഡ്മിന് മാത്രം മെസ്സേജ് അയക്കാം (Admin-Only Mode)</b>
-                            <small style="color:var(--text-muted); font-size:0.75rem;">ഓൺ ആക്കിയാൽ കുട്ടികൾക്ക് മെസ്സേജ് അയക്കാൻ കഴിയില്ല.</small>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="chkAdminOnlyChat" onchange="toggleChatLock(this.checked)">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                </div>
-
                 <div class="card" style="background: #fff1f2; border: 1.5px solid #fecdd3;">
                     <h3 style="margin-top:0; font-size:1rem; color:#b91c1c;">📄 സ്റ്റുഡന്റ്സ് PDF റിപ്പോർട്ട് (Print / Download)</h3>
                     <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">
@@ -758,7 +557,7 @@
                 </form>
 
                 <form id="formStaffChangeCreds" class="card">
-                    <h3 style="margin-top:0; font-size:1rem; color:#0284c7;">👨‍🍳 സ്റ്റാഫ് ലോഗിൻ വിവരങ്ങൾ മാറ്റുക</h3>
+                    <h3 style="margin-top:0; font-size:1rem; color:#0284c7;">👨‍‍🍳 സ്റ്റാഫ് ലോഗിൻ വിവരങ്ങൾ മാറ്റുക</h3>
                     <div class="form-group">
                         <label>സ്റ്റാഫ് യൂസർനെയിം:</label>
                         <input type="text" id="inStaffNewUser" required>
@@ -943,7 +742,6 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const storage = firebase.storage();
 
     async function hashPassword(plainText) {
         const msgUint8 = new TextEncoder().encode(plainText);
@@ -964,19 +762,42 @@
         return new Date().toISOString().split('T')[0];
     }
 
+    // Function to calculate exact unpaid months from Joining Date
+    function getStudentPendingMonths(joinDateStr, paidMonths = []) {
+        if (!joinDateStr) return [];
+        const start = new Date(joinDateStr);
+        const now = new Date();
+
+        let curYear = start.getFullYear();
+        let curMonth = start.getMonth() + 1; // 1-12
+
+        const endYear = now.getFullYear();
+        const endMonth = now.getMonth() + 1;
+
+        const monthsToPay = [];
+
+        while (curYear < endYear || (curYear === endYear && curMonth <= endMonth)) {
+            const mKey = `${curYear}-${String(curMonth).padStart(2, '0')}`;
+            if (!paidMonths.includes(mKey)) {
+                monthsToPay.push(mKey);
+            }
+            curMonth++;
+            if (curMonth > 12) {
+                curMonth = 1;
+                curYear++;
+            }
+        }
+        return monthsToPay;
+    }
+
     let students = [];
-    let chatMessages = [];
     let dailyMenuText = "ചോറ്, സാമ്പാർ, മീൻ വറുത്തത്, തോരൻ";
     let isOrderActive = true;
-    let isAdminOnlyChat = false;
+    let broadcastNotice = "";
     let currentUser = null;
     let currentRole = 'student';
     let filterMode = 'all'; 
     let html5QrCodeScanner = null;
-
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let isRecording = false;
 
     document.getElementById('inNewDate').valueAsDate = new Date();
 
@@ -1026,12 +847,13 @@
         });
     }
 
+    // App Settings Listener
     db.collection("settings").doc("mess_state").onSnapshot(async doc => {
         if (doc.exists) {
             const data = doc.data();
             dailyMenuText = data.menu || "";
             isOrderActive = data.isOrderActive ?? true;
-            isAdminOnlyChat = data.isAdminOnlyChat ?? false;
+            broadcastNotice = data.notice || "";
 
             adminCredentials.user = data.adminUser || "admin";
             adminCredentials.passHash = data.adminPassHash || await hashPassword("admin123");
@@ -1042,10 +864,10 @@
             document.getElementById('inAdmNewUser').value = adminCredentials.user;
             document.getElementById('inStaffNewUser').value = staffCredentials.user;
             
-            const chkLock = document.getElementById('chkAdminOnlyChat');
-            if(chkLock) chkLock.checked = isAdminOnlyChat;
+            const noticeInput = document.getElementById('inNoticeText');
+            if (noticeInput) noticeInput.value = broadcastNotice;
 
-            updateChatLockUI();
+            renderBroadcastNotice();
 
             if (currentUser && currentRole === 'student') loadStudentData();
             if (currentRole === 'admin' || currentRole === 'staff') renderAdmin();
@@ -1059,23 +881,24 @@
                 staffUser: "staff",
                 staffPassHash: defaultStaffHash,
                 isOrderActive: true,
-                isAdminOnlyChat: false,
-                menu: dailyMenuText
+                menu: dailyMenuText,
+                notice: ""
             });
         }
     });
 
-    // Realtime Chat Listener (Last 50 messages)
-    db.collection("chats")
-      .orderBy("timestamp", "asc")
-      .limitToLast(50)
-      .onSnapshot(snapshot => {
-          chatMessages = [];
-          snapshot.forEach(doc => {
-              chatMessages.push({ docId: doc.id, ...doc.data() });
-          });
-          renderChatMessages();
-      });
+    function renderBroadcastNotice() {
+        const noticeBox = document.getElementById('studentNoticeBox');
+        const noticeText = document.getElementById('dispStudentNoticeText');
+        if (noticeBox && noticeText) {
+            if (broadcastNotice && broadcastNotice.trim() !== "") {
+                noticeText.innerText = broadcastNotice;
+                noticeBox.classList.remove('hidden');
+            } else {
+                noticeBox.classList.add('hidden');
+            }
+        }
+    }
 
     function initMonthSelector() {
         const sel = document.getElementById('selectFinanceMonth');
@@ -1204,9 +1027,9 @@
             bottomBar.innerHTML = `
                 <button class="nav-item active" onclick="switchStuTab('order', this)"><span class="icon">🍲</span>ഭക്ഷണം</button>
                 <button class="nav-item" onclick="switchStuTab('rent', this)"><span class="icon">💳</span>വാടക</button>
-                <button class="nav-item" onclick="switchStuTab('chat', this)"><span class="icon">💬</span>ചാറ്റ്</button>
             `;
             loadStudentData();
+            renderBroadcastNotice();
         } else if (role === 'staff') {
             document.getElementById('viewAdmin').classList.remove('hidden');
             document.getElementById('appSubHeader').innerText = "👨‍🍳 സ്റ്റാഫ് പാനൽ (Food Service)";
@@ -1232,7 +1055,7 @@
             bottomBar.innerHTML = `
                 <button class="nav-item active" id="btnNavAdmDash" onclick="switchAdmTab('overview', this)"><span class="icon">📊</span>ഡാഷ്</button>
                 <button class="nav-item" id="btnNavAdmScan" onclick="switchAdmTab('scanner', this)"><span class="icon">📷</span>സ്കാനർ</button>
-                <button class="nav-item" id="btnNavAdmChat" onclick="switchAdmTab('chat', this)"><span class="icon">💬</span>ചാറ്റ്</button>
+                <button class="nav-item" id="btnNavAdmNotice" onclick="switchAdmTab('notice', this)"><span class="icon">📢</span>നോട്ടീസ്</button>
                 <button class="nav-item" id="btnNavAdmRent" onclick="switchAdmTab('rent', this)"><span class="icon">👥</span>ലിസ്റ്റ്</button>
                 <button class="nav-item" id="btnNavAdmMenu" onclick="switchAdmTab('menu', this)"><span class="icon">🍲</span>മെനു</button>
                 <button class="nav-item" id="btnNavAdmReg" onclick="switchAdmTab('reg', this)"><span class="icon">➕</span>ആഡ്</button>
@@ -1248,10 +1071,6 @@
 
         document.getElementById('stuTabOrder').classList.toggle('hidden', tab !== 'order');
         document.getElementById('stuTabRent').classList.toggle('hidden', tab !== 'rent');
-        document.getElementById('stuTabChat').classList.toggle('hidden', tab !== 'chat');
-        if(tab === 'chat') {
-            scrollChatToBottom();
-        }
     }
 
     function switchAdmTab(tab, el) {
@@ -1263,7 +1082,7 @@
         document.getElementById('admTabRent').classList.toggle('hidden', tab !== 'rent');
         document.getElementById('admTabMenu').classList.toggle('hidden', tab !== 'menu');
         document.getElementById('admTabReg').classList.toggle('hidden', tab !== 'reg');
-        document.getElementById('admTabChat').classList.toggle('hidden', tab !== 'chat');
+        document.getElementById('admTabNotice').classList.toggle('hidden', tab !== 'notice');
         
         const setTab = document.getElementById('admTabSettings');
         if(setTab) setTab.classList.toggle('hidden', tab !== 'settings');
@@ -1276,10 +1095,6 @@
             updateAutoStudentId();
         }
 
-        if(tab === 'chat') {
-            scrollChatToBottom();
-        }
-
         if(tab !== 'scanner') {
             stopQRScanner();
         }
@@ -1287,27 +1102,38 @@
 
     function loadStudentData() {
         const todayStr = getTodayDateKey();
-        const curM = getCurMonthKey();
-        const isPaid = (currentUser.paidMonths || []).includes(curM);
+        
+        // Exact pending calculation
+        const pendingMonthsList = getStudentPendingMonths(currentUser.joinDate, currentUser.paidMonths || []);
+        const pendingCount = pendingMonthsList.length;
+        const monthlyRent = currentUser.rent || 4500;
+        const totalPendingAmount = pendingCount * monthlyRent;
 
         document.getElementById('dispStuMenu').innerText = dailyMenuText || "മെനു ലഭ്യമല്ല.";
-        document.getElementById('dispStuRentAmt').innerText = currentUser.rent || 4500;
+        document.getElementById('dispStuRentAmt').innerText = monthlyRent;
         document.getElementById('dispStuJoinDate').innerText = currentUser.joinDate;
         document.getElementById('dispStuDueDate').innerText = calculateDueDate(currentUser.joinDate);
 
         const badge = document.getElementById('badgeStuRentStatus');
         const payBox = document.getElementById('boxPayAction');
-        badge.className = `badge ${isPaid ? 'paid' : 'unpaid'}`;
-        badge.innerText = isPaid ? 'PAID ✓' : 'PENDING';
-
-        if (isPaid) {
+        
+        if (pendingCount === 0) {
+            badge.className = 'badge paid';
+            badge.innerText = 'PAID ✓ (കുടിശ്ശികയില്ല)';
             payBox.style.background = '#dcfce7';
             payBox.style.color = '#15803d';
-            payBox.innerHTML = `<b>✓ ഈ മാസത്തെ വാടക ലഭിച്ചു.</b>`;
+            payBox.innerHTML = `<b>✓ ഈ മാസം വരെയുള്ള മുഴുവൻ വാടകയും ലഭിച്ചിട്ടുണ്ട്.</b>`;
         } else {
+            badge.className = 'badge unpaid';
+            badge.innerText = `${pendingCount} മാസം ബാക്കി`;
             payBox.style.background = '#fee2e2';
             payBox.style.color = '#b91c1c';
-            payBox.innerHTML = `<b>⚠️ വാടക കുടിശ്ശികയുണ്ട്:</b> മെസ്സ് മാനേജർക്ക് വാടക നൽകുക.`;
+            payBox.innerHTML = `
+                <div style="font-size:0.95rem; font-weight:800; margin-bottom:4px;">⚠️ വാടക കുടിശ്ശികയുണ്ട്!</div>
+                <div><b>കുടിശ്ശികയുള്ള മാസങ്ങൾ:</b> <span style="font-size:1.1rem; font-weight:800;">${pendingCount} മാസം</span> (${pendingMonthsList.join(', ')})</div>
+                <div style="margin-top:4px;"><b>ആകെ അടയ്ക്കാനുള്ള തുക:</b> <span style="font-size:1.1rem; font-weight:800;">₹${totalPendingAmount}</span></div>
+                <div style="margin-top:6px; font-size:0.8rem;">മെസ്സ് മാനേജറുമായി ബന്ധപ്പെട്ട് വാടക അടയ്ക്കുക.</div>
+            `;
         }
 
         const chkFood = document.getElementById('chkStuFood');
@@ -1396,6 +1222,28 @@
         });
     });
 
+    // Admin Notice Form Handling
+    document.getElementById('formAdminNotice').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const noticeTxt = document.getElementById('inNoticeText').value.trim();
+        db.collection("settings").doc("mess_state").set({
+            notice: noticeTxt
+        }, { merge: true }).then(() => {
+            alert('അറിയിപ്പ് വിജയകരമായി പ്രസിദ്ധീകരിച്ചു! എല്ലാ വിദ്യാർത്ഥികളുടെയും സ്ക്രീനിൽ ഇത് കാണാം.');
+        });
+    });
+
+    function clearAdminNotice() {
+        if (confirm("നോട്ടിഫിക്കേഷൻ ഒഴിവാക്കണോ?")) {
+            db.collection("settings").doc("mess_state").set({
+                notice: ""
+            }, { merge: true }).then(() => {
+                document.getElementById('inNoticeText').value = '';
+                alert('അറിയിപ്പ് നീക്കം ചെയ്തു!');
+            });
+        }
+    }
+
     document.getElementById('formAdminChangeCreds').addEventListener('submit', async function(e) {
         e.preventDefault();
         const newU = document.getElementById('inAdmNewUser').value.trim();
@@ -1471,237 +1319,6 @@
             }
         } else {
             qrBox.classList.add('hidden');
-        }
-    }
-
-    // ================= CHAT LOGIC (FIREBASE STORAGE & CLOUD DELETION) =================
-    function updateChatLockUI() {
-        const inputBarStu = document.getElementById('chatInputBarStudent');
-        const bannerStu = document.getElementById('chatLockBannerStu');
-        
-        if (inputBarStu && bannerStu) {
-            if (isAdminOnlyChat) {
-                inputBarStu.classList.add('hidden');
-                bannerStu.classList.remove('hidden');
-            } else {
-                inputBarStu.classList.remove('hidden');
-                bannerStu.classList.add('hidden');
-            }
-        }
-    }
-
-    function toggleChatLock(isChecked) {
-        db.collection("settings").doc("mess_state").set({
-            isAdminOnlyChat: isChecked
-        }, { merge: true }).then(() => {
-            alert(isChecked ? "🔒 അഡ്മിൻ ഒൺലി മോഡ് ഓൺ ചെയ്തു! വിദ്യാർത്ഥികൾക്ക് മെസ്സേജ് അയക്കാൻ സാധിക്കില്ല." : "🔓 എല്ലാ വിദ്യാർത്ഥികൾക്കും മെസ്സേജ് അയക്കാനുള്ള അനുമതി നൽകി.");
-        });
-    }
-
-    function handleChatEnter(e, role) {
-        if (e.key === 'Enter') {
-            sendChatMessage(role);
-        }
-    }
-
-    function sendChatMessage(senderRole) {
-        const inputEl = senderRole === 'admin' 
-            ? document.getElementById('chatInputTextAdm') 
-            : document.getElementById('chatInputTextStu');
-        
-        const text = inputEl.value.trim();
-        if (!text) return;
-
-        let senderName = "Admin";
-        let senderId = "ADMIN";
-
-        if (senderRole === 'student') {
-            if (isAdminOnlyChat) {
-                alert('അഡ്മിൻ മെസ്സേജിംഗ് ലോക്ക് ചെയ്തിരിക്കുകയാണ്!');
-                return;
-            }
-            senderName = currentUser.name;
-            senderId = currentUser.id;
-        }
-
-        const newMsg = {
-            senderRole: senderRole,
-            senderName: senderName,
-            senderId: senderId,
-            text: text,
-            type: 'text',
-            timestamp: Date.now()
-        };
-
-        db.collection("chats").add(newMsg).then(() => {
-            inputEl.value = '';
-        });
-    }
-
-    function renderChatMessages() {
-        const containerAdm = document.getElementById('chatMessagesAdmin');
-        const containerStu = document.getElementById('chatMessagesStudent');
-
-        const html = chatMessages.map(m => {
-            const isMine = (currentRole === 'admin' && m.senderRole === 'admin') || 
-                           (currentRole === 'student' && m.senderRole === 'student' && String(m.senderId) === String(currentUser?.id));
-            
-            const isAdminMsg = m.senderRole === 'admin';
-            const timeStr = new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            let contentHtml = '';
-            if (m.type === 'voice') {
-                contentHtml = `
-                    <div class="audio-player-wrapper">
-                        <div style="font-size:0.75rem; margin-bottom:4px;">🎙️ വോയ്‌സ് നോട്ട്:</div>
-                        <audio controls preload="metadata" src="${m.audioUrl}"></audio>
-                    </div>
-                `;
-            } else {
-                contentHtml = `<div>${m.text}</div>`;
-            }
-
-            return `
-                <div class="chat-bubble ${isMine ? 'mine' : 'theirs'} ${isAdminMsg ? 'admin-msg' : ''}">
-                    <div class="chat-sender-name">
-                        <span>${isAdminMsg ? '👑 അഡ്മിൻ (Admin)' : `${m.senderName} (ID: ${m.senderId})`}</span>
-                    </div>
-                    ${contentHtml}
-                    <div class="chat-time">${timeStr}</div>
-                </div>
-            `;
-        }).join('');
-
-        if (containerAdm) {
-            containerAdm.innerHTML = html || `<div style="text-align:center; color:var(--text-muted); font-size:0.85rem; padding:20px;">സന്ദേശങ്ങളൊന്നും ലഭ്യമല്ല. പുതിയ സന്ദേശം അയക്കൂ...</div>`;
-        }
-        if (containerStu) {
-            containerStu.innerHTML = html || `<div style="text-align:center; color:var(--text-muted); font-size:0.85rem; padding:20px;">സന്ദേശങ്ങളൊന്നും ലഭ്യമല്ല.</div>`;
-        }
-
-        scrollChatToBottom();
-    }
-
-    function scrollChatToBottom() {
-        setTimeout(() => {
-            const containerAdm = document.getElementById('chatMessagesAdmin');
-            const containerStu = document.getElementById('chatMessagesStudent');
-            if(containerAdm) containerAdm.scrollTop = containerAdm.scrollHeight;
-            if(containerStu) containerStu.scrollTop = containerStu.scrollHeight;
-        }, 50);
-    }
-
-    async function toggleVoiceRecord(role) {
-        if (role === 'student' && isAdminOnlyChat) {
-            alert('അഡ്മിൻ ചാറ്റ് ലോക്ക് ചെയ്തിരിക്കുന്നു!');
-            return;
-        }
-
-        const btn = role === 'admin' ? document.getElementById('btnVoiceRecordAdm') : document.getElementById('btnVoiceRecordStu');
-
-        if (!isRecording) {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-
-                mediaRecorder.ondataavailable = event => {
-                    if (event.data.size > 0) audioChunks.push(event.data);
-                };
-
-                mediaRecorder.onstop = async () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    btn.disabled = true;
-                    btn.innerText = '⏳';
-                    await uploadVoiceToStorage(audioBlob, role);
-                    btn.disabled = false;
-                    btn.innerText = '🎙️';
-                };
-
-                mediaRecorder.start();
-                isRecording = true;
-                btn.classList.add('recording');
-                btn.innerText = '⏹️';
-            } catch (err) {
-                alert('മൈക്രോഫോൺ പെർമിഷൻ ലഭിച്ചില്ല: ' + err.message);
-            }
-        } else {
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
-            }
-            isRecording = false;
-            btn.classList.remove('recording');
-        }
-    }
-
-    async function uploadVoiceToStorage(audioBlob, senderRole) {
-        let senderName = "Admin";
-        let senderId = "ADMIN";
-
-        if (senderRole === 'student') {
-            senderName = currentUser.name;
-            senderId = currentUser.id;
-        }
-
-        try {
-            const fileName = `voice_${Date.now()}_${senderId}.webm`;
-            const storageRef = storage.ref(`voice_messages/${fileName}`);
-            
-            const snapshot = await storageRef.put(audioBlob);
-            const downloadUrl = await snapshot.ref.getDownloadURL();
-
-            const newVoiceMsg = {
-                senderRole: senderRole,
-                senderName: senderName,
-                senderId: senderId,
-                audioUrl: downloadUrl,
-                type: 'voice',
-                timestamp: Date.now()
-            };
-
-            await db.collection("chats").add(newVoiceMsg);
-        } catch (err) {
-            alert('വോയ്സ് അപ്‌ലോഡ് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു: ' + err.message);
-        }
-    }
-
-    // Complete storage cleanup with Firestore deletion
-    async function clearAllChat() {
-        if (!confirm("എല്ലാ സന്ദേശങ്ങളും അനുബന്ധ ഓഡിയോ ഫയലുകളും ക്ലൗഡിൽ നിന്ന് നീക്കം ചെയ്യണോ?")) {
-            return;
-        }
-
-        try {
-            const snapshot = await db.collection("chats").get();
-            const deletePromises = [];
-            const batch = db.batch();
-
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                
-                // 1. Storage file deletion
-                if (data.type === 'voice' && data.audioUrl) {
-                    try {
-                        const storageRef = storage.refFromURL(data.audioUrl);
-                        deletePromises.push(storageRef.delete().catch(err => {
-                            console.warn("Storage ഫയൽ ഡിലീറ്റ് ചെയ്യുന്നതിൽ പിശക്:", err);
-                        }));
-                    } catch (e) {
-                        console.warn("Invalid Storage URL:", e);
-                    }
-                }
-
-                // 2. Firestore document deletion
-                batch.delete(doc.ref);
-            });
-
-            await Promise.all(deletePromises);
-            await batch.commit();
-
-            alert("എല്ലാ സന്ദേശങ്ങളും ഓഡിയോ ഫയലുകളും വിജയകരമായി നീക്കം ചെയ്തു! സ്റ്റോറേജ് സ്പേസ് ക്ലിയർ ആയി.");
-        } catch (err) {
-            alert("ചാറ്റ് ക്ലിയർ ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു: " + err.message);
         }
     }
 
@@ -1849,9 +1466,9 @@
             sortedStudents.sort((a, b) => a.name.localeCompare(b.name));
         } else if(sortMode === 'pendingFirst') {
             sortedStudents.sort((a, b) => {
-                const aPaid = (a.paidMonths || []).includes(selVal);
-                const bPaid = (b.paidMonths || []).includes(selVal);
-                return aPaid === bPaid ? 0 : aPaid ? 1 : -1;
+                const aPendingCount = getStudentPendingMonths(a.joinDate, a.paidMonths || []).length;
+                const bPendingCount = getStudentPendingMonths(b.joinDate, b.paidMonths || []).length;
+                return bPendingCount - aPendingCount;
             });
         }
 
@@ -1865,7 +1482,10 @@
             }
 
             const amt = s.rent || 4500;
-            let isPaid = false;
+            const stuPendingList = getStudentPendingMonths(s.joinDate, s.paidMonths || []);
+            const stuPendingCount = stuPendingList.length;
+
+            let isPaidForSelectedMonth = false;
             let statusText = "";
 
             if(isYearlyMode) {
@@ -1874,16 +1494,16 @@
                 const yearlyPaid = amt * paidCountInYear;
                 collected += yearlyPaid;
                 pending += (yearlyTotal - yearlyPaid);
-                isPaid = (paidCountInYear >= 12);
+                isPaidForSelectedMonth = (paidCountInYear >= 12);
                 statusText = `${paidCountInYear}/12 മാസം അടച്ചു`;
             } else {
-                isPaid = (s.paidMonths || []).includes(selVal);
-                if(isPaid) collected += amt; else pending += amt;
-                statusText = isPaid ? 'PAID ✓' : 'PENDING';
+                isPaidForSelectedMonth = (s.paidMonths || []).includes(selVal);
+                if(isPaidForSelectedMonth) collected += amt; else pending += amt;
+                statusText = isPaidForSelectedMonth ? 'PAID ✓' : 'PENDING';
             }
 
-            if(filterMode === 'paid' && !isPaid) return;
-            if(filterMode === 'pending' && isPaid) return;
+            if(filterMode === 'paid' && stuPendingCount > 0) return;
+            if(filterMode === 'pending' && stuPendingCount === 0) return;
             if(filterMode === 'all-ordered' && !s.hasFoodOrder) return;
             if(filterMode === 'served' && (!s.hasFoodOrder || !s.isServed)) return;
             if(filterMode === 'remaining' && (!s.hasFoodOrder || s.isServed)) return;
@@ -1892,7 +1512,7 @@
             card.className = `student-item-card ${s.isBlocked ? 'blocked' : ''} ${s.isServed ? 'served' : ''}`;
             card.setAttribute('data-search', `${s.name.toLowerCase()} ${s.id.toLowerCase()}`);
 
-            const waMsg = encodeURIComponent(`ശ്രീ മുത്തപ്പൻ മെസ്സ്: പ്രിയപ്പെട്ട ${s.name}, നിങ്ങളുടെ ${isYearlyMode ? currentYearStr + ' ലെ' : selVal + ' ലെ'} വാടക തുക ₹${amt} കുടിശ്ശികയായി കാണിക്കുന്നു. ദയവായി എത്രയും വേഗം അടയ്ക്കുക.`);
+            const waMsg = encodeURIComponent(`ശ്രീ മുത്തപ്പൻ മെസ്സ്: പ്രിയപ്പെട്ട ${s.name}, നിങ്ങളുടെ ${stuPendingCount} മാസത്തെ വാടക തുക ₹${stuPendingCount * amt} കുടിശ്ശികയായി കാണിക്കുന്നു (${stuPendingList.join(', ')}). ദയവായി എത്രയും വേഗം അടയ്ക്കുക.`);
 
             let foodStatusBadge = s.hasFoodOrder 
                 ? (s.isServed ? '<span class="badge served">കഴിച്ചു (Served)</span>' : '<span class="badge pending-food">കഴിക്കാൻ ബാക്കി</span>')
@@ -1918,7 +1538,9 @@
                             <b style="font-size:0.95rem;">${s.name}</b> <small style="color:var(--text-muted); font-weight:700;">(ID: ${s.id})</small>
                             <div style="font-size:0.75rem; color:var(--text-muted);">Due: ${calculateDueDate(s.joinDate)} | വാടക: ₹${amt}</div>
                         </div>
-                        <span class="badge ${isPaid ? 'paid' : 'unpaid'}">${statusText}</span>
+                        <span class="badge ${stuPendingCount === 0 ? 'paid' : 'unpaid'}">
+                            ${stuPendingCount === 0 ? 'കുടിശ്ശികയില്ല ✓' : `കുടിശ്ശിക: ${stuPendingCount} മാസം (₹${stuPendingCount * amt})`}
+                        </span>
                     </div>
                     
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin:2px 0;">
@@ -1929,12 +1551,12 @@
                     <div class="item-actions">
                         ${!isYearlyMode ? `
                         <label style="display:flex; align-items:center; gap:4px; font-size:0.78rem; font-weight:700; cursor:pointer;">
-                            <input type="checkbox" class="pay-checkbox" ${isPaid ? 'checked' : ''} onchange="togglePay('${s.docId}', '${selVal}', this.checked)"> ഈ മാസം അടച്ചു
-                        </label>` : `<span style="font-size:0.75rem; color:var(--text-muted);">മാസം തിരഞ്ഞെടുത്ത് ടിക്ക് ചെയ്യുക</span>`}
+                            <input type="checkbox" class="pay-checkbox" ${isPaidForSelectedMonth ? 'checked' : ''} onchange="togglePay('${s.docId}', '${selVal}', this.checked)"> ഈ മാസം (${selVal}) അടച്ചു
+                        </label>` : `<span style="font-size:0.75rem; color:var(--text-muted);">${statusText}</span>`}
 
                         <div style="margin-left:auto; display:flex; gap:6px;">
                             ${s.phone ? `<a href="tel:${s.phone}" style="text-decoration:none;"><button class="btn-action-sm call">📞 Call</button></a>` : ''}
-                            ${!isPaid && s.phone ? `<a href="https://wa.me/91${s.phone}?text=${waMsg}" target="_blank" style="text-decoration:none;"><button class="btn-action-sm whatsapp">📲 WA</button></a>` : ''}
+                            ${stuPendingCount > 0 && s.phone ? `<a href="https://wa.me/91${s.phone}?text=${waMsg}" target="_blank" style="text-decoration:none;"><button class="btn-action-sm whatsapp">📲 WA</button></a>` : ''}
                             <button class="btn-action-sm edit" onclick="openEditModal(${originalIndex})">✏️</button>
                             <button class="btn-action-sm info" onclick="openDetailsModal(${originalIndex})">📋</button>
                             <button class="btn-action-sm ${s.isBlocked ? 'unlock' : 'block'}" onclick="toggleBlock('${s.docId}', ${!s.isBlocked})">${s.isBlocked ? '🔓' : '🚫'}</button>
@@ -2002,19 +1624,22 @@
         doc.text('Students Master Directory & Records', 14, 18);
         doc.text(`Generated Date: ${new Date().toLocaleDateString('en-GB')}  |  Total Students: ${sortedList.length}`, 14, 24);
 
-        const tableBody = sortedList.map((s, idx) => [
-            s.id || (idx + 1).toString(),
-            s.name || '-',
-            s.phone || '-',
-            s.address || '-',
-            `Rs. ${s.rent || 4500}`,
-            s.joinDate || '-',
-            s.isBlocked ? 'Blocked' : 'Active'
-        ]);
+        const tableBody = sortedList.map((s, idx) => {
+            const pCount = getStudentPendingMonths(s.joinDate, s.paidMonths || []).length;
+            return [
+                s.id || (idx + 1).toString(),
+                s.name || '-',
+                s.phone || '-',
+                s.address || '-',
+                `Rs. ${s.rent || 4500}`,
+                pCount > 0 ? `${pCount} M Due` : 'Clear',
+                s.isBlocked ? 'Blocked' : 'Active'
+            ];
+        });
 
         doc.autoTable({
             startY: 32,
-            head: [['ID', 'Name', 'Phone Number', 'Address', 'Rent', 'Join Date', 'Status']],
+            head: [['ID', 'Name', 'Phone Number', 'Address', 'Rent', 'Due Months', 'Status']],
             body: tableBody,
             theme: 'grid',
             headStyles: {
@@ -2207,6 +1832,7 @@
         const s = students[idx];
         const modalBody = document.getElementById('modalDetailsBody');
         const quickActions = document.getElementById('modalQuickActions');
+        const pendingMonthsList = getStudentPendingMonths(s.joinDate, s.paidMonths || []);
         
         modalBody.innerHTML = `
             <div class="detail-row"><span>Student ID</span><b>${s.id}</b></div>
@@ -2215,6 +1841,7 @@
             <div class="detail-row"><span>മേൽവിലാസം</span><b>${s.address || 'N/A'}</b></div>
             <div class="detail-row"><span>പ്രതിമാസ വാടക</span><b>₹${s.rent || 4500}</b></div>
             <div class="detail-row"><span>ജോയിനിംഗ് ഡേറ്റ്</span><b>${s.joinDate || 'N/A'}</b></div>
+            <div class="detail-row"><span>കുടിശ്ശികയുള്ള മാസങ്ങൾ</span><b>${pendingMonthsList.length > 0 ? `<span style="color:var(--danger);">${pendingMonthsList.length} മാസം (${pendingMonthsList.join(', ')})</span>` : '<span style="color:var(--success);">കുടിശ്ശികയില്ല ✓</span>'}</b></div>
             <div class="detail-row"><span>അടച്ച മാസങ്ങൾ</span><b>${(s.paidMonths || []).join(', ') || 'ഒന്നും അടച്ചിട്ടില്ല'}</b></div>
             <div class="detail-row"><span>അക്കൗണ്ട് നില</span><b>${s.isBlocked ? '<span style="color:var(--danger)">🚫 BLOCKED</span>' : '<span style="color:var(--success)">✅ ACTIVE</span>'}</b></div>
         `;
@@ -2268,11 +1895,12 @@
 
     function exportCSV() {
         const selVal = document.getElementById('selectFinanceMonth').value || getCurMonthKey();
-        let csv = "data:text/csv;charset=utf-8,\uFEFFID,Name,Phone,Address,Rent,Joining Date,Paid Months\n";
+        let csv = "data:text/csv;charset=utf-8,\uFEFFID,Name,Phone,Address,Rent,Joining Date,Pending Months Count,Paid Months\n";
         students.forEach(s => {
             const cleanAddr = (s.address || '').replace(/"/g, '""');
             const paidStr = (s.paidMonths || []).join('; ');
-            csv += `"${s.id}","${s.name}","${s.phone || ''}","${cleanAddr}","${s.rent || 4500}","${s.joinDate || ''}","${paidStr}"\n`;
+            const pendingCount = getStudentPendingMonths(s.joinDate, s.paidMonths || []).length;
+            csv += `"${s.id}","${s.name}","${s.phone || ''}","${cleanAddr}","${s.rent || 4500}","${s.joinDate || ''}","${pendingCount} Months","${paidStr}"\n`;
         });
         const link = document.createElement("a");
         link.setAttribute("href", encodeURI(csv));
