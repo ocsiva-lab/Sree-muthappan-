@@ -405,14 +405,6 @@
         .month-matrix-item.pending { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
         .month-matrix-item.partial { background: #fffbeb; border-color: #fde68a; color: #92400e; }
 
-        .timer-config-box {
-            background: #f8fafc;
-            border: 1.5px solid var(--border);
-            border-radius: 14px;
-            padding: 12px;
-            margin-top: 10px;
-        }
-
         /* Edit Mode Bar */
         .edit-mode-bar {
             background: #fef3c7;
@@ -538,40 +530,14 @@
         <!-- Admin View -->
         <div id="viewAdmin" class="hidden">
             <div id="admTabOverview">
-                <!-- Order Window & Auto Timer Config -->
-                <div id="secOrderSwitch" class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">ഓർഡർ വിൻഡോ നില</div>
-                            <span id="badgeAdminOrderActive" class="badge open" style="margin-top:4px;">🟢 OPEN</span>
-                        </div>
-                        <div id="grpOrderSwitchBtns" style="display:flex; gap:6px;">
-                            <button class="btn-action-sm" style="background:#dcfce7; color:#15803d;" onclick="setOrderActive(true)">Start</button>
-                            <button class="btn-action-sm" style="background:#fee2e2; color:#b91c1c;" onclick="setOrderActive(false)">Close</button>
-                        </div>
+                <div id="secOrderSwitch" class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">ഓർഡർ വിൻഡോ നില</div>
+                        <span id="badgeAdminOrderActive" class="badge open" style="margin-top:4px;">🟢 OPEN</span>
                     </div>
-
-                    <!-- Auto Timer Controls -->
-                    <div class="timer-config-box">
-                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem; margin-bottom:8px;">
-                            <input type="checkbox" id="chkAutoTimerEnabled" style="width:18px; height:18px; accent-color:var(--primary);" onchange="toggleAutoTimerSwitch()">
-                            ⏰ എല്ലാ ദിവസവും ഓട്ടോമാറ്റിക് ടൈമർ പ്രവർത്തിപ്പിക്കുക
-                        </label>
-                        <div id="boxTimerInputs" style="display:none; grid-template-columns: 1fr 1fr; gap:8px; margin-top:8px;">
-                            <div>
-                                <small style="font-size:0.7rem; color:var(--text-muted); font-weight:700;">തുടങ്ങുന്ന സമയം:</small>
-                                <input type="time" id="inTimerStartTime" value="06:00" style="padding:8px; font-size:0.85rem;">
-                            </div>
-                            <div>
-                                <small style="font-size:0.7rem; color:var(--text-muted); font-weight:700;">അവസാനിക്കുന്ന സമയം:</small>
-                                <input type="time" id="inTimerEndTime" value="22:00" style="padding:8px; font-size:0.85rem;">
-                            </div>
-                            <div style="grid-column: span 2;">
-                                <button type="button" class="btn-main success" style="padding:8px; font-size:0.8rem;" onclick="saveAutoTimerSettings()">
-                                    💾 സമയം ക്ലൗഡിൽ സേവ് ചെയ്യുക
-                                </button>
-                            </div>
-                        </div>
+                    <div id="grpOrderSwitchBtns" style="display:flex; gap:6px;">
+                        <button class="btn-action-sm" style="background:#dcfce7; color:#15803d;" onclick="setOrderActive(true)">Start</button>
+                        <button class="btn-action-sm" style="background:#fee2e2; color:#b91c1c;" onclick="setOrderActive(false)">Close</button>
                     </div>
                 </div>
 
@@ -660,18 +626,45 @@
                 </div>
             </div>
 
-            <!-- Settings Tab with Auto Reset Time Controls -->
+            <!-- Settings Tab -->
             <div id="admTabSettings" class="hidden">
-                <!-- Daily Auto Reset Food Orders Schedule Card -->
+                <!-- 1. Auto Order Window Timer Card (Moved to Settings) -->
+                <div class="card" style="background:#f8fafc; border: 1.5px solid var(--border);">
+                    <h3 style="margin-top:0; font-size:1rem; color:var(--primary);">⏰ ഓർഡർ സ്വീകരിക്കുന്ന ഓട്ടോമാറ്റിക് ടൈമർ</h3>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
+                        നിശ്ചിത സമയത്ത് ഓർഡർ വിൻഡോ തനിയെ ഓപ്പൺ ആവാനും ക്ലോസ് ആവാനുമുള്ള ടൈമർ സെറ്റ് ചെയ്യാം:
+                    </p>
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem; margin-bottom:10px; font-weight:700;">
+                        <input type="checkbox" id="chkAutoTimerEnabled" style="width:18px; height:18px; accent-color:var(--primary);" onchange="toggleAutoTimerSwitch()">
+                        എല്ലാ ദിവസവും ഓട്ടോമാറ്റിക് ടൈമർ പ്രവർത്തിപ്പിക്കുക
+                    </label>
+                    <div id="boxTimerInputs" style="display:none; grid-template-columns: 1fr 1fr; gap:8px; margin-top:8px;">
+                        <div>
+                            <small style="font-size:0.7rem; color:var(--text-muted); font-weight:700;">തുടങ്ങുന്ന സമയം:</small>
+                            <input type="time" id="inTimerStartTime" value="06:00" style="padding:8px; font-size:0.85rem;">
+                        </div>
+                        <div>
+                            <small style="font-size:0.7rem; color:var(--text-muted); font-weight:700;">അവസാനിക്കുന്ന സമയം:</small>
+                            <input type="time" id="inTimerEndTime" value="22:00" style="padding:8px; font-size:0.85rem;">
+                        </div>
+                        <div style="grid-column: span 2; margin-top:4px;">
+                            <button type="button" class="btn-main success" style="padding:10px; font-size:0.82rem;" onclick="saveAutoTimerSettings()">
+                                💾 ഓർഡർ സമയം ക്ലൗഡിൽ സേവ് ചെയ്യുക
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Daily Auto Reset Food Orders Schedule Card -->
                 <div class="card" style="background: #eff6ff; border: 1.5px solid #bfdbfe;">
-                    <h3 style="margin-top:0; font-size:1rem; color:#1d4ed8;">⏰ ദിവസേനയുള്ള ഭക്ഷണ ഓർഡറുകൾ ഓട്ടോ റീസെറ്റ്</h3>
+                    <h3 style="margin-top:0; font-size:1rem; color:#1d4ed8;">🔄 ദിവസേനയുള്ള ഭക്ഷണ ഓർഡറുകൾ ഓട്ടോ റീസെറ്റ്</h3>
                     <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
                         എല്ലാ ദിവസവും നിശ്ചിത സമയത്ത് (ഉദാ: രാത്രി 10:00 മണിക്ക്) വിദ്യാർത്ഥികളുടെ ഭക്ഷണ ഓർഡറുകൾ തനിയെ റീസെറ്റ് ആവാനുള്ള സൗകര്യം:
                     </p>
 
                     <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem; margin-bottom:10px; font-weight:700;">
                         <input type="checkbox" id="chkAutoResetOrdersEnabled" style="width:18px; height:18px; accent-color:var(--primary);" onchange="toggleAutoResetOrdersSwitch()">
-                        🔄 ദിവസേന ഓട്ടോമാറ്റിക് റീസെറ്റ് പ്രവർത്തിപ്പിക്കുക
+                        ദിവസേന ഓട്ടോമാറ്റിക് റീസെറ്റ് പ്രവർത്തിപ്പിക്കുക
                     </label>
 
                     <div id="boxAutoResetInputs" style="display:none; flex-direction:column; gap:8px;">
@@ -1078,7 +1071,7 @@
     let autoResetTime = "22:00";
     let lastResetDateExecuted = "";
 
-    let isEditModeActive = false; // Global toggle to lock accidental clicks
+    let isEditModeActive = false;
     let broadcastNotice = "ഈ മാസം പണം അടക്കാനുള്ളവർ ഉടൻ അടയ്ക്കണമെന്ന് വിനീതമായി അഭ്യർത്ഥിക്കുന്നു";
     let currentUser = null;
     let currentRole = 'student';
@@ -1137,7 +1130,6 @@
         });
     }
 
-    // Auto Order Window Timer Logic
     function checkAutoTimerExecution() {
         if (!autoTimerEnabled || !timerStartTime || !timerEndTime) return;
         const now = new Date();
@@ -1157,7 +1149,6 @@
         }
     }
 
-    // Daily Auto Order Reset Functionality (Every Day at specified time e.g., 22:00)
     function checkDailyAutoResetOrders() {
         if (!autoResetOrdersEnabled || !autoResetTime) return;
 
@@ -1219,7 +1210,7 @@
             const noticeInput = document.getElementById('inNoticeText');
             if (noticeInput) noticeInput.value = broadcastNotice;
 
-            // Timer UI
+            // Timer UI in Settings
             const chkTimer = document.getElementById('chkAutoTimerEnabled');
             const boxInputs = document.getElementById('boxTimerInputs');
             if (chkTimer && boxInputs) {
@@ -1284,7 +1275,6 @@
         });
     }
 
-    // Auto Reset Orders Settings UI Functions
     function toggleAutoResetOrdersSwitch() {
         const isChecked = document.getElementById('chkAutoResetOrdersEnabled').checked;
         document.getElementById('boxAutoResetInputs').style.display = isChecked ? 'flex' : 'none';
@@ -1761,7 +1751,7 @@
         const newP = document.getElementById('inAdmNewPass').value.trim();
 
         if(!newU || !newP) {
-            alert('യൂസർനെയിമും പാസ്‌‌വേഡും നൽകുക.');
+            alert('യൂസർനെയിമും പാസ്‌വേഡും നൽകുക.');
             return;
         }
 
@@ -2743,7 +2733,17 @@
             studentUnsubscribe = null;
         }
         currentUser = null;
+
+        // ലോഗൗട്ട് ചെയ്യുമ്പോൾ എഡിറ്റ് മോഡ് പൂർണ്ണമായി റീസെറ്റ് ചെയ്യുന്നു
         isEditModeActive = false;
+        const chkEdit = document.getElementById('chkToggleEditMode');
+        if (chkEdit) chkEdit.checked = false;
+        
+        const statusTxt = document.getElementById('txtEditModeStatus');
+        if (statusTxt) {
+            statusTxt.innerHTML = "🔒 <span>എഡിറ്റ് മോഡ് ഓഫാണ് (ലോക്ക് ചെയ്തിരിക്കുന്നു)</span>";
+        }
+
         stopQRScanner();
         document.getElementById('viewLogin').classList.remove('hidden');
         document.getElementById('viewStudent').classList.add('hidden');
