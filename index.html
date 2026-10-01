@@ -209,6 +209,7 @@
         .badge { padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; }
         .badge.paid { background: #dcfce7; color: #15803d; }
         .badge.unpaid { background: #fee2e2; color: #b91c1c; }
+        .badge.partial { background: #fef3c7; color: #b45309; }
         .badge.blocked { background: #7f1d1d; color: #ffffff; }
         .badge.served { background: #dcfce7; color: #15803d; }
         .badge.pending-food { background: #fef3c7; color: #b45309; }
@@ -232,6 +233,45 @@
         .btn-action-sm.info { background: #f1f5f9; color: #475569; }
         .btn-action-sm.edit { background: #fef3c7; color: #92400e; }
         .btn-action-sm.serve { background: #10b981; color: #ffffff; }
+        .btn-action-sm.payment-mgr { background: #eef2ff; color: var(--primary); border: 1px solid #c7d2fe; }
+
+        .pending-months-box {
+            background: #fff8f8;
+            border: 1px dashed #fca5a5;
+            border-radius: 10px;
+            padding: 8px 10px;
+            margin-top: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .pending-pills-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .month-check-pill {
+            background: #ffffff;
+            border: 1px solid #f87171;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #b91c1c;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .month-check-pill.partial-item {
+            border-color: #f59e0b;
+            color: #b45309;
+            background: #fffbeb;
+        }
 
         .qr-display-box {
             background: #ffffff;
@@ -329,7 +369,7 @@
         .detail-row span { color: var(--text-muted); font-weight: 600; display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 2px; }
         .detail-row b { color: var(--text-dark); font-weight: 700; }
 
-        .pay-checkbox { width: 20px; height: 20px; accent-color: var(--success); cursor: pointer; }
+        .pay-checkbox { width: 18px; height: 18px; accent-color: var(--success); cursor: pointer; }
 
         .filter-status-banner {
             display: flex; justify-content: space-between; align-items: center;
@@ -339,6 +379,30 @@
 
         .scanner-box-wrapper { width: 100%; border-radius: 14px; overflow: hidden; border: 2px solid var(--border); margin-bottom: 14px; }
         .hidden { display: none !important; }
+
+        .month-matrix-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 360px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .month-matrix-item {
+            background: #f8fafc;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        .month-matrix-item.paid { background: #f0fdf4; border-color: #86efac; color: #166534; }
+        .month-matrix-item.pending { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
+        .month-matrix-item.partial { background: #fffbeb; border-color: #fde68a; color: #92400e; }
     </style>
 </head>
 <body>
@@ -512,7 +576,6 @@
                 </div>
             </div>
 
-            <!-- Admin Notice Management Tab -->
             <div id="admTabNotice" class="hidden">
                 <form id="formAdminNotice" class="card">
                     <h3 style="margin-top:0; font-size:1rem; color:var(--primary);">📢 വിദ്യാർത്ഥികൾക്ക് നോട്ടിഫിക്കേഷൻ അയക്കുക</h3>
@@ -555,7 +618,7 @@
                 </form>
 
                 <form id="formStaffChangeCreds" class="card">
-                    <h3 style="margin-top:0; font-size:1rem; color:#0284c7;">👨‍‍🍳 സ്റ്റാഫ് ലോഗിൻ വിവരങ്ങൾ മാറ്റുക</h3>
+                    <h3 style="margin-top:0; font-size:1rem; color:#0284c7;">👨‍🍳 സ്റ്റാഫ് ലോഗിൻ വിവരങ്ങൾ മാറ്റുക</h3>
                     <div class="form-group">
                         <label>സ്റ്റാഫ് യൂസർനെയിം:</label>
                         <input type="text" id="inStaffNewUser" required>
@@ -656,6 +719,7 @@
 
     <div id="bottomNavBar" class="bottom-nav hidden"></div>
 
+    <!-- Student Full Details Modal -->
     <div id="modalFullDetails" class="modal-overlay hidden" onclick="handleModalBackdropClick(event)">
         <div class="modal-card">
             <div class="modal-header">
@@ -667,6 +731,45 @@
         </div>
     </div>
 
+    <!-- Rent Payment History Matrix Modal -->
+    <div id="modalPaymentHistory" class="modal-overlay hidden" onclick="handlePayHistoryBackdropClick(event)">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>💳 വാടക കുടിശ്ശിക & പേയ്‌മെന്റ് മാനേജർ</h3>
+                <button class="close-btn" onclick="closePaymentHistoryModal()">✕</button>
+            </div>
+            <p id="payHistorySubHead" style="font-size:0.82rem; color:var(--text-muted); margin-top:0; margin-bottom:12px;"></p>
+            <div id="matrixPaymentMonths" class="month-matrix-grid"></div>
+        </div>
+    </div>
+
+    <!-- Partial Payment Entry Modal -->
+    <div id="modalPartialPay" class="modal-overlay hidden" onclick="handlePartialModalBackdrop(event)">
+        <div class="modal-card" style="max-width: 380px;">
+            <div class="modal-header">
+                <h3>💰 ഭാഗിക തുക രേഖപ്പെടുത്തുക</h3>
+                <button class="close-btn" onclick="closePartialPayModal()">✕</button>
+            </div>
+            <form id="formPartialPay">
+                <input type="hidden" id="partDocId">
+                <input type="hidden" id="partMonthKey">
+                <div class="form-group">
+                    <label id="lblPartialMonth">മാസം:</label>
+                    <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:6px;">
+                        പൂർണ്ണ മാസ വാടക: <b>₹<span id="dispPartFullRent">4500</span></b>
+                    </div>
+                    <label>ലഭിച്ച തുക (₹):</label>
+                    <input type="number" id="inPartialPaidAmt" placeholder="തന്ന തുക നൽകുക" required min="0">
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button type="submit" class="btn-main success" style="flex:2;">സേവ് ചെയ്യുക</button>
+                    <button type="button" class="btn-main danger" style="flex:1;" onclick="clearPartialPayment()">റദ്ദാക്കുക</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Student Modal -->
     <div id="modalEditStudent" class="modal-overlay hidden" onclick="handleEditBackdropClick(event)">
         <div class="modal-card">
             <div class="modal-header">
@@ -741,6 +844,15 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
+    const MALAYALAM_MONTHS = ["ജനുവരി", "ഫെബ്രുവരി", "മാർച്ച്", "ഏപ്രിൽ", "മേയ്", "ജൂൺ", "ജൂലൈ", "ഓഗസ്റ്റ്", "സെപ്റ്റംബർ", "ഒക്ടോബർ", "നവംബർ", "ഡിസംബർ"];
+
+    function formatMonthKeyML(mKey) {
+        if(!mKey || !mKey.includes('-')) return mKey;
+        const [y, m] = mKey.split('-');
+        const mIdx = parseInt(m, 10) - 1;
+        return `${MALAYALAM_MONTHS[mIdx] || m} ${y}`;
+    }
+
     async function hashPassword(plainText) {
         if (!plainText) return "";
         const msgUint8 = new TextEncoder().encode(plainText);
@@ -761,7 +873,7 @@
         return new Date().toISOString().split('T')[0];
     }
 
-    function getStudentPendingMonths(joinDateStr, paidMonths = []) {
+    function getAllStudentApplicableMonths(joinDateStr) {
         if (!joinDateStr) return [];
         const start = new Date(joinDateStr);
         const now = new Date();
@@ -772,20 +884,61 @@
         const endYear = now.getFullYear();
         const endMonth = now.getMonth() + 1;
 
-        const monthsToPay = [];
-
+        const months = [];
         while (curYear < endYear || (curYear === endYear && curMonth <= endMonth)) {
             const mKey = `${curYear}-${String(curMonth).padStart(2, '0')}`;
-            if (!paidMonths.includes(mKey)) {
-                monthsToPay.push(mKey);
-            }
+            months.push(mKey);
             curMonth++;
             if (curMonth > 12) {
                 curMonth = 1;
                 curYear++;
             }
         }
-        return monthsToPay;
+        return months;
+    }
+
+    // Accurate calculation of financial breakdown including partial payments
+    function calculateStudentFinancials(student) {
+        const allMonths = getAllStudentApplicableMonths(student.joinDate);
+        const paidMonths = student.paidMonths || [];
+        const partials = student.partialPayments || {}; // { "2026-05": 2000 }
+        const monthlyRent = student.rent || 4500;
+
+        let totalExpected = allMonths.length * monthlyRent;
+        let totalPaid = 0;
+        let pendingMonthsList = [];
+        let breakdown = [];
+
+        allMonths.forEach(mKey => {
+            if (paidMonths.includes(mKey)) {
+                totalPaid += monthlyRent;
+                breakdown.push({ month: mKey, status: 'paid', paidAmt: monthlyRent, dueAmt: 0 });
+            } else if (partials[mKey] !== undefined && partials[mKey] > 0) {
+                const pAmt = partials[mKey];
+                const dueAmt = Math.max(0, monthlyRent - pAmt);
+                totalPaid += pAmt;
+                if (dueAmt > 0) {
+                    pendingMonthsList.push({ month: mKey, due: dueAmt, isPartial: true, paid: pAmt });
+                    breakdown.push({ month: mKey, status: 'partial', paidAmt: pAmt, dueAmt: dueAmt });
+                } else {
+                    breakdown.push({ month: mKey, status: 'paid', paidAmt: monthlyRent, dueAmt: 0 });
+                }
+            } else {
+                pendingMonthsList.push({ month: mKey, due: monthlyRent, isPartial: false, paid: 0 });
+                breakdown.push({ month: mKey, status: 'unpaid', paidAmt: 0, dueAmt: monthlyRent });
+            }
+        });
+
+        const totalPending = totalExpected - totalPaid;
+
+        return {
+            allMonths,
+            totalExpected,
+            totalPaid,
+            totalPending,
+            pendingMonthsList,
+            breakdown
+        };
     }
 
     let students = [];
@@ -796,6 +949,7 @@
     let currentRole = 'student';
     let filterMode = 'all'; 
     let html5QrCodeScanner = null;
+    let selectedStudentDocIdForPayHistory = null;
 
     document.getElementById('inNewDate').valueAsDate = new Date();
 
@@ -841,6 +995,9 @@
             }
             if (currentRole === 'admin' || currentRole === 'staff') {
                 renderAdmin();
+                if(selectedStudentDocIdForPayHistory) {
+                    renderPaymentHistoryMatrix(selectedStudentDocIdForPayHistory);
+                }
             }
         });
     }
@@ -901,7 +1058,6 @@
     function initMonthSelector() {
         const sel = document.getElementById('selectFinanceMonth');
         sel.innerHTML = '';
-        const months = ["ജനുവരി", "ഫെബ്രുവരി", "മാർച്ച്", "ഏപ്രിൽ", "മേയ്", "ജൂൺ", "ജൂലൈ", "ഓഗസ്റ്റ്", "സെപ്റ്റംബർ", "ഒക്ടോബർ", "നവംബർ", "ഡിസംബർ"];
         const now = new Date();
         const curYear = now.getFullYear();
         const curKey = getCurMonthKey();
@@ -916,7 +1072,7 @@
                 const k = `${y}-${String(m + 1).padStart(2, '0')}`;
                 const opt = document.createElement('option');
                 opt.value = k;
-                opt.innerText = `${months[m]} ${y}`;
+                opt.innerText = `${MALAYALAM_MONTHS[m]} ${y}`;
                 if (k === curKey) opt.selected = true;
                 sel.appendChild(opt);
             }
@@ -946,7 +1102,6 @@
         }
     }
 
-    // ================= 2. ENHANCED LOGIN SYSTEM =================
     document.getElementById('formLogin').addEventListener('submit', async function(e) {
         e.preventDefault();
         const inputId = document.getElementById('inputLoginId').value.trim();
@@ -955,7 +1110,6 @@
 
         if (currentRole === 'admin') {
             const isUserValid = inputId.toLowerCase() === (adminCredentials.user || "admin").toLowerCase();
-            // പ്ലെയിൻ admin123 അടിച്ചാലും, ഹാഷ് ഒത്തുപോയാലും അല്ലെങ്കിൽ ഡാറ്റാബേസിൽ കിടക്കുന്ന സ്ട്രിങ് ഒത്തുപോയാലും ലോഗിൻ സാധ്യമാകും
             const isPassValid = (hashedInput === adminCredentials.passHash) || 
                                 (inputPass === "admin123") || 
                                 (inputPass === adminCredentials.passHash);
@@ -981,7 +1135,6 @@
                 alert('സ്റ്റാഫ് യൂസർനെയിം അല്ലെങ്കിൽ പാസ്‌വേഡ് തെറ്റാണ്!');
             }
         } else {
-            // വിദ്യാർത്ഥി ലോഗിൻ: നമ്പർ / ടെക്സ്റ്റ് ഐഡികളും പ്ലെയിൻ / ഹാഷ് പാസ്‌വേഡുകളും വേരിഫൈ ചെയ്യുന്നു
             const numId = Number(inputId);
             const queryRef = isNaN(numId) 
                 ? db.collection("students").where("id", "==", inputId)
@@ -1118,11 +1271,8 @@
 
     function loadStudentData() {
         const todayStr = getTodayDateKey();
-        
-        const pendingMonthsList = getStudentPendingMonths(currentUser.joinDate, currentUser.paidMonths || []);
-        const pendingCount = pendingMonthsList.length;
+        const fin = calculateStudentFinancials(currentUser);
         const monthlyRent = currentUser.rent || 4500;
-        const totalPendingAmount = pendingCount * monthlyRent;
 
         document.getElementById('dispStuMenu').innerText = dailyMenuText || "മെനു ലഭ്യമല്ല.";
         document.getElementById('dispStuRentAmt').innerText = monthlyRent;
@@ -1132,21 +1282,27 @@
         const badge = document.getElementById('badgeStuRentStatus');
         const payBox = document.getElementById('boxPayAction');
         
-        if (pendingCount === 0) {
+        if (fin.totalPending <= 0) {
             badge.className = 'badge paid';
             badge.innerText = 'PAID ✓ (കുടിശ്ശികയില്ല)';
             payBox.style.background = '#dcfce7';
             payBox.style.color = '#15803d';
             payBox.innerHTML = `<b>✓ ഈ മാസം വരെയുള്ള മുഴുവൻ വാടകയും ലഭിച്ചിട്ടുണ്ട്.</b>`;
         } else {
-            badge.className = 'badge unpaid';
-            badge.innerText = `${pendingCount} മാസം ബാക്കി`;
+            const hasPartial = fin.pendingMonthsList.some(p => p.isPartial);
+            badge.className = `badge ${hasPartial ? 'partial' : 'unpaid'}`;
+            badge.innerText = `₹${fin.totalPending} ബാക്കി`;
             payBox.style.background = '#fee2e2';
             payBox.style.color = '#b91c1c';
+
+            const pendingDetailsHtml = fin.pendingMonthsList.map(p => `
+                <li>${formatMonthKeyML(p.month)}: <b>₹${p.due} ബാക്കി</b> ${p.isPartial ? `(₹${p.paid} അടച്ചു)` : ''}</li>
+            `).join('');
+
             payBox.innerHTML = `
                 <div style="font-size:0.95rem; font-weight:800; margin-bottom:4px;">⚠️ വാടക കുടിശ്ശികയുണ്ട്!</div>
-                <div><b>കുടിശ്ശികയുള്ള മാസങ്ങൾ:</b> <span style="font-size:1.1rem; font-weight:800;">${pendingCount} മാസം</span> (${pendingMonthsList.join(', ')})</div>
-                <div style="margin-top:4px;"><b>ആകെ അടയ്ക്കാനുള്ള തുക:</b> <span style="font-size:1.1rem; font-weight:800;">₹${totalPendingAmount}</span></div>
+                <div style="margin-top:4px;"><b>ആകെ അടയ്ക്കാനുള്ള ബാലൻസ് തുക:</b> <span style="font-size:1.15rem; font-weight:800; color:#b91c1c;">₹${fin.totalPending}</span></div>
+                <ul style="margin:6px 0 6px 18px; padding:0; font-size:0.82rem; line-height:1.5;">${pendingDetailsHtml}</ul>
                 <div style="margin-top:6px; font-size:0.8rem;">മെസ്സ് മാനേജറുമായി ബന്ധപ്പെട്ട് വാടക അടയ്ക്കുക.</div>
             `;
         }
@@ -1414,6 +1570,7 @@
             joinDate: document.getElementById('inNewDate').value,
             isBlocked: false,
             paidMonths: [],
+            partialPayments: {},
             hasFoodOrder: false,
             isServed: false,
             lastOrderDate: ""
@@ -1480,9 +1637,9 @@
             sortedStudents.sort((a, b) => a.name.localeCompare(b.name));
         } else if(sortMode === 'pendingFirst') {
             sortedStudents.sort((a, b) => {
-                const aPendingCount = getStudentPendingMonths(a.joinDate, a.paidMonths || []).length;
-                const bPendingCount = getStudentPendingMonths(b.joinDate, b.paidMonths || []).length;
-                return bPendingCount - aPendingCount;
+                const finA = calculateStudentFinancials(a);
+                const finB = calculateStudentFinancials(b);
+                return finB.totalPending - finA.totalPending;
             });
         }
 
@@ -1496,28 +1653,34 @@
             }
 
             const amt = s.rent || 4500;
-            const stuPendingList = getStudentPendingMonths(s.joinDate, s.paidMonths || []);
-            const stuPendingCount = stuPendingList.length;
+            const fin = calculateStudentFinancials(s);
+            const stuPendingAmt = fin.totalPending;
+            const stuPendingList = fin.pendingMonthsList;
 
             let isPaidForSelectedMonth = false;
             let statusText = "";
 
             if(isYearlyMode) {
-                const paidCountInYear = (s.paidMonths || []).filter(m => m.startsWith(currentYearStr)).length;
-                const yearlyTotal = amt * 12;
-                const yearlyPaid = amt * paidCountInYear;
-                collected += yearlyPaid;
-                pending += (yearlyTotal - yearlyPaid);
-                isPaidForSelectedMonth = (paidCountInYear >= 12);
-                statusText = `${paidCountInYear}/12 മാസം അടച്ചു`;
+                const yearPayments = fin.breakdown.filter(b => b.month.startsWith(currentYearStr));
+                const yearPaid = yearPayments.reduce((acc, cur) => acc + cur.paidAmt, 0);
+                const yearDue = yearPayments.reduce((acc, cur) => acc + cur.dueAmt, 0);
+                collected += yearPaid;
+                pending += yearDue;
+                statusText = `ലഭിച്ചത്: ₹${yearPaid} / കുടിശ്ശിക: ₹${yearDue}`;
             } else {
-                isPaidForSelectedMonth = (s.paidMonths || []).includes(selVal);
-                if(isPaidForSelectedMonth) collected += amt; else pending += amt;
-                statusText = isPaidForSelectedMonth ? 'PAID ✓' : 'PENDING';
+                const monthDetail = fin.breakdown.find(b => b.month === selVal);
+                if (monthDetail) {
+                    collected += monthDetail.paidAmt;
+                    pending += monthDetail.dueAmt;
+                    isPaidForSelectedMonth = monthDetail.status === 'paid';
+                    statusText = monthDetail.status === 'paid' ? 'PAID ✓' : (monthDetail.status === 'partial' ? `PARTIAL (₹${monthDetail.dueAmt} ബാക്കി)` : 'PENDING');
+                } else {
+                    statusText = 'NOT JOINED';
+                }
             }
 
-            if(filterMode === 'paid' && stuPendingCount > 0) return;
-            if(filterMode === 'pending' && stuPendingCount === 0) return;
+            if(filterMode === 'paid' && stuPendingAmt > 0) return;
+            if(filterMode === 'pending' && stuPendingAmt === 0) return;
             if(filterMode === 'all-ordered' && !s.hasFoodOrder) return;
             if(filterMode === 'served' && (!s.hasFoodOrder || !s.isServed)) return;
             if(filterMode === 'remaining' && (!s.hasFoodOrder || s.isServed)) return;
@@ -1526,7 +1689,8 @@
             card.className = `student-item-card ${s.isBlocked ? 'blocked' : ''} ${s.isServed ? 'served' : ''}`;
             card.setAttribute('data-search', `${s.name.toLowerCase()} ${s.id.toLowerCase()}`);
 
-            const waMsg = encodeURIComponent(`ശ്രീ മുത്തപ്പൻ മെസ്സ്: പ്രിയപ്പെട്ട ${s.name}, നിങ്ങളുടെ ${stuPendingCount} മാസത്തെ വാടക തുക ₹${stuPendingCount * amt} കുടിശ്ശികയായി കാണിക്കുന്നു (${stuPendingList.join(', ')}). ദയവായി എത്രയും വേഗം അടയ്ക്കുക.`);
+            const waDetails = stuPendingList.map(p => `${formatMonthKeyML(p.month)} (₹${p.due} ബാക്കി)`).join(', ');
+            const waMsg = encodeURIComponent(`ശ്രീ മുത്തപ്പൻ മെസ്സ്: പ്രിയപ്പെട്ട ${s.name}, നിങ്ങളുടെ ആകെ വാടക കുടിശ്ശിക തുക ₹${stuPendingAmt} ആണ് [${waDetails}]. ദയവായി എത്രയും വേഗം അടയ്ക്കുക.`);
 
             let foodStatusBadge = s.hasFoodOrder 
                 ? (s.isServed ? '<span class="badge served">കഴിച്ചു (Served)</span>' : '<span class="badge pending-food">കഴിക്കാൻ ബാക്കി</span>')
@@ -1546,14 +1710,37 @@
                     </div>
                 `;
             } else {
+                let pendingPillsHtml = '';
+                if (stuPendingAmt > 0) {
+                    const pillItems = stuPendingList.map(p => `
+                        <div class="month-check-pill ${p.isPartial ? 'partial-item' : ''}">
+                            <input type="checkbox" title="മുഴുവൻ തുക ലഭിച്ചതായി അടയാളപ്പെടുത്തുക" onchange="togglePay('${s.docId}', '${p.month}', this.checked)">
+                            <span>${formatMonthKeyML(p.month)}: <b>₹${p.due}</b> ${p.isPartial ? '(പകുതി അടച്ചു)' : ''}</span>
+                            <button type="button" style="border:none; background:#ffffff; border-radius:4px; font-size:0.7rem; font-weight:700; cursor:pointer; padding:2px 5px; color:#4338ca; box-shadow:0 1px 3px rgba(0,0,0,0.1);" onclick="openPartialPayModal('${s.docId}', '${p.month}', ${amt}, ${p.paid})">
+                                ✏️ തുക
+                            </button>
+                        </div>
+                    `).join('');
+
+                    pendingPillsHtml = `
+                        <div class="pending-months-box">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:0.75rem; font-weight:700; color:#b91c1c;">⚠️ കുടിശ്ശിക / ബാക്കി തുകകൾ:</span>
+                                <button class="btn-action-sm payment-mgr" style="padding:2px 8px; font-size:0.7rem;" onclick="openPaymentHistoryModal('${s.docId}')">മുഴുവൻ മാസങ്ങൾ 📑</button>
+                            </div>
+                            <div class="pending-pills-row">${pillItems}</div>
+                        </div>
+                    `;
+                }
+
                 card.innerHTML = `
                     <div class="item-row-top">
                         <div>
                             <b style="font-size:0.95rem;">${s.name}</b> <small style="color:var(--text-muted); font-weight:700;">(ID: ${s.id})</small>
                             <div style="font-size:0.75rem; color:var(--text-muted);">Due: ${calculateDueDate(s.joinDate)} | വാടക: ₹${amt}</div>
                         </div>
-                        <span class="badge ${stuPendingCount === 0 ? 'paid' : 'unpaid'}">
-                            ${stuPendingCount === 0 ? 'കുടിശ്ശികയില്ല ✓' : `കുടിശ്ശിക: ${stuPendingCount} മാസം (₹${stuPendingCount * amt})`}
+                        <span class="badge ${stuPendingAmt === 0 ? 'paid' : (stuPendingList.some(p => p.isPartial) ? 'partial' : 'unpaid')}">
+                            ${stuPendingAmt === 0 ? 'കുടിശ്ശികയില്ല ✓' : `കുടിശ്ശിക: ₹${stuPendingAmt}`}
                         </span>
                     </div>
                     
@@ -1562,15 +1749,18 @@
                         ${s.hasFoodOrder && !s.isServed ? `<button class="btn-action-sm serve" onclick="manualServeFood('${s.docId}', '${s.name}')">✓ Serve</button>` : ''}
                     </div>
 
+                    ${pendingPillsHtml}
+
                     <div class="item-actions">
                         ${!isYearlyMode ? `
                         <label style="display:flex; align-items:center; gap:4px; font-size:0.78rem; font-weight:700; cursor:pointer;">
-                            <input type="checkbox" class="pay-checkbox" ${isPaidForSelectedMonth ? 'checked' : ''} onchange="togglePay('${s.docId}', '${selVal}', this.checked)"> ഈ മാസം (${selVal}) അടച്ചു
+                            <input type="checkbox" class="pay-checkbox" ${isPaidForSelectedMonth ? 'checked' : ''} onchange="togglePay('${s.docId}', '${selVal}', this.checked)"> ഈ മാസം (${formatMonthKeyML(selVal)}) ഫുൾ അടച്ചു
                         </label>` : `<span style="font-size:0.75rem; color:var(--text-muted);">${statusText}</span>`}
 
                         <div style="margin-left:auto; display:flex; gap:6px;">
+                            ${stuPendingAmt === 0 ? `<button class="btn-action-sm payment-mgr" onclick="openPaymentHistoryModal('${s.docId}')">💳 ഹിസ്റ്ററി</button>` : ''}
                             ${s.phone ? `<a href="tel:${s.phone}" style="text-decoration:none;"><button class="btn-action-sm call">📞 Call</button></a>` : ''}
-                            ${stuPendingCount > 0 && s.phone ? `<a href="https://wa.me/91${s.phone}?text=${waMsg}" target="_blank" style="text-decoration:none;"><button class="btn-action-sm whatsapp">📲 WA</button></a>` : ''}
+                            ${stuPendingAmt > 0 && s.phone ? `<a href="https://wa.me/91${s.phone}?text=${waMsg}" target="_blank" style="text-decoration:none;"><button class="btn-action-sm whatsapp">📲 WA</button></a>` : ''}
                             <button class="btn-action-sm edit" onclick="openEditModal(${originalIndex})">✏️</button>
                             <button class="btn-action-sm info" onclick="openDetailsModal(${originalIndex})">📋</button>
                             <button class="btn-action-sm ${s.isBlocked ? 'unlock' : 'block'}" onclick="toggleBlock('${s.docId}', ${!s.isBlocked})">${s.isBlocked ? '🔓' : '🚫'}</button>
@@ -1607,6 +1797,141 @@
         }
     }
 
+    // Modal to Manage All Months for a Student
+    function openPaymentHistoryModal(docId) {
+        selectedStudentDocIdForPayHistory = docId;
+        renderPaymentHistoryMatrix(docId);
+        document.getElementById('modalPaymentHistory').classList.remove('hidden');
+    }
+
+    function closePaymentHistoryModal() {
+        document.getElementById('modalPaymentHistory').classList.add('hidden');
+        selectedStudentDocIdForPayHistory = null;
+    }
+
+    function handlePayHistoryBackdropClick(event) {
+        if(event.target.id === 'modalPaymentHistory') closePaymentHistoryModal();
+    }
+
+    function renderPaymentHistoryMatrix(docId) {
+        const student = students.find(s => s.docId === docId);
+        if(!student) return;
+
+        const fin = calculateStudentFinancials(student);
+        const subHead = document.getElementById('payHistorySubHead');
+        subHead.innerHTML = `വിദ്യാർത്ഥി: <b>${student.name}</b> (ID: ${student.id}) | ആകെ കുടിശ്ശിക: <b>₹${fin.totalPending}</b>`;
+
+        const matrixContainer = document.getElementById('matrixPaymentMonths');
+        matrixContainer.innerHTML = '';
+
+        const reverseBreakdown = [...fin.breakdown].reverse();
+
+        if(reverseBreakdown.length === 0) {
+            matrixContainer.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:20px;">മാസങ്ങൾ ലഭ്യമല്ല.</div>`;
+            return;
+        }
+
+        reverseBreakdown.forEach(item => {
+            const row = document.createElement('div');
+            row.className = `month-matrix-item ${item.status}`;
+            
+            let statusLabel = '';
+            if (item.status === 'paid') statusLabel = '<span style="color:#15803d;">മുഴുവൻ അടച്ചു ✓</span>';
+            else if (item.status === 'partial') statusLabel = `<span style="color:#b45309;">₹${item.paidAmt} അടച്ചു (ബാക്കി: ₹${item.dueAmt})</span>`;
+            else statusLabel = '<span style="color:#b91c1c;">അടച്ചിട്ടില്ല ⚠️</span>';
+
+            row.innerHTML = `
+                <div>
+                    <div style="font-size:0.95rem; font-weight:800;">${formatMonthKeyML(item.month)}</div>
+                    <div style="font-size:0.75rem; margin-top:2px;">${statusLabel}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button type="button" class="btn-action-sm edit" style="padding:4px 8px; font-size:0.75rem;" onclick="openPartialPayModal('${student.docId}', '${item.month}', ${student.rent || 4500}, ${item.paidAmt})">
+                        ✏️ തുക നൽകുക
+                    </button>
+                    <label style="display:flex; align-items:center; gap:4px; font-size:0.75rem; cursor:pointer;">
+                        <input type="checkbox" class="pay-checkbox" ${item.status === 'paid' ? 'checked' : ''} onchange="togglePay('${student.docId}', '${item.month}', this.checked)"> ഫുൾ
+                    </label>
+                </div>
+            `;
+            matrixContainer.appendChild(row);
+        });
+    }
+
+    // Partial Payment Handlers
+    function openPartialPayModal(docId, mKey, fullRent, currentPaid) {
+        document.getElementById('partDocId').value = docId;
+        document.getElementById('partMonthKey').value = mKey;
+        document.getElementById('lblPartialMonth').innerText = `മാസം: ${formatMonthKeyML(mKey)}`;
+        document.getElementById('dispPartFullRent').innerText = fullRent;
+        document.getElementById('inPartialPaidAmt').value = currentPaid > 0 ? currentPaid : '';
+        document.getElementById('inPartialPaidAmt').max = fullRent;
+
+        document.getElementById('modalPartialPay').classList.remove('hidden');
+    }
+
+    function closePartialPayModal() {
+        document.getElementById('modalPartialPay').classList.add('hidden');
+    }
+
+    function handlePartialModalBackdrop(event) {
+        if (event.target.id === 'modalPartialPay') closePartialPayModal();
+    }
+
+    document.getElementById('formPartialPay').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const docId = document.getElementById('partDocId').value;
+        const mKey = document.getElementById('partMonthKey').value;
+        const paidAmt = parseInt(document.getElementById('inPartialPaidAmt').value) || 0;
+
+        const stu = students.find(s => s.docId === docId);
+        if(!stu) return;
+
+        const fullRent = stu.rent || 4500;
+        let partials = stu.partialPayments ? { ...stu.partialPayments } : {};
+        let paidMonths = stu.paidMonths ? [...stu.paidMonths] : [];
+
+        if (paidAmt >= fullRent) {
+            // Full Payment
+            if(!paidMonths.includes(mKey)) paidMonths.push(mKey);
+            delete partials[mKey];
+        } else if (paidAmt > 0) {
+            // Partial
+            paidMonths = paidMonths.filter(m => m !== mKey);
+            partials[mKey] = paidAmt;
+        } else {
+            // Reset to unpaid
+            paidMonths = paidMonths.filter(m => m !== mKey);
+            delete partials[mKey];
+        }
+
+        db.collection("students").doc(docId).update({
+            paidMonths: paidMonths,
+            partialPayments: partials,
+            isBlocked: false
+        }).then(() => {
+            closePartialPayModal();
+        });
+    });
+
+    function clearPartialPayment() {
+        const docId = document.getElementById('partDocId').value;
+        const mKey = document.getElementById('partMonthKey').value;
+        const stu = students.find(s => s.docId === docId);
+        if(!stu) return;
+
+        let partials = stu.partialPayments ? { ...stu.partialPayments } : {};
+        let paidMonths = stu.paidMonths ? stu.paidMonths.filter(m => m !== mKey) : [];
+        delete partials[mKey];
+
+        db.collection("students").doc(docId).update({
+            paidMonths: paidMonths,
+            partialPayments: partials
+        }).then(() => {
+            closePartialPayModal();
+        });
+    }
+
     function generateStudentsPDF() {
         if (!students || students.length === 0) {
             alert('ഡൗൺലോഡ് ചെയ്യാൻ വിദ്യാർത്ഥികളുടെ വിവരങ്ങൾ ലഭ്യമല്ല!');
@@ -1639,21 +1964,21 @@
         doc.text(`Generated Date: ${new Date().toLocaleDateString('en-GB')}  |  Total Students: ${sortedList.length}`, 14, 24);
 
         const tableBody = sortedList.map((s, idx) => {
-            const pCount = getStudentPendingMonths(s.joinDate, s.paidMonths || []).length;
+            const fin = calculateStudentFinancials(s);
             return [
                 s.id || (idx + 1).toString(),
                 s.name || '-',
                 s.phone || '-',
                 s.address || '-',
                 `Rs. ${s.rent || 4500}`,
-                pCount > 0 ? `${pCount} M Due` : 'Clear',
+                fin.totalPending > 0 ? `Rs. ${fin.totalPending} Due` : 'Clear',
                 s.isBlocked ? 'Blocked' : 'Active'
             ];
         });
 
         doc.autoTable({
             startY: 32,
-            head: [['ID', 'Name', 'Phone Number', 'Address', 'Rent', 'Due Months', 'Status']],
+            head: [['ID', 'Name', 'Phone Number', 'Address', 'Rent', 'Due Balance', 'Status']],
             body: tableBody,
             theme: 'grid',
             headStyles: {
@@ -1846,8 +2171,12 @@
         const s = students[idx];
         const modalBody = document.getElementById('modalDetailsBody');
         const quickActions = document.getElementById('modalQuickActions');
-        const pendingMonthsList = getStudentPendingMonths(s.joinDate, s.paidMonths || []);
+        const fin = calculateStudentFinancials(s);
         
+        const pendingDetails = fin.pendingMonthsList.map(p => 
+            `${formatMonthKeyML(p.month)}: ₹${p.due} ബാക്കി ${p.isPartial ? `(₹${p.paid} അടച്ചു)` : ''}`
+        ).join('<br>');
+
         modalBody.innerHTML = `
             <div class="detail-row"><span>Student ID</span><b>${s.id}</b></div>
             <div class="detail-row"><span>പേര്</span><b>${s.name}</b></div>
@@ -1855,8 +2184,8 @@
             <div class="detail-row"><span>മേൽവിലാസം</span><b>${s.address || 'N/A'}</b></div>
             <div class="detail-row"><span>പ്രതിമാസ വാടക</span><b>₹${s.rent || 4500}</b></div>
             <div class="detail-row"><span>ജോയിനിംഗ് ഡേറ്റ്</span><b>${s.joinDate || 'N/A'}</b></div>
-            <div class="detail-row"><span>കുടിശ്ശികയുള്ള മാസങ്ങൾ</span><b>${pendingMonthsList.length > 0 ? `<span style="color:var(--danger);">${pendingMonthsList.length} മാസം (${pendingMonthsList.join(', ')})</span>` : '<span style="color:var(--success);">കുടിശ്ശികയില്ല ✓</span>'}</b></div>
-            <div class="detail-row"><span>അടച്ച മാസങ്ങൾ</span><b>${(s.paidMonths || []).join(', ') || 'ഒന്നും അടച്ചിട്ടില്ല'}</b></div>
+            <div class="detail-row"><span>ആകെ കുടിശ്ശിക തുക</span><b>${fin.totalPending > 0 ? `<span style="color:var(--danger);">₹${fin.totalPending}</span>` : '<span style="color:var(--success);">കുടിശ്ശികയില്ല ✓</span>'}</b></div>
+            <div class="detail-row"><span>കുടിശ്ശിക വിവരങ്ങൾ</span><div style="font-size:0.85rem; line-height:1.4;">${pendingDetails || 'ബാക്കിയില്ല'}</div></div>
             <div class="detail-row"><span>അക്കൗണ്ട് നില</span><b>${s.isBlocked ? '<span style="color:var(--danger)">🚫 BLOCKED</span>' : '<span style="color:var(--success)">✅ ACTIVE</span>'}</b></div>
         `;
 
@@ -1879,18 +2208,25 @@
 
     function togglePay(docId, mKey, isChecked) {
         const stu = students.find(s => s.docId === docId);
-        let months = stu.paidMonths || [];
+        if(!stu) return;
+
+        let months = stu.paidMonths ? [...stu.paidMonths] : [];
+        let partials = stu.partialPayments ? { ...stu.partialPayments } : {};
 
         if(isChecked) {
             if(!months.includes(mKey)) months.push(mKey);
+            delete partials[mKey];
             db.collection("students").doc(docId).update({
                 paidMonths: months,
+                partialPayments: partials,
                 isBlocked: false
             });
         } else {
             months = months.filter(m => m !== mKey);
+            delete partials[mKey];
             db.collection("students").doc(docId).update({
-                paidMonths: months
+                paidMonths: months,
+                partialPayments: partials
             });
         }
     }
@@ -1909,12 +2245,11 @@
 
     function exportCSV() {
         const selVal = document.getElementById('selectFinanceMonth').value || getCurMonthKey();
-        let csv = "data:text/csv;charset=utf-8,\uFEFFID,Name,Phone,Address,Rent,Joining Date,Pending Months Count,Paid Months\n";
+        let csv = "data:text/csv;charset=utf-8,\uFEFFID,Name,Phone,Address,Rent,Joining Date,Total Due Amount\n";
         students.forEach(s => {
             const cleanAddr = (s.address || '').replace(/"/g, '""');
-            const paidStr = (s.paidMonths || []).join('; ');
-            const pendingCount = getStudentPendingMonths(s.joinDate, s.paidMonths || []).length;
-            csv += `"${s.id}","${s.name}","${s.phone || ''}","${cleanAddr}","${s.rent || 4500}","${s.joinDate || ''}","${pendingCount} Months","${paidStr}"\n`;
+            const fin = calculateStudentFinancials(s);
+            csv += `"${s.id}","${s.name}","${s.phone || ''}","${cleanAddr}","${s.rent || 4500}","${s.joinDate || ''}","₹${fin.totalPending}"\n`;
         });
         const link = document.createElement("a");
         link.setAttribute("href", encodeURI(csv));
